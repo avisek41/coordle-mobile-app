@@ -6,4 +6,5 @@ export const images = {
   or_sign_banner: require('./Images/sign_banner.png'),
   email_verification_banner: require('./Images/emailVerification.png'),
   resendEmail: require('./Images/Resend.png'),
+  account_created: require('./Images/account_created.png'),
 };

@@ -22,6 +22,10 @@ const AuthStack = () => {
         name={Routes.CreatePassword}
         component={Auth.CreatePassword}
       />
+      <Stack.Screen
+        name={Routes.AccountCreated}
+        component={Auth.AccountCreated}
+      />
     </Stack.Navigator>
   );
 };

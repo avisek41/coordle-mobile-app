@@ -17,7 +17,7 @@ import { useNavigation } from '@react-navigation/native';
 import { AuthNavigationProps } from '@/src/types/allRoutes';
 
 const CreatePassword = () => {
-  const { goBack } = useNavigation<AuthNavigationProps>();
+  const { goBack, navigate } = useNavigation<AuthNavigationProps>();
   const [createPassword, setCreatePassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showCreatePassword, setShowCreatePassword] = useState(false);
@@ -29,7 +29,7 @@ const CreatePassword = () => {
   };
 
   const handleContinue = () => {
-    console.log(createPasswordStrings.continuePressed);
+    navigate('AccountCreated');
   };
 
   const toggleCreatePasswordVisibility = () => {
