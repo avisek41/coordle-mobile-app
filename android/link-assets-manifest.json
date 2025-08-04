@@ -1,0 +1,17 @@
+{
+  "migIndex": 1,
+  "data": [
+    {
+      "path": "src/assets/fonts/AvenirLTProBlack.otf",
+      "sha1": "7b6470876e2d6e0e5e03e6c6ecdc02903d2a3bbc"
+    },
+    {
+      "path": "src/assets/fonts/AvenirLTProMedium.otf",
+      "sha1": "a9226ffd2ddf7f7a3bcb22276ac4fa4a7f9f460d"
+    },
+    {
+      "path": "src/assets/fonts/AvenirLTProRoman.otf",
+      "sha1": "eed794beb4b410ffc851e98eca1f2daca12f621e"
+    }
+  ]
+}
