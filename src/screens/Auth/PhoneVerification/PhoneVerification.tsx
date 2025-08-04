@@ -28,7 +28,7 @@ const PhoneVerification = () => {
   };
 
   const handleContinue = () => {
-    navigate('CreatePassword');
+    navigate('ProfileSetup');
   };
 
   const handleResendCode = () => {

@@ -11,6 +11,7 @@ export type AuthStackParams = {
   CreatePassword: undefined;
   AccountCreated: undefined;
   PhoneVerification: undefined;
+  ProfileSetup: undefined;
 };
 
 export type MainStackParams = {
