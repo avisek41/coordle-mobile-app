@@ -250,7 +250,8 @@ const Welcome = () => {
           disabled={!isAgreementChecked}
           style={{ marginTop: 20, width: '90%', alignSelf: 'center' }}
           onPress={() => {
-            navigate('EmailVerifications');
+            // navigate('EmailVerifications');
+            navigate('PhoneVerification');
           }}
         />
 

@@ -5,4 +5,5 @@ export const Routes = {
   EmailVerifications: 'EmailVerifications',
   CreatePassword: 'CreatePassword',
   AccountCreated: 'AccountCreated',
+  PhoneVerification: 'PhoneVerification',
 } as const;

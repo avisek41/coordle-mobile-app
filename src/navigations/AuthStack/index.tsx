@@ -26,6 +26,10 @@ const AuthStack = () => {
         name={Routes.AccountCreated}
         component={Auth.AccountCreated}
       />
+      <Stack.Screen
+        name={Routes.PhoneVerification}
+        component={Auth.PhoneVerification}
+      />
     </Stack.Navigator>
   );
 };

@@ -10,6 +10,7 @@ export type AuthStackParams = {
   EmailVerifications: undefined;
   CreatePassword: undefined;
   AccountCreated: undefined;
+  PhoneVerification: undefined;
 };
 
 export type MainStackParams = {
