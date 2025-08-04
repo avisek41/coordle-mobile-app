@@ -12,7 +12,7 @@ export const welcomeStrings = {
 
   // Email/Phone input
   emailPhoneLabel: 'Email address or Phone number*',
-  emailPhonePlaceholder: 'Enter your email address',
+  emailPhonePlaceholder: 'Email address',
   orText: 'Or',
   phoneNumberLabel: 'Phone Number',
   phoneNumberPlaceholder: 'Phone Number',
