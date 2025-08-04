@@ -21,18 +21,16 @@ module.exports = {
     extend: {
       colors: {
         primary: {
-          0: 'rgb(var(--color-primary-0)/<alpha-value>)',
-          50: 'rgb(var(--color-primary-50)/<alpha-value>)',
-          100: 'rgb(var(--color-primary-100)/<alpha-value>)',
-          200: 'rgb(var(--color-primary-200)/<alpha-value>)',
-          300: 'rgb(var(--color-primary-300)/<alpha-value>)',
-          400: 'rgb(var(--color-primary-400)/<alpha-value>)',
-          500: 'rgb(var(--color-primary-500)/<alpha-value>)',
-          600: 'rgb(var(--color-primary-600)/<alpha-value>)',
-          700: 'rgb(var(--color-primary-700)/<alpha-value>)',
-          800: 'rgb(var(--color-primary-800)/<alpha-value>)',
-          900: 'rgb(var(--color-primary-900)/<alpha-value>)',
-          950: 'rgb(var(--color-primary-950)/<alpha-value>)',
+          50: '#e0f6f8',
+          100: '#b3e6ed',
+          200: '#80d6e2',
+          300: '#4dc6d7',
+          400: '#26b9ce',
+          500: '#51B1C0', // your main color
+          600: '#2e8c9c',
+          700: '#206874',
+          800: '#12434d',
+          900: '#061f26',
         },
         secondary: {
           0: 'rgb(var(--color-secondary-0)/<alpha-value>)',

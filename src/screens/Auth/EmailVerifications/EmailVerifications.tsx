@@ -13,10 +13,11 @@ import { images } from '@/src/assets';
 import { GradientButton } from '@/src/components';
 import { useNavigation } from '@react-navigation/native';
 import { AuthNavigationProps } from '@/src/types/allRoutes';
+import { emailVerificationStrings } from './strings';
 
 const EmailVerifications = () => {
-  const { goBack } = useNavigation<AuthNavigationProps>();
-  const email = 'kristinwatson@hotmail.com';
+  const { goBack, navigate } = useNavigation<AuthNavigationProps>();
+  const email = emailVerificationStrings.emailAddress;
 
   const handleBackPress = () => {
     // Handle back navigation
@@ -25,12 +26,12 @@ const EmailVerifications = () => {
 
   const handleResendEmail = () => {
     // Handle resend email
-    console.log('Resend email pressed');
+    console.log(emailVerificationStrings.resendEmailPressed);
   };
 
   const handleContinue = () => {
     // Handle continue action
-    console.log('Continue pressed');
+    navigate('CreatePassword');
   };
 
   return (
@@ -56,13 +57,13 @@ const EmailVerifications = () => {
 
           {/* Title */}
           <Text className="text-2xl font-heading text-black text-center mb-4">
-            Check Your Inbox
+            {emailVerificationStrings.title}
           </Text>
 
           {/* Email Message */}
           <VStack className="items-center mb-8">
             <Text className="text-base font-body text-gray-600 text-center mb-2">
-              We've sent a verification email to
+              {emailVerificationStrings.emailSentMessage}
             </Text>
             <Text className="text-base font-body text-blue-500 text-center mb-6">
               {email}
@@ -71,10 +72,10 @@ const EmailVerifications = () => {
             {/* Instructions */}
             <VStack className="items-center space-y-2">
               <Text className="text-sm font-body text-gray-500 text-center">
-                Click link in your email to verify account.
+                {emailVerificationStrings.clickLinkInstruction}
               </Text>
               <Text className="text-sm font-body text-gray-500 text-center">
-                if you can't find the email check your spam folder.
+                {emailVerificationStrings.spamFolderInstruction}
               </Text>
             </VStack>
           </VStack>
@@ -92,7 +93,10 @@ const EmailVerifications = () => {
 
       {/* Continue Button */}
       <Box className="px-6 pb-6">
-        <GradientButton title="Continue" onPress={handleContinue} />
+        <GradientButton
+          title={emailVerificationStrings.continueButton}
+          onPress={handleContinue}
+        />
       </Box>
     </SafeAreaView>
   );

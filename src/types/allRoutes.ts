@@ -8,6 +8,7 @@ export type AuthStackParams = {
   Login: undefined;
   OnBoarding: undefined;
   EmailVerifications: undefined;
+  CreatePassword: undefined;
 };
 
 export type MainStackParams = {

@@ -18,6 +18,10 @@ const AuthStack = () => {
         name={Routes.EmailVerifications}
         component={Auth.EmailVerifications}
       />
+      <Stack.Screen
+        name={Routes.CreatePassword}
+        component={Auth.CreatePassword}
+      />
     </Stack.Navigator>
   );
 };
