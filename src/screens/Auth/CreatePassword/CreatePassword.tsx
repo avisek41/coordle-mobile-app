@@ -1,14 +1,10 @@
 import React, { useState } from 'react';
-import {
-  SafeAreaView,
-  ScrollView,
-  TouchableOpacity,
-  TextInput,
-} from 'react-native';
+import { SafeAreaView, ScrollView, TouchableOpacity } from 'react-native';
 import { Box } from '@/components/ui/box';
 import { Text } from '@/components/ui/text';
 import { VStack } from '@/components/ui/vstack';
 import { HStack } from '@/components/ui/hstack';
+import { Input, InputField } from '@/components/ui/input';
 import { Header } from '@/src/components';
 import { GradientButton } from '@/src/components';
 import { createPasswordStrings } from './strings';
@@ -23,6 +19,7 @@ const CreatePassword = () => {
   const [showCreatePassword, setShowCreatePassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isAgreementChecked, setIsAgreementChecked] = useState(false);
+  const [isExistingUser, setIsExistingUser] = useState(true); // Track if user is existing
 
   const handleBackPress = () => {
     goBack();
@@ -68,23 +65,25 @@ const CreatePassword = () => {
               {createPasswordStrings.createPasswordLabel}
             </Text>
             <Box className="relative mt-2">
-              <TextInput
-                className="rounded-lg px-4 py-3 text-base font-body text-black"
-                placeholder={createPasswordStrings.createPasswordPlaceholder}
-                placeholderTextColor="#9CA3AF"
-                value={createPassword}
-                onChangeText={setCreatePassword}
-                secureTextEntry={!showCreatePassword}
-                autoCapitalize="none"
-                autoCorrect={false}
+              <Input
+                className="bg-gray-50 border border-gray-200 rounded-lg w-full h-12"
                 style={{
-                  paddingLeft: 16,
-                  paddingRight: 50,
-                  backgroundColor: '#FAFAFA',
-                  borderWidth: 1,
-                  borderColor: '#E8ECF4',
+                  opacity: 1,
                 }}
-              />
+              >
+                <InputField
+                  placeholder={createPasswordStrings.createPasswordPlaceholder}
+                  value={createPassword}
+                  onChangeText={setCreatePassword}
+                  secureTextEntry={!showCreatePassword}
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                  className="text-base font-body"
+                  style={{
+                    gap: 1,
+                  }}
+                />
+              </Input>
               <TouchableOpacity
                 onPress={toggleCreatePasswordVisibility}
                 className="absolute right-3 top-3"
@@ -104,23 +103,25 @@ const CreatePassword = () => {
               {createPasswordStrings.confirmPasswordLabel}
             </Text>
             <Box className="relative mt-2">
-              <TextInput
-                className="rounded-lg px-4 py-3 text-base font-body text-black"
-                placeholder={createPasswordStrings.confirmPasswordPlaceholder}
-                placeholderTextColor="#9CA3AF"
-                value={confirmPassword}
-                onChangeText={setConfirmPassword}
-                secureTextEntry={!showConfirmPassword}
-                autoCapitalize="none"
-                autoCorrect={false}
+              <Input
+                className="bg-gray-50 border border-gray-200 rounded-lg w-full h-12"
                 style={{
-                  paddingLeft: 16,
-                  paddingRight: 50,
-                  backgroundColor: '#FAFAFA',
-                  borderWidth: 1,
-                  borderColor: '#E8ECF4',
+                  opacity: 1,
                 }}
-              />
+              >
+                <InputField
+                  placeholder={createPasswordStrings.confirmPasswordPlaceholder}
+                  value={confirmPassword}
+                  onChangeText={setConfirmPassword}
+                  secureTextEntry={!showConfirmPassword}
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                  className="text-base font-body"
+                  style={{
+                    gap: 1,
+                  }}
+                />
+              </Input>
               <TouchableOpacity
                 onPress={toggleConfirmPasswordVisibility}
                 className="absolute right-3 top-3"
@@ -133,6 +134,19 @@ const CreatePassword = () => {
               </TouchableOpacity>
             </Box>
           </VStack>
+
+          {/* Forgot Password Link - Only show for existing users */}
+          {isExistingUser && (
+            <Box className="items-end mb-6">
+              <TouchableOpacity
+                onPress={() => console.log('Forgot Password pressed')}
+              >
+                <Text className="text-red-500 text-sm font-body">
+                  {createPasswordStrings.forgotPassword}
+                </Text>
+              </TouchableOpacity>
+            </Box>
+          )}
 
           {/* Terms and Privacy Checkbox */}
           <HStack space="sm" className="items-start mb-8">

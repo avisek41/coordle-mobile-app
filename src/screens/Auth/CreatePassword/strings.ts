@@ -24,6 +24,9 @@ export const createPasswordStrings = {
   // Buttons
   continueButton: 'Continue',
 
+  // Forgot Password
+  forgotPassword: 'Forgot Password?',
+
   // Console log messages
   continuePressed: 'Continue pressed',
 } as const;

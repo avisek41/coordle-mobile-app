@@ -32,6 +32,9 @@ module.exports = {
           800: '#12434d',
           900: '#061f26',
         },
+        red: {
+          500: '#FF414D',
+        },
         secondary: {
           0: 'rgb(var(--color-secondary-0)/<alpha-value>)',
           50: 'rgb(var(--color-secondary-50)/<alpha-value>)',

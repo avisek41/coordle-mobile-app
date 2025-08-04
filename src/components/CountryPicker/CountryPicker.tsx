@@ -7,13 +7,13 @@ import {
   Platform,
   SafeAreaView,
   StyleSheet,
-  TextInput,
 } from 'react-native';
 import { Box } from '@/components/ui/box';
 import { Text } from '@/components/ui/text';
 import { VStack } from '@/components/ui/vstack';
 import { HStack } from '@/components/ui/hstack';
 import { Pressable } from '@/components/ui/pressable';
+import { Input, InputField } from '@/components/ui/input';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 interface Country {
@@ -92,22 +92,22 @@ const CountryPicker: React.FC<CountryPickerProps> = ({
 
           {/* Search Input */}
           <Box className="p-4">
-            <TextInput
-              className="bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-base font-body"
-              placeholder="Search country..."
-              placeholderTextColor="#9CA3AF"
-              value={searchText}
-              onChangeText={setSearchText}
+            <Input
+              className="bg-gray-50 border border-gray-200 rounded-lg w-full h-12"
               style={{
-                backgroundColor: '#f8f9fa',
-                borderWidth: 1,
-                borderColor: '#E8ECF4',
-                borderRadius: 8,
-                paddingHorizontal: 16,
-                paddingVertical: 12,
-                fontSize: 16,
+                opacity: 1,
               }}
-            />
+            >
+              <InputField
+                placeholder="Search country..."
+                value={searchText}
+                onChangeText={setSearchText}
+                className="text-base font-body"
+                style={{
+                  gap: 1,
+                }}
+              />
+            </Input>
           </Box>
 
           {/* Countries List */}

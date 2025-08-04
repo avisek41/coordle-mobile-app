@@ -4,7 +4,6 @@ import {
   TouchableOpacity,
   StyleSheet,
   Image,
-  TextInput,
   ScrollView,
   SafeAreaView,
 } from 'react-native';
@@ -16,6 +15,7 @@ import { Text } from '@/components/ui/text';
 import { Box } from '@/components/ui/box';
 import { VStack } from '@/components/ui/vstack';
 import { HStack } from '@/components/ui/hstack';
+import { Input, InputField } from '@/components/ui/input';
 import { welcomeStrings } from './strings';
 import { Pressable } from '@/components/ui/pressable';
 import { GradientButton } from '@/src/components';
@@ -32,6 +32,7 @@ const Welcome = () => {
   const [show, setShow] = useState(false);
   const [countryCode, setCountryCode] = useState('+91');
   const [isAgreementChecked, setIsAgreementChecked] = useState(false);
+  const [isExistingUser, setIsExistingUser] = useState(false); // Track if user is existing
 
   const handleGoogleSignIn = () => {
     // Handle Google sign in
@@ -133,22 +134,25 @@ const Welcome = () => {
           </Text>
           <Box className="h-2" />
           <Box className="relative">
-            <TextInput
-              className="rounded-lg px-4 py-3 text-base font-body text-black"
-              placeholder={welcomeStrings.emailPhonePlaceholder}
-              placeholderTextColor="#9CA3AF"
-              value={email}
-              onChangeText={handleEmailChange}
-              keyboardType="email-address"
-              autoCapitalize="none"
-              autoCorrect={false}
+            <Input
+              className="bg-gray-50 border border-gray-200 rounded-lg w-full h-12"
               style={{
-                paddingLeft: 16,
-                backgroundColor: '#FAFAFA',
-                borderWidth: 1,
-                borderColor: '#E8ECF4',
+                opacity: 1,
               }}
-            />
+            >
+              <InputField
+                placeholder={welcomeStrings.emailPhonePlaceholder}
+                value={email}
+                onChangeText={handleEmailChange}
+                keyboardType="email-address"
+                autoCapitalize="none"
+                autoCorrect={false}
+                className="text-base font-body"
+                style={{
+                  gap: 1,
+                }}
+              />
+            </Input>
             {emailValidation && (
               <Text className="text-red-500 text-xs mt-1 font-body">
                 {emailValidation}
@@ -194,21 +198,25 @@ const Welcome = () => {
               {/* Vertical Divider */}
               <Box className="w-[1px] h-6 bg-gray-400" />
               {/* Phone Number Input */}
-              <TextInput
-                className="rounded-lg px-4 py-3 text-base font-body text-black"
-                placeholder={welcomeStrings.phoneNumberLabel}
-                placeholderTextColor="#9CA3AF"
-                value={email}
-                onChangeText={handleEmailChange}
-                keyboardType="number-pad"
-                autoCapitalize="none"
-                autoCorrect={false}
+              <Input
+                className="bg-gray-50 border-0 w-1/2 h-12"
                 style={{
-                  paddingLeft: 16,
-                  backgroundColor: '#FAFAFA',
-                  borderWidth: 0,
+                  opacity: 1,
                 }}
-              />
+              >
+                <InputField
+                  placeholder={welcomeStrings.phoneNumberLabel}
+                  value={phoneNumber}
+                  onChangeText={handlePhoneChange}
+                  keyboardType="number-pad"
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                  className="text-base font-body"
+                  style={{
+                    gap: 1,
+                  }}
+                />
+              </Input>
             </HStack>
             {phoneValidation && (
               <Text className="text-red-500 text-xs mt-1 font-body">
