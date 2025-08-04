@@ -139,7 +139,9 @@ const CreatePassword = () => {
           {isExistingUser && (
             <Box className="items-end mb-6">
               <TouchableOpacity
-                onPress={() => console.log('Forgot Password pressed')}
+                onPress={() => {
+                  navigate('ForgotPassword');
+                }}
               >
                 <Text className="text-red-500 text-sm font-body">
                   {createPasswordStrings.forgotPassword}

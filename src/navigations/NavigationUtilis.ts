@@ -7,4 +7,5 @@ export const Routes = {
   AccountCreated: 'AccountCreated',
   PhoneVerification: 'PhoneVerification',
   ProfileSetup: 'ProfileSetup',
+  ForgotPassword: 'ForgotPassword',
 } as const;

@@ -5,3 +5,4 @@ export { default as CreatePassword } from './CreatePassword/CreatePassword';
 export { default as AccountCreated } from './AccountCreated';
 export { default as PhoneVerification } from './PhoneVerification';
 export { default as ProfileSetup } from './ProfileSetup';
+export { default as ForgotPassword } from './ForgotPassword';

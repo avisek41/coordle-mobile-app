@@ -18,7 +18,7 @@ const Header: React.FC<HeaderProps> = ({
   title,
 }) => {
   return (
-    <HStack className="items-center justify-between px-4 py-3">
+    <HStack className="items-center  px-4 py-3">
       {/* Back Button */}
       {showBackButton && (
         <TouchableOpacity
