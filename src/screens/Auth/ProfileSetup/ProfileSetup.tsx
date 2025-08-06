@@ -27,8 +27,7 @@ const ProfileSetup: React.FC = () => {
     lastName: '',
     preferredName: '',
     phoneNumber: '',
-    pronouns1: '',
-    pronouns2: '',
+    pronouns: '',
     country: '',
     state: '',
     postalCode: '',
@@ -243,8 +242,8 @@ const ProfileSetup: React.FC = () => {
           label={strings.pronouns}
           placeholder={strings.pronounsPlaceholder}
           options={pronounsOptions}
-          value={formData.pronouns1}
-          onValueChange={value => updateFormData('pronouns1', value)}
+          value={formData.pronouns}
+          onValueChange={value => updateFormData('pronouns', value)}
         />
       </VStack>
 
