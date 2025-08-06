@@ -13,7 +13,12 @@ import { Text } from '@/components/ui/text';
 import { VStack } from '@/components/ui/vstack';
 import { HStack } from '@/components/ui/hstack';
 import { Input, InputField } from '@/components/ui/input';
-import { GradientButton, Header, Dropdown } from '@/src/components';
+import {
+  GradientButton,
+  Header,
+  Dropdown,
+  CountryStatePicker,
+} from '@/src/components';
 import { Pressable } from '@/components/ui/pressable';
 import CountryPicker from '@/src/components/CountryPicker/CountryPicker';
 import ProfileSetup2 from './ProfileSetup2';
@@ -43,11 +48,15 @@ const ProfileSetup: React.FC = () => {
   });
 
   const [showCountryPicker, setShowCountryPicker] = useState(false);
+  const [showCountryStatePicker, setShowCountryStatePicker] = useState(false);
+  const [pickerType, setPickerType] = useState<'country' | 'state'>('country');
   const [countryCode, setCountryCode] = useState('+1');
   const [selectedCountry, setSelectedCountry] = useState({
     code: 'US',
     phone: '+1',
   });
+  const [selectedCountryName, setSelectedCountryName] = useState('');
+  const [selectedStateName, setSelectedStateName] = useState('');
   const [isSmsConsentChecked, setIsSmsConsentChecked] = useState(false);
 
   // Static pronouns data
@@ -60,25 +69,28 @@ const ProfileSetup: React.FC = () => {
     { label: 'Prefer not to say', value: 'prefer_not_to_say' },
   ];
 
-  // Static country data
-  const countryOptions = [
-    { label: 'United States', value: 'us' },
-    { label: 'Canada', value: 'ca' },
-    { label: 'United Kingdom', value: 'uk' },
-    { label: 'Australia', value: 'au' },
-    { label: 'Germany', value: 'de' },
-    { label: 'France', value: 'fr' },
-  ];
+  const handleCountryStateSelect = (
+    type: 'country' | 'state',
+    value: string,
+    label: string,
+  ) => {
+    if (type === 'country') {
+      updateFormData('country', value);
+      setSelectedCountryName(label);
+      // Reset state when country changes
+      updateFormData('state', '');
+      setSelectedStateName('');
+    } else if (type === 'state') {
+      updateFormData('state', value);
+      setSelectedStateName(label);
+    }
+    setShowCountryStatePicker(false);
+  };
 
-  // Static state data
-  const stateOptions = [
-    { label: 'California', value: 'ca' },
-    { label: 'New York', value: 'ny' },
-    { label: 'Texas', value: 'tx' },
-    { label: 'Florida', value: 'fl' },
-    { label: 'Illinois', value: 'il' },
-    { label: 'Pennsylvania', value: 'pa' },
-  ];
+  const openCountryStatePicker = (type: 'country' | 'state') => {
+    setPickerType(type);
+    setShowCountryStatePicker(true);
+  };
 
   const handleNext = () => {
     if (currentStep < 2) {
@@ -252,13 +264,17 @@ const ProfileSetup: React.FC = () => {
         <Text className="text-sm font-body text-black mb-1">
           {strings.country}
         </Text>
-        <Dropdown
-          label={strings.country}
-          placeholder={strings.countryPlaceholder}
-          options={countryOptions}
-          value={formData.country}
-          onValueChange={value => updateFormData('country', value)}
-        />
+        <Pressable
+          onPress={() => openCountryStatePicker('country')}
+          className="bg-gray-50 border border-gray-200 rounded-lg h-12 px-4 justify-center"
+        >
+          <HStack className="items-center justify-between">
+            <Text className="text-base font-body text-black">
+              {selectedCountryName || strings.countryPlaceholder}
+            </Text>
+            <Ionicons name="chevron-down" size={16} color="#9CA3AF" />
+          </HStack>
+        </Pressable>
       </VStack>
 
       {/* State */}
@@ -266,13 +282,28 @@ const ProfileSetup: React.FC = () => {
         <Text className="text-sm font-body text-black mb-1">
           {strings.state}
         </Text>
-        <Dropdown
-          label={strings.state}
-          placeholder={strings.statePlaceholder}
-          options={stateOptions}
-          value={formData.state}
-          onValueChange={value => updateFormData('state', value)}
-        />
+        <Pressable
+          onPress={() => openCountryStatePicker('state')}
+          disabled={!formData.country}
+          className={`border border-gray-200 rounded-lg h-12 px-4 justify-center ${
+            formData.country ? 'bg-gray-50' : 'bg-gray-100'
+          }`}
+        >
+          <HStack className="items-center justify-between">
+            <Text
+              className={`text-base font-body ${
+                formData.country ? 'text-black' : 'text-gray-400'
+              }`}
+            >
+              {selectedStateName || strings.statePlaceholder}
+            </Text>
+            <Ionicons
+              name="chevron-down"
+              size={16}
+              color={formData.country ? '#9CA3AF' : '#D1D5DB'}
+            />
+          </HStack>
+        </Pressable>
       </VStack>
 
       {/* Postal Code */}
@@ -390,6 +421,14 @@ const ProfileSetup: React.FC = () => {
           setSelectedCountry({ code: country.code, phone: country.phone });
           setShowCountryPicker(false);
         }}
+      />
+
+      <CountryStatePicker
+        visible={showCountryStatePicker}
+        onClose={() => setShowCountryStatePicker(false)}
+        onSelect={handleCountryStateSelect}
+        type={pickerType}
+        selectedCountry={formData.country}
       />
     </SafeAreaView>
   );
