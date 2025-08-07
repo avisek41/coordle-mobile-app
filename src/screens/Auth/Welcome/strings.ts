@@ -24,6 +24,21 @@ export const welcomeStrings = {
   // Console log messages
   googleSignInPressed: 'Google sign in pressed',
   appleSignInPressed: 'Apple sign in pressed',
+
+  // Toast messages
+  emailRequired: 'Email Required',
+  emailRequiredMessage: 'Please enter your email address',
+  invalidEmail: 'Invalid Email',
+  invalidEmailMessage: 'Please enter a valid email address',
+  emailRequiredToContinue: 'Please enter your email address to continue',
+  error: 'Error',
+  somethingWentWrong: 'Something went wrong. Please try again.',
+  userFound: 'User Found',
+  welcomeBackMessage: 'Welcome back! Please proceed to sign in.',
+  newUser: 'New User',
+  pleaseRegisterMessage: 'Please register with this email',
+  checking: 'Checking...',
+  signIn: 'Sign In',
 } as const;
 
 export type WelcomeStrings = typeof welcomeStrings;

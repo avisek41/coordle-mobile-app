@@ -5,6 +5,7 @@ import {
   StyleSheet,
   ViewStyle,
   TextStyle,
+  ActivityIndicator,
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 
@@ -16,6 +17,7 @@ interface GradientButtonProps {
   style?: ViewStyle;
   textStyle?: TextStyle;
   size?: 'small' | 'medium' | 'large';
+  loading?: boolean;
 }
 
 const GradientButton: React.FC<GradientButtonProps> = ({
@@ -25,12 +27,13 @@ const GradientButton: React.FC<GradientButtonProps> = ({
   colors = ['#2E6F9E', '#51B1C0'],
   style,
   textStyle,
+  loading = false,
 }) => {
   return (
     <TouchableOpacity
       onPress={onPress}
-      disabled={disabled}
-      style={[styles.container, style, { opacity: disabled ? 0.5 : 1 }]}
+      disabled={disabled || loading}
+      style={[styles.container, style, { opacity: disabled || loading ? 0.5 : 1 }]}
       activeOpacity={0.8}
     >
       <LinearGradient
@@ -39,9 +42,13 @@ const GradientButton: React.FC<GradientButtonProps> = ({
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 0 }}
       >
-        <Text className="font-heading" style={[styles.text, textStyle]}>
-          {title}
-        </Text>
+        {loading ? (
+          <ActivityIndicator color="#ffffff" size="small" />
+        ) : (
+          <Text className="font-heading" style={[styles.text, textStyle]}>
+            {title}
+          </Text>
+        )}
       </LinearGradient>
     </TouchableOpacity>
   );

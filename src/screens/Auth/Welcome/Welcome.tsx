@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   TouchableOpacity,
@@ -21,6 +21,8 @@ import { Pressable } from '@/components/ui/pressable';
 import { GradientButton } from '@/src/components';
 import { useNavigation } from '@react-navigation/native';
 import { AuthNavigationProps } from '@/src/types/allRoutes';
+import { useCheckEmailStatusMutation } from '@/src/services/emailCheckApi';
+import { useSimpleToast } from '@/src/hooks/useSimpleToast';
 
 const Welcome = () => {
   const { navigate } = useNavigation<AuthNavigationProps>();
@@ -34,6 +36,13 @@ const Welcome = () => {
   const [isAgreementChecked, setIsAgreementChecked] = useState(false);
   const [isExistingUser, setIsExistingUser] = useState(false); // Track if user is existing
 
+  // Email check mutation and toast
+  const [
+    checkEmailStatus,
+    { isLoading: isCheckingEmail, data: emailData, isSuccess, error, reset },
+  ] = useCheckEmailStatusMutation();
+  const { showToast, ToastComponent } = useSimpleToast();
+
   const handleGoogleSignIn = () => {
     // Handle Google sign in
     console.log(welcomeStrings.googleSignInPressed);
@@ -44,14 +53,78 @@ const Welcome = () => {
     console.log(welcomeStrings.appleSignInPressed);
   };
 
+  const validateEmail = (email: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
   const handleEmailChange = (val: string) => {
     setEmail(val);
-    setEmailValidation('Email');
+    setEmailValidation('');
     setPhoneValidation('');
-    if (val === '') {
-      setEmailValidation('');
+  };
+
+  const handleEmailCheck = async () => {
+    // Reset previous state
+    reset();
+
+    if (!email.trim()) {
+      showToast({
+        type: 'error',
+        title: welcomeStrings.emailRequired,
+        message: welcomeStrings.emailRequiredMessage,
+      });
+      return;
+    }
+
+    if (!validateEmail(email)) {
+      showToast({
+        type: 'error',
+        title: welcomeStrings.invalidEmail,
+        message: welcomeStrings.invalidEmailMessage,
+      });
+      return;
+    }
+
+    try {
+      await checkEmailStatus(email).unwrap();
+    } catch (error: any) {
+      // Let the useEffect handle the error
+      console.error('Email check error:', error);
     }
   };
+
+  // Handle success and data changes
+  useEffect(() => {
+    if (isSuccess && emailData) {
+      console.log('emailData', emailData.data);
+      if (emailData.data.action === 'login') {
+        setIsExistingUser(true);
+        showToast({
+          type: 'success',
+          title: welcomeStrings.userFound,
+          message: welcomeStrings.welcomeBackMessage,
+        });
+        // Navigate to login screen
+        navigate('Login');
+      } else if (emailData.data.action === 'register') {
+        setIsExistingUser(false);
+        showToast({
+          type: 'error',
+          title: 'Error',
+          message: emailData.message || welcomeStrings.pleaseRegisterMessage,
+        });
+        // Don't navigate, just show the message
+      } else if (emailData.data.action === 'verify_email') {
+        showToast({
+          type: 'error',
+          title: 'Error',
+          message: emailData.message || welcomeStrings.pleaseRegisterMessage,
+        });
+      }
+      navigate('EmailVerifications');
+    }
+  }, [isSuccess, emailData]);
 
   const handlePhoneChange = (val: string) => {
     // Only allow digits
@@ -61,6 +134,19 @@ const Welcome = () => {
     setEmailValidation('');
     if (numericValue === '') {
       setPhoneValidation('');
+    }
+  };
+
+  const handleSignInPress = () => {
+    if (email.trim()) {
+      handleEmailCheck();
+    } else {
+      console.log('Showing toast for empty email');
+      showToast({
+        type: 'error',
+        title: welcomeStrings.emailRequired,
+        message: welcomeStrings.emailRequiredToContinue,
+      });
     }
   };
 
@@ -246,13 +332,11 @@ const Welcome = () => {
           </HStack>
         </VStack>
         <GradientButton
-          title="Sign In"
+          title={welcomeStrings.signIn}
           disabled={!isAgreementChecked}
+          loading={isCheckingEmail}
           style={{ marginTop: 20, width: '90%', alignSelf: 'center' }}
-          onPress={() => {
-            // navigate('EmailVerifications');
-            navigate('ProfileSetup');
-          }}
+          onPress={handleSignInPress}
         />
 
         {/* Gradient Bar Image */}
@@ -266,6 +350,7 @@ const Welcome = () => {
           setShow(false);
         }}
       />
+      <ToastComponent />
     </SafeAreaView>
   );
 };
