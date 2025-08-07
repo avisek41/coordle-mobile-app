@@ -1,5 +1,5 @@
+import { Text } from '@/components/ui/text';
 import React from 'react';
-import { Text } from 'react-native';
 
 type TabLabelProps = {
   focused: boolean;
@@ -10,9 +10,10 @@ type TabLabelProps = {
 export default ({ color, focused, text }: TabLabelProps) => {
   return (
     <Text
+      className={`text-sm ${focused ? 'font-heading' : 'font-body'}`}
       style={{
         fontSize: 12,
-        fontWeight: focused ? 'bold' : 'normal',
+
         color: color,
       }}
     >

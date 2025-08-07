@@ -23,9 +23,18 @@ import { Pressable } from '@/components/ui/pressable';
 import CountryPicker from '@/src/components/CountryPicker/CountryPicker';
 import ProfileSetup2 from './ProfileSetup2';
 import { strings } from './strings';
+import {
+  useSetupProfileMutation,
+  useGetProfileOptionsQuery,
+} from '@/src/services';
+import { useSimpleToast } from '@/src/hooks/useSimpleToast';
+import { Loader } from '@/src/components';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import { AuthNavigationProps } from '@/src/types/allRoutes';
+import { useNavigation } from '@react-navigation/native';
 
 const ProfileSetup: React.FC = () => {
+  const { navigate } = useNavigation<AuthNavigationProps>();
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState({
     firstName: '',
@@ -44,7 +53,9 @@ const ProfileSetup: React.FC = () => {
     dietaryRestrictions: '',
     genderIdentity: '',
     sexualOrientation: false,
+    sexualOrientationValue: '',
     disabilityStatus: false,
+    disabilityStatusValue: '',
   });
 
   const [showCountryPicker, setShowCountryPicker] = useState(false);
@@ -59,15 +70,17 @@ const ProfileSetup: React.FC = () => {
   const [selectedStateName, setSelectedStateName] = useState('');
   const [isSmsConsentChecked, setIsSmsConsentChecked] = useState(false);
 
-  // Static pronouns data
-  const pronounsOptions = [
-    { label: 'He/Him', value: 'he_him' },
-    { label: 'She/Her', value: 'she_her' },
-    { label: 'They/Them', value: 'they_them' },
-    { label: 'He/They', value: 'he_they' },
-    { label: 'She/They', value: 'she_they' },
-    { label: 'Prefer not to say', value: 'prefer_not_to_say' },
-  ];
+  const [setupProfile, { isLoading }] = useSetupProfileMutation();
+  const { showToast, ToastComponent } = useSimpleToast();
+  const { data: profileOptions, isLoading: isLoadingOptions } =
+    useGetProfileOptionsQuery();
+
+  // Convert API data to dropdown options format
+  const pronounsOptions =
+    profileOptions?.data?.pronouns?.map(pronoun => ({
+      label: pronoun,
+      value: pronoun.toLowerCase().replace(/\s+/g, '_'),
+    })) || [];
 
   const handleCountryStateSelect = (
     type: 'country' | 'state',
@@ -100,8 +113,76 @@ const ProfileSetup: React.FC = () => {
     }
   };
 
-  const handleProfileSetup2Next = () => {
-    Alert.alert('Success', 'Profile setup completed!');
+  const handleProfileSetup2Next = async () => {
+    try {
+      // Prepare the API request data with static data
+      const profileData = {
+        firstName: 'Avisek',
+        lastName: 'Sahoo',
+        preferredName: 'Avi12',
+        phoneNumber: '+917064802080',
+        pronouns: 'he/him',
+        country: 'IN',
+        state: 'OR',
+        postalCode: '7800032',
+        preferredAirport: 'Ahemdbad',
+        racialEthnic: 'asian',
+        ageDemographic: '25-34',
+        foodAllergies: ['all_seafood_(including_shellfish)', 'dairy'],
+        dietaryRestrictions: 'vegetarian',
+        genderIdentity: 'man',
+        sexualOrientation: 'straight',
+        disabilityStatus: 'no_disability',
+      };
+
+      // const profileData = {
+      //   firstName: formData.firstName,
+      //   lastName: formData.lastName,
+      //   preferredName: formData.preferredName,
+      //   phoneNumber: `${countryCode}${formData.phoneNumber}`,
+      //   pronouns: formData.pronouns,
+      //   country: formData.country,
+      //   state: formData.state,
+      //   postalCode: formData.postalCode,
+      //   preferredAirport: formData.preferredAirport,
+      //   racialEthnic: formData.racialEthnic,
+      //   ageDemographic: formData.ageDemographic,
+      //   foodAllergies: Array.isArray(formData.foodAllergies)
+      //     ? formData.foodAllergies
+      //     : [formData.foodAllergies],
+      //   dietaryRestrictions: formData.dietaryRestrictions,
+      //   genderIdentity: formData.genderIdentity,
+      //   sexualOrientation: formData.sexualOrientation
+      //     ? formData.sexualOrientationValue || 'Straight'
+      //     : 'Prefer not to say',
+      //   disabilityStatus: formData.disabilityStatus
+      //     ? formData.disabilityStatusValue || 'No disability'
+      //     : 'No disability',
+      // };
+
+      const response = await setupProfile(profileData).unwrap();
+
+      if (response.success) {
+        showToast({
+          type: 'success',
+          title: strings.profileSetupSuccessTitle,
+          message: strings.profileSetupSuccessMessage,
+          duration: 3000,
+        });
+
+        navigate('AccountCreated');
+        // TODO: Navigate to main app or next screen
+        // You can add navigation logic here
+      }
+    } catch (error) {
+      console.error('Profile setup failed:', error);
+      showToast({
+        type: 'error',
+        title: strings.profileSetupErrorTitle,
+        message: strings.profileSetupErrorMessage,
+        duration: 3000,
+      });
+    }
   };
 
   const handleBack = () => {
@@ -378,8 +459,16 @@ const ProfileSetup: React.FC = () => {
     }
   };
 
+  // Show loader when API is loading
+  if (isLoadingOptions) {
+    return <Loader />;
+  }
+
   return (
     <SafeAreaView className="flex-1 bg-white">
+      {/* Toast Component */}
+      <ToastComponent />
+
       <ScrollView className="flex-1" contentContainerStyle={{ flexGrow: 1 }}>
         <VStack className="flex-1 px-6 py-8">
           {/* Header */}
@@ -409,7 +498,12 @@ const ProfileSetup: React.FC = () => {
           <Box className="flex-1">{renderCurrentStep()}</Box>
 
           {/* Next Button */}
-          <GradientButton title={strings.nextButton} onPress={handleNext} />
+          <GradientButton
+            title={strings.nextButton}
+            onPress={handleNext}
+            loading={isLoading}
+            disabled={isLoading}
+          />
         </VStack>
       </ScrollView>
 

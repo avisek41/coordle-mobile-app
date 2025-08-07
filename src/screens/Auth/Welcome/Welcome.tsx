@@ -66,7 +66,6 @@ const Welcome = () => {
 
   const handleEmailCheck = async () => {
     // Reset previous state
-    reset();
 
     if (!email.trim()) {
       showToast({
@@ -91,12 +90,14 @@ const Welcome = () => {
     } catch (error: any) {
       // Let the useEffect handle the error
       console.error('Email check error:', error);
+    } finally {
+      reset();
     }
   };
 
   // Handle success and data changes
   useEffect(() => {
-    if (isSuccess && emailData) {
+    if (isSuccess && emailData?.data?.action?.length > 0) {
       console.log('emailData', emailData.data);
       if (emailData.data.action === 'login') {
         setIsExistingUser(true);
@@ -121,10 +122,12 @@ const Welcome = () => {
           title: 'Error',
           message: emailData.message || welcomeStrings.pleaseRegisterMessage,
         });
+        navigate('EmailVerifications', {
+          email: email,
+        });
       }
-      navigate('EmailVerifications');
     }
-  }, [isSuccess, emailData]);
+  }, [isSuccess, emailData?.data?.action]);
 
   const handlePhoneChange = (val: string) => {
     // Only allow digits

@@ -10,21 +10,84 @@ import { GradientButton } from '@/src/components';
 import { loginStrings } from './strings';
 import { useNavigation } from '@react-navigation/native';
 import { AuthNavigationProps } from '@/src/types/allRoutes';
+import { useLoginMutation } from '@/src/services';
+import { useSimpleToast } from '@/src/hooks/useSimpleToast';
+import { Loader } from '@/src/components';
+import { setItem } from '@/src/utils';
+import { setCredentials } from '@/src/features';
+import { useDispatch } from 'react-redux';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import { useBasicFunctions } from '@/src/hooks';
 
 const Login: React.FC = () => {
   const { goBack, navigate } = useNavigation<AuthNavigationProps>();
-  const [email, setEmail] = useState('kristinwatson@hotmail.com');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const { handleLogin } = useBasicFunctions();
+  const [login, { isLoading }] = useLoginMutation();
+  const { showToast, ToastComponent } = useSimpleToast();
+  const dispatch = useDispatch();
 
   const handleBackPress = () => {
     goBack();
   };
 
-  const handleContinue = () => {
-    // Handle login logic here
-    console.log('Login attempt with:', email, password);
+  const handleContinue = async () => {
+    // Validate inputs
+    if (!email || !password) {
+      showToast({
+        type: 'error',
+        title: loginStrings.loginErrorTitle,
+        message: 'Please fill in all fields.',
+        duration: 3000,
+      });
+      return;
+    }
+
+    try {
+      const response = await login({
+        email,
+        password,
+        loginMethod: 'email',
+      }).unwrap();
+
+      if (response.success) {
+        // Store the access token
+        const accessToken = response.data.token;
+        if (accessToken) {
+          // Store token in Redux store
+          dispatch(setCredentials({ token: accessToken }));
+          // Store token in local storage
+          setItem('accessToken', accessToken);
+          setItem('isLoggedIn', 'true');
+        }
+
+        // Check if profile setup is required
+        if (response?.data?.isProfileSetup) {
+          // Profile is already set up, show success message
+          handleLogin();
+          // TODO: Navigate to main app or handle authenticated state
+        } else {
+          // Profile setup is required, navigate to ProfileSetup
+          showToast({
+            type: 'info',
+            title: loginStrings.profileSetupRequiredTitle,
+            message: loginStrings.profileSetupRequiredMessage,
+            duration: 3000,
+          });
+          navigate('ProfileSetup');
+        }
+      }
+    } catch (error) {
+      console.error('Login failed:', error);
+      showToast({
+        type: 'error',
+        title: loginStrings.loginErrorTitle,
+        message: loginStrings.loginErrorMessage,
+        duration: 3000,
+      });
+    }
   };
 
   const handleForgotPassword = () => {
@@ -35,8 +98,16 @@ const Login: React.FC = () => {
     setShowPassword(!showPassword);
   };
 
+  // Show loader when API is loading
+  if (isLoading) {
+    return <Loader />;
+  }
+
   return (
     <SafeAreaView className="flex-1 bg-white">
+      {/* Toast Component */}
+      <ToastComponent />
+
       <ScrollView className="flex-1" contentContainerStyle={{ flexGrow: 1 }}>
         {/* Header */}
         <Header onBackPress={handleBackPress} showBackButton={true} />
@@ -130,6 +201,7 @@ const Login: React.FC = () => {
           <GradientButton
             title={loginStrings.continueButton}
             onPress={handleContinue}
+            loading={isLoading}
           />
         </VStack>
       </ScrollView>

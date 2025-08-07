@@ -1,8 +1,10 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-
+import Icon from 'react-native-vector-icons/Ionicons';
+import MIcon from 'react-native-vector-icons/MaterialIcons';
 import { Home } from '../screens/Main';
 import { TabLabel } from '../components';
+import { Colors } from '../configs/CustomTheme';
 
 export type BottomTabParams = {
   Home: undefined;
@@ -26,7 +28,7 @@ export default () => {
           paddingBottom: 6,
           height: 60,
         },
-        tabBarActiveTintColor: '#ec7500',
+        tabBarActiveTintColor: Colors.primary,
         tabBarInactiveTintColor: '#666',
       }}
     >
@@ -34,7 +36,9 @@ export default () => {
         name="Home"
         component={Home}
         options={{
-          tabBarIcon: ({ color, focused }) => <></>,
+          tabBarIcon: ({ color, focused }) => (
+            <Icon name="home" color={color} size={24} />
+          ),
           tabBarLabel: ({ color, focused }) => (
             <TabLabel color={color} focused={focused} text="Home" />
           ),
@@ -50,7 +54,9 @@ export default () => {
         name="MyTrips"
         component={Home}
         options={{
-          tabBarIcon: ({ color, focused }) => <></>,
+          tabBarIcon: ({ color, focused }) => (
+            <Icon name="bag-sharp" color={color} size={24} />
+          ),
           tabBarLabel: ({ color, focused }) => (
             <TabLabel color={color} focused={focused} text="My Trips" />
           ),
@@ -60,7 +66,11 @@ export default () => {
         name="Team"
         component={Home}
         options={{
-          tabBarIcon: ({ color, focused }) => <></>,
+          tabBarIcon: ({ color, focused }) => (
+            <>
+              <MIcon name="group" color={color} size={30} />
+            </>
+          ),
           tabBarLabel: ({ color, focused }) => (
             <TabLabel color={color} focused={focused} text="Team" />
           ),
@@ -70,7 +80,9 @@ export default () => {
         name="Chat"
         component={Home}
         options={{
-          tabBarIcon: ({ color, focused }) => <></>,
+          tabBarIcon: ({ color, focused }) => (
+            <Icon name="chatbox-ellipses" color={color} size={24} />
+          ),
           tabBarLabel: ({ color, focused }) => (
             <TabLabel color={color} focused={focused} text="Chat" />
           ),
@@ -80,7 +92,9 @@ export default () => {
         name="Profile"
         component={Home}
         options={{
-          tabBarIcon: ({ color, focused }) => <></>,
+          tabBarIcon: ({ color, focused }) => (
+            <Icon name="person" color={color} size={24} />
+          ),
           tabBarLabel: ({ color, focused }) => (
             <TabLabel color={color} focused={focused} text="Profile" />
           ),

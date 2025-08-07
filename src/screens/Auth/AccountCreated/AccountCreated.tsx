@@ -11,16 +11,14 @@ import { useNavigation } from '@react-navigation/native';
 import { AuthNavigationProps } from '@/src/types/allRoutes';
 
 const AccountCreated = () => {
-  const { goBack } = useNavigation<AuthNavigationProps>();
+  const { goBack, navigate } = useNavigation<AuthNavigationProps>();
 
   const handleBackPress = () => {
     goBack();
   };
 
   const handleBackToSignIn = () => {
-    console.log(accountCreatedStrings.backToSignInPressed);
-    // Navigate back to sign in or home screen
-    goBack();
+    navigate('Login');
   };
 
   return (

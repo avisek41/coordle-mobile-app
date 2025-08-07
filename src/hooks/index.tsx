@@ -9,3 +9,4 @@ export const useAppDispatch = () => useDispatch<AppDispatch>();
 export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;
 
 export { useSimpleToast } from './useSimpleToast';
+export { default as useBasicFunctions } from './useBasicFunction';

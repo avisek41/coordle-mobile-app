@@ -21,4 +21,10 @@ export const strings = {
   preferredAirport: 'Preferred airport*',
   preferredAirportPlaceholder: 'Enter preferred airport',
   nextButton: 'Next',
+
+  // Toast messages
+  profileSetupSuccessTitle: 'Success',
+  profileSetupSuccessMessage: 'Profile setup completed successfully!',
+  profileSetupErrorTitle: 'Error',
+  profileSetupErrorMessage: 'Failed to setup profile. Please try again.',
 } as const;

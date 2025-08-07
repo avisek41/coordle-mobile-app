@@ -5,6 +5,7 @@ import { Text } from '@/components/ui/text';
 import { VStack } from '@/components/ui/vstack';
 import { HStack } from '@/components/ui/hstack';
 import { Dropdown } from '@/src/components';
+import { useGetProfileOptionsQuery } from '@/src/services';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 interface ProfileSetup2Props {
@@ -18,56 +19,50 @@ const ProfileSetup2: React.FC<ProfileSetup2Props> = ({
   updateFormData,
   onNext,
 }) => {
-  // Static options data
-  const racialEthnicOptions = [
-    { label: 'Asian', value: 'asian' },
-    { label: 'Black or African American', value: 'black' },
-    { label: 'Hispanic or Latino', value: 'hispanic' },
-    { label: 'Native American', value: 'native_american' },
-    { label: 'Pacific Islander', value: 'pacific_islander' },
-    { label: 'White', value: 'white' },
-    { label: 'Multiracial', value: 'multiracial' },
-    { label: 'Other', value: 'other' },
-    { label: 'Prefer not to say', value: 'prefer_not_to_say' },
-  ];
+  const { data: profileOptions } = useGetProfileOptionsQuery();
 
-  const ageDemographicOptions = [
-    { label: '18-24', value: '18-24' },
-    { label: '25-34', value: '25-34' },
-    { label: '35-44', value: '35-44' },
-    { label: '45-54', value: '45-54' },
-    { label: '55-64', value: '55-64' },
-    { label: '65+', value: '65+' },
-    { label: 'Prefer not to say', value: 'prefer_not_to_say' },
-  ];
+  // Convert API data to dropdown options format
+  const racialEthnicOptions =
+    profileOptions?.data?.racialEthnic?.map(option => ({
+      label: option,
+      value: option.toLowerCase().replace(/\s+/g, '_'),
+    })) || [];
 
-  const foodAllergiesOptions = [
-    { label: 'All seafood (including shellfish)', value: 'seafood' },
-    { label: 'Dairy', value: 'dairy' },
-    { label: 'Gluten', value: 'gluten' },
-    { label: 'Tree Nuts', value: 'tree_nuts' },
-    { label: 'Peanuts', value: 'peanuts' },
-    { label: 'No Allergy', value: 'no_allergy' },
-    { label: 'Other', value: 'other' },
-  ];
+  const ageDemographicOptions =
+    profileOptions?.data?.ageDemographic?.map(option => ({
+      label: option,
+      value: option,
+    })) || [];
 
-  const dietaryRestrictionsOptions = [
-    { label: 'Vegetarian', value: 'vegetarian' },
-    { label: 'Vegan', value: 'vegan' },
-    { label: 'Kosher', value: 'kosher' },
-    { label: 'Halal', value: 'halal' },
-    { label: 'No Restrictions', value: 'no_restrictions' },
-    { label: 'Other', value: 'other' },
-  ];
+  const foodAllergiesOptions =
+    profileOptions?.data?.foodAllergies?.map(option => ({
+      label: option,
+      value: option.toLowerCase().replace(/\s+/g, '_'),
+    })) || [];
 
-  const genderIdentityOptions = [
-    { label: 'Male', value: 'male' },
-    { label: 'Female', value: 'female' },
-    { label: 'Non-binary', value: 'non_binary' },
-    { label: 'Gender fluid', value: 'gender_fluid' },
-    { label: 'Other', value: 'other' },
-    { label: 'Prefer not to say', value: 'prefer_not_to_say' },
-  ];
+  const dietaryRestrictionsOptions =
+    profileOptions?.data?.dietaryRestrictions?.map(option => ({
+      label: option,
+      value: option.toLowerCase().replace(/\s+/g, '_'),
+    })) || [];
+
+  const genderIdentityOptions =
+    profileOptions?.data?.genderIdentity?.map(option => ({
+      label: option,
+      value: option.toLowerCase().replace(/\s+/g, '_'),
+    })) || [];
+
+  const sexualOrientationOptions =
+    profileOptions?.data?.sexualOrientation?.map(option => ({
+      label: option,
+      value: option.toLowerCase().replace(/\s+/g, '_'),
+    })) || [];
+
+  const disabilityStatusOptions =
+    profileOptions?.data?.disabilityStatus?.map(option => ({
+      label: option,
+      value: option.toLowerCase().replace(/\s+/g, '_'),
+    })) || [];
 
   return (
     <VStack className="space-y-4">
@@ -159,12 +154,14 @@ const ProfileSetup2: React.FC<ProfileSetup2Props> = ({
               Sexual orientation
             </Text>
             <TouchableOpacity
-              onPress={() =>
-                updateFormData(
-                  'sexualOrientation',
-                  !formData.sexualOrientation ? 'true' : 'false',
-                )
-              }
+              onPress={() => {
+                const newValue = !formData.sexualOrientation;
+                updateFormData('sexualOrientation', newValue);
+                // Clear the selected value when toggle is turned off
+                if (!newValue) {
+                  updateFormData('sexualOrientationValue', '');
+                }
+              }}
               className={`w-12 h-6 rounded-full flex-row items-center ${
                 formData.sexualOrientation ? 'bg-primary-500' : 'bg-gray-300'
               }`}
@@ -177,6 +174,36 @@ const ProfileSetup2: React.FC<ProfileSetup2Props> = ({
             </TouchableOpacity>
           </HStack>
         </Box>
+
+        {/* Sexual Orientation Options */}
+        {formData.sexualOrientation && (
+          <VStack className="space-y-2 mt-2">
+            {sexualOrientationOptions.map((option, index) => (
+              <TouchableOpacity
+                key={index}
+                onPress={() =>
+                  updateFormData('sexualOrientationValue', option.value)
+                }
+                className="flex-row items-center justify-between py-2"
+              >
+                <Text className="text-sm font-body text-black flex-1">
+                  {option.label}
+                </Text>
+                <Box
+                  className={`w-5 h-5 rounded-full border-2 items-center justify-center ${
+                    formData.sexualOrientationValue === option.value
+                      ? 'border-primary-500 bg-primary-500'
+                      : 'border-gray-300'
+                  }`}
+                >
+                  {formData.sexualOrientationValue === option.value && (
+                    <Box className="w-2 h-2 rounded-full bg-white" />
+                  )}
+                </Box>
+              </TouchableOpacity>
+            ))}
+          </VStack>
+        )}
       </VStack>
 
       {/* Disability Status Toggle */}
@@ -187,12 +214,14 @@ const ProfileSetup2: React.FC<ProfileSetup2Props> = ({
               Disability status
             </Text>
             <TouchableOpacity
-              onPress={() =>
-                updateFormData(
-                  'disabilityStatus',
-                  !formData.disabilityStatus ? 'true' : 'false',
-                )
-              }
+              onPress={() => {
+                const newValue = !formData.disabilityStatus;
+                updateFormData('disabilityStatus', newValue);
+                // Clear the selected value when toggle is turned off
+                if (!newValue) {
+                  updateFormData('disabilityStatusValue', '');
+                }
+              }}
               className={`w-12 h-6 rounded-full flex-row items-center ${
                 formData.disabilityStatus ? 'bg-primary-500' : 'bg-gray-300'
               }`}
@@ -205,6 +234,36 @@ const ProfileSetup2: React.FC<ProfileSetup2Props> = ({
             </TouchableOpacity>
           </HStack>
         </Box>
+
+        {/* Disability Status Options */}
+        {formData.disabilityStatus && (
+          <VStack className="space-y-2 mt-2">
+            {disabilityStatusOptions.map((option, index) => (
+              <TouchableOpacity
+                key={index}
+                onPress={() =>
+                  updateFormData('disabilityStatusValue', option.value)
+                }
+                className="flex-row items-center justify-between py-2"
+              >
+                <Text className="text-sm font-body text-black flex-1">
+                  {option.label}
+                </Text>
+                <Box
+                  className={`w-5 h-5 rounded-full border-2 items-center justify-center ${
+                    formData.disabilityStatusValue === option.value
+                      ? 'border-primary-500 bg-primary-500'
+                      : 'border-gray-300'
+                  }`}
+                >
+                  {formData.disabilityStatusValue === option.value && (
+                    <Box className="w-2 h-2 rounded-full bg-white" />
+                  )}
+                </Box>
+              </TouchableOpacity>
+            ))}
+          </VStack>
+        )}
       </VStack>
     </VStack>
   );

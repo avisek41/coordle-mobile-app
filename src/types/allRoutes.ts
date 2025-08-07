@@ -7,7 +7,9 @@ export type AuthStackParams = {
   Welcome: undefined;
   Login: undefined;
   OnBoarding: undefined;
-  EmailVerifications: undefined;
+  EmailVerifications: {
+    email: string;
+  };
   CreatePassword: undefined;
   AccountCreated: undefined;
   PhoneVerification: undefined;
