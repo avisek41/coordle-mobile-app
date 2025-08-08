@@ -5,4 +5,23 @@ export const profileStrings = {
   privacy: 'Privacy & Security',
   help: 'Help & Support',
   logout: 'Logout',
+  // ProfileCard strings
+  accountType: 'Account type :',
+  preferredName: 'Preferred name',
+  pronouns: 'Pronouns',
+  email: 'Email',
+  phoneNumber: 'Phone Number',
+  address: 'Address',
+  preferredAirport: 'Preferred airport',
+  notSet: 'Not set',
+  viewMore: 'View more',
+  // ProfileSettings strings
+  yourDocuments: 'Your documents',
+  documentsSubtitle: 'Keep everything organized for your trip',
+  settings: 'Settings',
+  settingsSubtitle: 'Manage notifications, Change password',
+  coordle: 'Coordle',
+  about: 'About',
+  signOut: 'Sign Out',
+  deleteAccount: 'Delete Account',
 } as const;

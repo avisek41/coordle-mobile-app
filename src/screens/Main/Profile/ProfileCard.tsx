@@ -52,7 +52,7 @@ const ProfileCard: React.FC = () => {
               {userName}
             </GluestackText>
             <GluestackText className="text-sm text-gray-500">
-              Account type :
+              {profileStrings.accountType}
             </GluestackText>
           </VStack>
         </Box>
@@ -61,37 +61,37 @@ const ProfileCard: React.FC = () => {
         <VStack space="lg">
           <ProfileItem
             icon="person-outline"
-            label="Preferred name"
-            value={userData?.preferredName || 'Not set'}
+            label={profileStrings.preferredName}
+            value={userData?.preferredName || profileStrings.notSet}
           />
           <ProfileItem
             icon="male-female-outline"
-            label="Pronouns"
-            value={userData?.pronouns || 'Not set'}
+            label={profileStrings.pronouns}
+            value={userData?.pronouns || profileStrings.notSet}
           />
           <ProfileItem
             icon="mail-outline"
-            label="Email"
-            value={userData?.email || 'Not set'}
+            label={profileStrings.email}
+            value={userData?.email || profileStrings.notSet}
           />
           <ProfileItem
             icon="call-outline"
-            label="Phone Number"
-            value={userData?.phoneNumber || 'Not set'}
+            label={profileStrings.phoneNumber}
+            value={userData?.phoneNumber || profileStrings.notSet}
           />
           <ProfileItem
             icon="home-outline"
-            label="Address"
+            label={profileStrings.address}
             value={
               `${userData?.country || ''} ${userData?.state || ''} ${
                 userData?.postalCode || ''
-              }`.trim() || 'Not set'
+              }`.trim() || profileStrings.notSet
             }
           />
           <ProfileItem
             icon="airplane-outline"
-            label="Preferred airport"
-            value={userData?.preferredAirport || 'Not set'}
+            label={profileStrings.preferredAirport}
+            value={userData?.preferredAirport || profileStrings.notSet}
           />
         </VStack>
 
@@ -99,7 +99,7 @@ const ProfileCard: React.FC = () => {
         <TouchableOpacity>
           <HStack className="justify-center items-center" space="sm">
             <GluestackText className="text-lg font-body text-primary-500">
-              View more
+              {profileStrings.viewMore}
             </GluestackText>
             <Ionicons name="chevron-forward" size={20} color="#51B1C0" />
           </HStack>

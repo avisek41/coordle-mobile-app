@@ -6,6 +6,7 @@ import { VStack } from '@/components/ui/vstack';
 import { HStack } from '@/components/ui/hstack';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { Colors } from '@/src/configs/CustomTheme';
+import { profileStrings } from './strings';
 
 const ProfileSettings: React.FC = () => {
   return (
@@ -19,10 +20,10 @@ const ProfileSettings: React.FC = () => {
             </Box>
             <VStack className="flex-1" space="xs">
               <GluestackText className="text-lg font-heading text-gray-800">
-                Your documents
+                {profileStrings.yourDocuments}
               </GluestackText>
               <GluestackText className="text-sm text-gray-500">
-                Keep everything organized for your trip
+                {profileStrings.documentsSubtitle}
               </GluestackText>
             </VStack>
             <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
@@ -39,10 +40,10 @@ const ProfileSettings: React.FC = () => {
             </Box>
             <VStack className="flex-1" space="xs">
               <GluestackText className="text-lg font-heading text-gray-800">
-                Settings
+                {profileStrings.settings}
               </GluestackText>
               <GluestackText className="text-sm text-gray-500">
-                Manage notifications, Change password
+                {profileStrings.settingsSubtitle}
               </GluestackText>
             </VStack>
             <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
@@ -56,7 +57,7 @@ const ProfileSettings: React.FC = () => {
           className="text-2xl font-heading"
           style={{ color: Colors.secondary }}
         >
-          Coordle
+          {profileStrings.coordle}
         </GluestackText>
       </Box>
 
@@ -72,7 +73,7 @@ const ProfileSettings: React.FC = () => {
               />
             </Box>
             <GluestackText className="flex-1 text-lg font-body text-gray-800">
-              About
+              {profileStrings.about}
             </GluestackText>
             <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
           </HStack>
@@ -84,7 +85,7 @@ const ProfileSettings: React.FC = () => {
               <Ionicons name="log-out-outline" size={20} color="#6B7280" />
             </Box>
             <GluestackText className="flex-1 text-lg font-body text-gray-800">
-              Sign Out
+              {profileStrings.signOut}
             </GluestackText>
             <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
           </HStack>
@@ -100,7 +101,7 @@ const ProfileSettings: React.FC = () => {
               />
             </Box>
             <GluestackText className="flex-1 text-lg font-body text-gray-800">
-              Delete Account
+              {profileStrings.deleteAccount}
             </GluestackText>
             <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
           </HStack>
