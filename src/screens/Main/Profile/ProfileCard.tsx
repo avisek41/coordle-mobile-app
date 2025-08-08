@@ -9,9 +9,19 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import LinearGradient from 'react-native-linear-gradient';
 import { useGetCurrentUserProfileQuery } from '@/src/services';
 import { Loader } from '@/src/components';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { MainStackParams } from '@/src/types/allRoutes';
 import { profileStrings } from './strings';
 
+type ProfileNavigationProp = NativeStackNavigationProp<
+  MainStackParams,
+  'ProfileOtherInfo'
+>;
+
 const ProfileCard: React.FC = () => {
+  const navigation = useNavigation<ProfileNavigationProp>();
+
   const {
     data: userProfile,
     isLoading,
@@ -96,7 +106,9 @@ const ProfileCard: React.FC = () => {
         </VStack>
 
         {/* View More Button */}
-        <TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => navigation.navigate('ProfileOtherInfo')}
+        >
           <HStack className="justify-center items-center" space="sm">
             <GluestackText className="text-lg font-body text-primary-500">
               {profileStrings.viewMore}

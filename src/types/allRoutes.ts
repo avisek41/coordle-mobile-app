@@ -22,6 +22,7 @@ export type AuthStackParams = {
 
 export type MainStackParams = {
   BottomTabs: undefined;
+  ProfileOtherInfo: undefined;
 };
 
 export type MainNavigationProps = NativeStackNavigationProp<MainStackParams>;

@@ -1,0 +1,18 @@
+export const profileOtherInfoStrings = {
+  title: 'Other Information',
+  racialEthnic: 'Racial/Ethnic Background',
+  racialEthnicPlaceholder: 'Enter your racial/ethnic background',
+  ageDemographic: 'Age Demographic',
+  ageDemographicPlaceholder: 'Enter your age demographic',
+  genderIdentity: 'Gender Identity',
+  genderIdentityPlaceholder: 'Enter your gender identity',
+  sexualOrientation: 'Sexual Orientation',
+  sexualOrientationPlaceholder: 'Enter your sexual orientation',
+  disabilityStatus: 'Disability Status',
+  disabilityStatusPlaceholder: 'Enter your disability status',
+  dietaryRestrictions: 'Dietary Restrictions',
+  dietaryRestrictionsPlaceholder: 'Enter your dietary restrictions',
+  foodAllergies: 'Food Allergies',
+  foodAllergiesPlaceholder: 'Enter your food allergies (comma separated)',
+  saveButton: 'Save Changes',
+} as const;

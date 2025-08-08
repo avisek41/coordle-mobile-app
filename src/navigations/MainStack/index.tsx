@@ -1,6 +1,7 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import React from 'react';
 import { Main } from '../../screens';
+import { ProfileOtherInfo } from '../../screens/Main/Profile/ProfileOtherInfo';
 
 import { Routes } from '../NavigationUtilis';
 import { MainStackParams } from '@/src/types/allRoutes';
@@ -13,6 +14,11 @@ const MainStack = () => {
       <Stack.Screen
         name="BottomTabs"
         component={BottomTabs}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="ProfileOtherInfo"
+        component={ProfileOtherInfo}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>

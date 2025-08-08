@@ -1,48 +1,89 @@
 import React from 'react';
-import { TouchableOpacity, Image } from 'react-native';
-import { HStack } from '@/components/ui/hstack';
+import { TouchableOpacity, StyleSheet } from 'react-native';
+import { Text as GluestackText } from '@/components/ui/text';
 import { Box } from '@/components/ui/box';
-import { Text } from '@/components/ui/text';
-import { images } from '@/src/assets';
+import { HStack } from '@/components/ui/hstack';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import { useNavigation } from '@react-navigation/native';
+import { Colors } from '@/src/configs/CustomTheme';
 
 interface HeaderProps {
-  onBackPress?: () => void;
+  title: string;
   showBackButton?: boolean;
-  title?: string;
+  onBackPress?: () => void;
+  rightComponent?: React.ReactNode;
+  containerStyle?: any;
+  titleStyle?: any;
+  backButtonStyle?: any;
+  iconName?: string;
+  iconSize?: number;
+  iconColor?: string;
 }
 
 const Header: React.FC<HeaderProps> = ({
-  onBackPress,
-  showBackButton = true,
   title,
+  showBackButton = true,
+  onBackPress,
+  rightComponent,
+  containerStyle,
+  titleStyle,
+  backButtonStyle,
+  iconName = 'chevron-back',
+  iconSize = 20,
+  iconColor = '#333',
 }) => {
+  const navigation = useNavigation();
+
+  const handleBackPress = () => {
+    if (onBackPress) {
+      onBackPress();
+    } else {
+      navigation.goBack();
+    }
+  };
+
   return (
-    <HStack className="items-center  px-4 py-3">
-      {/* Back Button */}
-      {showBackButton && (
-        <TouchableOpacity
-          onPress={onBackPress}
-          className="w-10 h-10 rounded-lg border border-gray-200 bg-white items-center justify-center"
-          activeOpacity={0.7}
+    <Box className="px-5 py-4" style={[styles.container, containerStyle]}>
+      <HStack className="items-center" space="md">
+        {/* Back Button */}
+        {showBackButton && (
+          <TouchableOpacity
+            onPress={handleBackPress}
+            style={[styles.backButton, backButtonStyle]}
+            activeOpacity={0.8}
+          >
+            <Ionicons name={iconName} size={iconSize} color={iconColor} />
+          </TouchableOpacity>
+        )}
+
+        {/* Title */}
+        <GluestackText
+          className="text-xl font-heading text-gray-800 flex-1"
+          style={titleStyle}
         >
-          <Ionicons name="chevron-back" size={20} color="#000" />
-        </TouchableOpacity>
-      )}
+          {title}
+        </GluestackText>
 
-      {/* Logo */}
-      <Box className="flex-1 items-center">
-        <Image
-          source={images.appLogo}
-          className="w-24 h-8"
-          resizeMode="contain"
-        />
-      </Box>
-
-      {/* Spacer to balance the layout */}
-      {showBackButton && <Box className="w-10 h-10" />}
-    </HStack>
+        {/* Right Component */}
+        {rightComponent && <Box>{rightComponent}</Box>}
+      </HStack>
+    </Box>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    // Default container styles
+  },
+  backButton: {
+    width: 35,
+    height: 35,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: Colors.gray,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+});
 
 export default Header;
