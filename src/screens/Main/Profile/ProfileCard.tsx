@@ -16,7 +16,7 @@ import { profileStrings } from './strings';
 
 type ProfileNavigationProp = NativeStackNavigationProp<
   MainStackParams,
-  'ProfileOtherInfo'
+  'EditProfile'
 >;
 
 const ProfileCard: React.FC = () => {
@@ -107,7 +107,7 @@ const ProfileCard: React.FC = () => {
 
         {/* View More Button */}
         <TouchableOpacity
-          onPress={() => navigation.navigate('ProfileOtherInfo')}
+          onPress={() => navigation.navigate('EditProfile')}
         >
           <HStack className="justify-center items-center" space="sm">
             <GluestackText className="text-lg font-body text-primary-500">

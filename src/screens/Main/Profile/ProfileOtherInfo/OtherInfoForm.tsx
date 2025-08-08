@@ -6,7 +6,6 @@ import { VStack } from '@/components/ui/vstack';
 import { HStack } from '@/components/ui/hstack';
 import { Dropdown, GradientButton } from '@/src/components';
 import { useGetProfileOptionsQuery } from '@/src/services';
-import Ionicons from 'react-native-vector-icons/Ionicons';
 import { profileOtherInfoStrings } from '@/src/screens/Main/Profile/ProfileOtherInfo/strings';
 
 interface OtherInfoFormProps {

@@ -6,8 +6,13 @@ import { HStack } from '@/components/ui/hstack';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { profileStrings } from './strings';
 import { Colors } from '@/src/configs/CustomTheme';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { MainStackParams } from '@/src/types/allRoutes';
 
 const Header: React.FC = () => {
+  const navigation = useNavigation<NativeStackNavigationProp<MainStackParams>>();
+
   return (
     <Box className="px-5 py-4">
       <HStack className=" items-center">
@@ -22,7 +27,10 @@ const Header: React.FC = () => {
         </GluestackText>
 
         {/* Edit Button */}
-        <TouchableOpacity style={styles.iconButton}>
+        <TouchableOpacity 
+          style={styles.iconButton}
+          onPress={() => navigation.navigate('EditProfile')}
+        >
           <Ionicons name="pencil-sharp" size={20} color="white" />
         </TouchableOpacity>
       </HStack>
