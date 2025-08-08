@@ -19,7 +19,7 @@ const ProfileSettings: React.FC = () => {
               <Ionicons name="folder-outline" size={20} color="#6B7280" />
             </Box>
             <VStack className="flex-1" space="xs">
-              <GluestackText className="text-lg font-heading text-gray-800">
+              <GluestackText className="text-lg font-body text-gray-800">
                 {profileStrings.yourDocuments}
               </GluestackText>
               <GluestackText className="text-sm text-gray-500">
@@ -39,7 +39,7 @@ const ProfileSettings: React.FC = () => {
               <Ionicons name="settings-outline" size={20} color="#6B7280" />
             </Box>
             <VStack className="flex-1" space="xs">
-              <GluestackText className="text-lg font-heading text-gray-800">
+              <GluestackText className="text-lg font-body text-gray-800">
                 {profileStrings.settings}
               </GluestackText>
               <GluestackText className="text-sm text-gray-500">
