@@ -34,8 +34,8 @@ import { MainNavigationProps } from '@/src/types/allRoutes';
 import { useNavigation } from '@react-navigation/native';
 import { globalStyles } from '@/src/styles';
 import { images } from '@/src/assets';
-import { Colors } from '@/src/configs/CustomTheme';
 import LinearGradient from 'react-native-linear-gradient';
+
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
 const EditProfile: React.FC = () => {
