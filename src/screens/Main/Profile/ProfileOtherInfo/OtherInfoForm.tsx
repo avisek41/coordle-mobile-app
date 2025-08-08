@@ -10,9 +10,11 @@ import { profileOtherInfoStrings } from '@/src/screens/Main/Profile/ProfileOther
 
 interface OtherInfoFormProps {
   userData: any;
+  onSave: (formData: any) => void;
+  isLoading: boolean;
 }
 
-const OtherInfoForm: React.FC<OtherInfoFormProps> = ({ userData }) => {
+const OtherInfoForm: React.FC<OtherInfoFormProps> = ({ userData, onSave, isLoading }) => {
   const [formData, setFormData] = useState({
     racialEthnic: userData?.racialEthnic || '',
     ageDemographic: userData?.ageDemographic || '',
@@ -32,6 +34,10 @@ const OtherInfoForm: React.FC<OtherInfoFormProps> = ({ userData }) => {
     value: string | string[] | boolean,
   ) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleSave = () => {
+    onSave(formData);
   };
 
   // Convert API data to dropdown options format
@@ -275,10 +281,8 @@ const OtherInfoForm: React.FC<OtherInfoFormProps> = ({ userData }) => {
       {/* Save Button */}
       <GradientButton
         title={profileOtherInfoStrings.saveButton}
-        onPress={() => {
-          // TODO: Implement save logic
-          console.log('Save button pressed');
-        }}
+        onPress={handleSave}
+        loading={isLoading}
       />
     </VStack>
   );

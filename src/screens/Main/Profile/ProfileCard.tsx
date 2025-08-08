@@ -107,7 +107,7 @@ const ProfileCard: React.FC = () => {
 
         {/* View More Button */}
         <TouchableOpacity
-          onPress={() => navigation.navigate('EditProfile')}
+          onPress={() => navigation.navigate('ProfileOtherInfo')}
         >
           <HStack className="justify-center items-center" space="sm">
             <GluestackText className="text-lg font-body text-primary-500">
