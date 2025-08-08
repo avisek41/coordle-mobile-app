@@ -2,7 +2,7 @@ import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Icon from 'react-native-vector-icons/Ionicons';
 import MIcon from 'react-native-vector-icons/MaterialIcons';
-import { Home, MyTrips } from '../screens/Main';
+import { Home, MyTrips, Chat } from '../screens/Main';
 import { TabLabel } from '../components';
 import { Colors } from '../configs/CustomTheme';
 
@@ -65,7 +65,7 @@ export default () => {
 
       <BottomTab.Screen
         name="Chat"
-        component={Home}
+        component={Chat}
         options={{
           tabBarIcon: ({ color, focused }) => (
             <Icon name="chatbox-ellipses" color={color} size={24} />
