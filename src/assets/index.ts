@@ -8,4 +8,5 @@ export const images = {
   resendEmail: require('./Images/Resend.png'),
   account_created: require('./Images/account_created.png'),
   trip: require('./Images/trip.png'),
+  cover: require('./Images/Cover.png'),
 };
