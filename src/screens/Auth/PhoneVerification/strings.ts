@@ -32,6 +32,15 @@ export const phoneVerificationStrings = {
   // Console log messages
   continuePressed: 'Continue pressed',
   resendCodePressed: 'Resend code pressed',
+  
+  // Toast messages
+  incompleteCodeTitle: 'Error',
+  incompleteCodeMessage: 'Please enter the complete 6-digit verification code',
+  verificationSuccessTitle: 'Success',
+  verificationSuccessMessage: 'Phone verified successfully! Please complete your profile.',
+  loginSuccessMessage: 'Phone verified successfully! Please login.',
+  verificationErrorTitle: 'Error',
+  verificationErrorMessage: 'Verification failed. Please check your code and try again.',
 } as const;
 
 export type PhoneVerificationStrings = typeof phoneVerificationStrings; 

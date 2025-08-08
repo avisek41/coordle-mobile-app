@@ -13,22 +13,122 @@ import { Input, InputField } from '@/components/ui/input';
 import { Header } from '@/src/components';
 import { GradientButton } from '@/src/components';
 import { phoneVerificationStrings } from './strings';
-import { useNavigation } from '@react-navigation/native';
-import { AuthNavigationProps } from '@/src/types/allRoutes';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import { AuthNavigationProps, RootRouteProps } from '@/src/types/allRoutes';
+import { useVerifyPhoneCodeMutation, useLoginMutation } from '@/src/services';
+import { useSimpleToast } from '@/src/hooks/useSimpleToast';
+import { Loader } from '@/src/components';
+import { setItem } from '@/src/utils';
+import { setCredentials } from '@/src/features';
+import { useDispatch } from 'react-redux';
 
 const PhoneVerification = () => {
   const { goBack, navigate } = useNavigation<AuthNavigationProps>();
-  const [verificationCode, setVerificationCode] = useState('367660');
-  const [codeDigits, setCodeDigits] = useState(['3', '6', '7', '6', '6', '0']);
-  const [isAgreementChecked, setIsAgreementChecked] = useState(false);
+  const { phoneNumber, isExistingUser } =
+    useRoute<RootRouteProps<'PhoneVerification'>>().params;
+  const [verificationCode, setVerificationCode] = useState('');
+  const [codeDigits, setCodeDigits] = useState(['', '', '', '', '', '']);
+
   const inputRefs = useRef<Array<any>>([]);
+
+  const [verifyPhoneCode, { isLoading: isVerifying }] =
+    useVerifyPhoneCodeMutation();
+  const [login, { isLoading: isLoggingIn }] = useLoginMutation();
+  const { showToast, ToastComponent } = useSimpleToast();
+  const dispatch = useDispatch();
 
   const handleBackPress = () => {
     goBack();
   };
 
-  const handleContinue = () => {
-    navigate('ProfileSetup');
+  const handleContinue = async () => {
+    // Check if verification code is complete
+    if (verificationCode.length !== 6) {
+      showToast({
+        type: 'error',
+        title: phoneVerificationStrings.incompleteCodeTitle,
+        message: phoneVerificationStrings.incompleteCodeMessage,
+        duration: 3000,
+      });
+      return;
+    }
+
+    try {
+      if (isExistingUser) {
+        // For existing users, directly call login API
+        const loginResponse = await login({
+          phoneNumber,
+          verificationCode,
+          loginMethod: 'phone',
+        }).unwrap();
+
+        if (loginResponse.success) {
+          // Store the token
+          const token = loginResponse.data.token;
+          if (token) {
+            dispatch(setCredentials({ token }));
+            setItem('accessToken', token);
+            setItem('isLoggedIn', 'true');
+          }
+
+          showToast({
+            type: 'success',
+            title: phoneVerificationStrings.verificationSuccessTitle,
+            message: 'Login successful! Welcome back.',
+            duration: 3000,
+          });
+          // TODO: Navigate to main app/home screen
+          // navigate('MainApp');
+        }
+      } else {
+        // For new users, verify the phone code first
+        const verifyResponse = await verifyPhoneCode({
+          phoneNumber,
+          code: verificationCode,
+        }).unwrap();
+        console.log('verifyResponse', verifyResponse);
+
+        if (verifyResponse.success) {
+          // Store the token
+          const token = verifyResponse.data.token;
+          if (token) {
+            // Store token in Redux store
+            dispatch(setCredentials({ token }));
+            // Store token in local storage
+            setItem('accessToken', token);
+          }
+
+          // Check if profile setup is required based on verify response
+          if (verifyResponse.data.isProfileSetup) {
+            // New user with profile set up, navigate to login
+            showToast({
+              type: 'success',
+              title: phoneVerificationStrings.verificationSuccessTitle,
+              message: phoneVerificationStrings.loginSuccessMessage,
+              duration: 3000,
+            });
+            setItem('isLoggedIn', 'true');
+          } else {
+            // Profile setup is required, navigate to ProfileSetup
+            showToast({
+              type: 'success',
+              title: phoneVerificationStrings.verificationSuccessTitle,
+              message: phoneVerificationStrings.verificationSuccessMessage,
+              duration: 3000,
+            });
+            navigate('ProfileSetup');
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Operation failed:', error);
+      showToast({
+        type: 'error',
+        title: phoneVerificationStrings.verificationErrorTitle,
+        message: phoneVerificationStrings.verificationErrorMessage,
+        duration: 3000,
+      });
+    }
   };
 
   const handleResendCode = () => {
@@ -60,8 +160,16 @@ const PhoneVerification = () => {
     }
   };
 
+  // Show loader when API is loading
+  if (isVerifying || isLoggingIn) {
+    return <Loader />;
+  }
+
   return (
     <SafeAreaView className="flex-1 bg-white">
+      {/* Toast Component */}
+      <ToastComponent />
+
       {/* Header */}
       <Header onBackPress={handleBackPress} />
 
@@ -84,7 +192,7 @@ const PhoneVerification = () => {
 
           {/* Phone Number Display */}
           <Text className="text-base font-body text-black mb-6">
-            {phoneVerificationStrings.phoneNumber}
+            {phoneNumber}
           </Text>
 
           {/* Verification Code Input */}
@@ -133,6 +241,7 @@ const PhoneVerification = () => {
         <GradientButton
           title={phoneVerificationStrings.continueButton}
           onPress={handleContinue}
+          loading={isVerifying || isLoggingIn}
         />
 
         {/* Resend Code Link */}

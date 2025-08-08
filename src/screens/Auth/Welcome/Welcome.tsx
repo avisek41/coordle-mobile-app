@@ -22,6 +22,11 @@ import { GradientButton } from '@/src/components';
 import { useNavigation } from '@react-navigation/native';
 import { AuthNavigationProps } from '@/src/types/allRoutes';
 import { useCheckEmailStatusMutation } from '@/src/services/emailCheckApi';
+import {
+  useSendPhoneCodeMutation,
+  useCheckUserByPhoneMutation,
+  useSendLoginCodeMutation,
+} from '@/src/services';
 import { useSimpleToast } from '@/src/hooks/useSimpleToast';
 
 const Welcome = () => {
@@ -33,6 +38,10 @@ const Welcome = () => {
 
   const [show, setShow] = useState(false);
   const [countryCode, setCountryCode] = useState('+91');
+  const [selectedCountry, setSelectedCountry] = useState({
+    code: 'IN',
+    phone: '+91',
+  });
   const [isAgreementChecked, setIsAgreementChecked] = useState(false);
   const [isExistingUser, setIsExistingUser] = useState(false); // Track if user is existing
 
@@ -41,6 +50,12 @@ const Welcome = () => {
     checkEmailStatus,
     { isLoading: isCheckingEmail, data: emailData, isSuccess, error, reset },
   ] = useCheckEmailStatusMutation();
+  const [sendPhoneCode, { isLoading: isSendingPhoneCode }] =
+    useSendPhoneCodeMutation();
+  const [checkUserByPhone, { isLoading: isCheckingPhone }] =
+    useCheckUserByPhoneMutation();
+  const [sendLoginCode, { isLoading: isSendingLoginCode }] =
+    useSendLoginCodeMutation();
   const { showToast, ToastComponent } = useSimpleToast();
 
   const handleGoogleSignIn = () => {
@@ -140,15 +155,79 @@ const Welcome = () => {
     }
   };
 
-  const handleSignInPress = () => {
+  const handleSignInPress = async () => {
     if (email.trim()) {
+      // If email is provided, do email check
       handleEmailCheck();
+    } else if (phoneNumber.trim()) {
+      // If phone number is provided, check user by phone first
+      try {
+        const fullPhoneNumber = `${countryCode}${phoneNumber}`;
+        const phoneCheckResponse = await checkUserByPhone({
+          phoneNumber: fullPhoneNumber,
+        }).unwrap();
+
+        console.log('phoneCheckResponse', phoneCheckResponse);
+
+        if (phoneCheckResponse.success) {
+          if (phoneCheckResponse.data.action === 'login') {
+            // User exists, check if profile is set up
+            if (phoneCheckResponse?.data?.user?.isProfileSetup) {
+              // Profile is set up, send login code for existing user
+              await sendLoginCode({ phoneNumber: fullPhoneNumber }).unwrap();
+              showToast({
+                type: 'success',
+                title: 'Success',
+                message: 'Login code sent to your phone number',
+                duration: 3000,
+              });
+              navigate('PhoneVerification', {
+                phoneNumber: fullPhoneNumber,
+                isExistingUser: true, // Flag to indicate this is an existing user
+              });
+            } else {
+              // Profile not set up, send verification code
+              await sendPhoneCode({ phoneNumber: fullPhoneNumber }).unwrap();
+              showToast({
+                type: 'success',
+                title: 'Success',
+                message: 'Verification code sent to your phone number',
+                duration: 3000,
+              });
+              navigate('PhoneVerification', {
+                phoneNumber: fullPhoneNumber,
+              });
+            }
+          } else if (phoneCheckResponse.data.action === 'register') {
+            // New user, send verification code
+            await sendPhoneCode({ phoneNumber: fullPhoneNumber }).unwrap();
+            showToast({
+              type: 'success',
+              title: 'Success',
+              message: 'Verification code sent to your phone number',
+              duration: 3000,
+            });
+            navigate('PhoneVerification', {
+              phoneNumber: fullPhoneNumber,
+            });
+          }
+        }
+      } catch (error) {
+        console.error('Phone check or verification error:', error);
+        showToast({
+          type: 'error',
+          title: 'Error',
+          message: 'Failed to process phone number. Please try again.',
+          duration: 3000,
+        });
+      }
     } else {
-      console.log('Showing toast for empty email');
+      // Neither email nor phone provided
       showToast({
         type: 'error',
         title: welcomeStrings.emailRequired,
-        message: welcomeStrings.emailRequiredToContinue,
+        message: 'Please enter either email or phone number to continue.',
+        duration: 3000,
       });
     }
   };
@@ -270,7 +349,9 @@ const Welcome = () => {
             >
               <Image
                 source={{
-                  uri: `https://flagcdn.com/w20/us.png`,
+                  uri: `https://flagcdn.com/w20/${selectedCountry.code
+                    .slice(0, 2)
+                    .toLowerCase()}.png`,
                 }}
                 style={{
                   width: 20,
@@ -307,11 +388,6 @@ const Welcome = () => {
                 />
               </Input>
             </HStack>
-            {phoneValidation && (
-              <Text className="text-red-500 text-xs mt-1 font-body">
-                {phoneValidation}
-              </Text>
-            )}
           </Box>
         </VStack>
 
@@ -337,7 +413,12 @@ const Welcome = () => {
         <GradientButton
           title={welcomeStrings.signIn}
           disabled={!isAgreementChecked}
-          loading={isCheckingEmail}
+          loading={
+            isCheckingEmail ||
+            isSendingPhoneCode ||
+            isCheckingPhone ||
+            isSendingLoginCode
+          }
           style={{ marginTop: 20, width: '90%', alignSelf: 'center' }}
           onPress={handleSignInPress}
         />
@@ -350,6 +431,10 @@ const Welcome = () => {
         onClose={() => setShow(false)}
         onSelect={country => {
           setCountryCode(country.phone);
+          setSelectedCountry({
+            code: country.code,
+            phone: country.phone,
+          });
           setShow(false);
         }}
       />

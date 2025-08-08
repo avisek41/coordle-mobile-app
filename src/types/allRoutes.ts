@@ -12,7 +12,10 @@ export type AuthStackParams = {
   };
   CreatePassword: undefined;
   AccountCreated: undefined;
-  PhoneVerification: undefined;
+  PhoneVerification: {
+    phoneNumber: string;
+    isExistingUser?: boolean;
+  };
   ProfileSetup: undefined;
   ForgotPassword: undefined;
 };

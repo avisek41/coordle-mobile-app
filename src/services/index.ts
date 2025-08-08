@@ -21,3 +21,25 @@ export {
   profileOptionsApi,
   useGetProfileOptionsQuery,
 } from './profileOptionsApi';
+
+// Export phone verification API
+export {
+  phoneVerificationApi,
+  useSendPhoneCodeMutation,
+  useVerifyPhoneCodeMutation,
+} from './phoneVerificationApi';
+
+// Export check user by phone API
+export {
+  checkUserByPhoneApi,
+  useCheckUserByPhoneMutation,
+} from './checkUserByPhoneApi';
+
+// Export send login code API
+export { sendLoginCodeApi, useSendLoginCodeMutation } from './sendLoginCodeApi';
+
+// Export user profile API
+export {
+  userProfileApi,
+  useGetCurrentUserProfileQuery,
+} from './userProfileApi';

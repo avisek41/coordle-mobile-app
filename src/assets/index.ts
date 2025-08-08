@@ -7,4 +7,5 @@ export const images = {
   email_verification_banner: require('./Images/emailVerification.png'),
   resendEmail: require('./Images/Resend.png'),
   account_created: require('./Images/account_created.png'),
+  trip: require('./Images/trip.png'),
 };

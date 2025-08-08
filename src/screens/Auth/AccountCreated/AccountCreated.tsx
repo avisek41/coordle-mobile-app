@@ -18,7 +18,7 @@ const AccountCreated = () => {
   };
 
   const handleBackToSignIn = () => {
-    navigate('Login');
+    navigate('Welcome');
   };
 
   return (

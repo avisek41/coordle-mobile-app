@@ -2,9 +2,11 @@ import { apiSlice } from './apiSlice';
 import { API_ENDPOINTS } from '../constant/apiConstant';
 
 export interface LoginRequest {
-  email: string;
-  password: string;
-  loginMethod: 'email';
+  email?: string;
+  password?: string;
+  phoneNumber?: string;
+  verificationCode?: string;
+  loginMethod: 'email' | 'phone';
 }
 
 export interface LoginResponse {

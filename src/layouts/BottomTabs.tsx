@@ -2,7 +2,7 @@ import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Icon from 'react-native-vector-icons/Ionicons';
 import MIcon from 'react-native-vector-icons/MaterialIcons';
-import { Home } from '../screens/Main';
+import { Home, MyTrips } from '../screens/Main';
 import { TabLabel } from '../components';
 import { Colors } from '../configs/CustomTheme';
 
@@ -52,7 +52,7 @@ export default () => {
       />
       <BottomTab.Screen
         name="MyTrips"
-        component={Home}
+        component={MyTrips}
         options={{
           tabBarIcon: ({ color, focused }) => (
             <Icon name="bag-sharp" color={color} size={24} />
@@ -62,20 +62,7 @@ export default () => {
           ),
         }}
       />
-      <BottomTab.Screen
-        name="Team"
-        component={Home}
-        options={{
-          tabBarIcon: ({ color, focused }) => (
-            <>
-              <MIcon name="group" color={color} size={30} />
-            </>
-          ),
-          tabBarLabel: ({ color, focused }) => (
-            <TabLabel color={color} focused={focused} text="Team" />
-          ),
-        }}
-      />
+
       <BottomTab.Screen
         name="Chat"
         component={Home}

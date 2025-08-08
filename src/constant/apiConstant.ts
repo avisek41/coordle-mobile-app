@@ -1,8 +1,14 @@
 export const API_ENDPOINTS = {
   CHECK_EMAIL_STATUS: '/api/users/check-email-status',
+  CHECK_USER_BY_PHONE: '/api/users/check-user-by-phone',
   SEND_EMAIL_VERIFICATION: '/api/verification/send-email-link',
   RESEND_EMAIL_VERIFICATION: '/api/verification/resend-email-link',
   LOGIN: '/api/users/login',
   SETUP_PROFILE: '/api/users/setup-profile',
   PROFILE_OPTIONS: '/api/profile-options',
+  SEND_PHONE_CODE: '/api/verification/send-code',
+  SEND_LOGIN_CODE: '/api/users/send-login-code',
+  VERIFY_PHONE_CODE: '/api/verification/verify',
+  REGISTER: '/api/verification/register',
+  GET_CURRENT_USER_PROFILE: '/api/users/me',
 } as const;

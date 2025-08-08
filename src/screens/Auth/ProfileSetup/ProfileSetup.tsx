@@ -117,10 +117,10 @@ const ProfileSetup: React.FC = () => {
     try {
       // Prepare the API request data with static data
       const profileData = {
-        firstName: 'Avisek',
-        lastName: 'Sahoo',
-        preferredName: 'Avi12',
-        phoneNumber: '+917064802080',
+        firstName: 'John',
+        lastName: 'Doe',
+        preferredName: 'John',
+        phoneNumber: '+918637222653',
         pronouns: 'he/him',
         country: 'IN',
         state: 'OR',
