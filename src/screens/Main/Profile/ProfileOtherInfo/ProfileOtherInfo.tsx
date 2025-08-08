@@ -1,16 +1,13 @@
 import React from 'react';
 import { SafeAreaView, ScrollView } from 'react-native';
-import { Text as GluestackText } from '@/components/ui/text';
 import { Box } from '@/components/ui/box';
-import { VStack } from '@/components/ui/vstack';
-import { HStack } from '@/components/ui/hstack';
 import { globalStyles } from '@/src/styles';
 import {
   useGetCurrentUserProfileQuery,
   useSetupProfileMutation,
 } from '@/src/services';
 import { Loader } from '@/src/components';
-import { profileOtherInfoStrings } from './strings';
+
 import ProfileOtherInfoHeader from './Header';
 import OtherInfoForm from './OtherInfoForm';
 import { useSimpleToast } from '@/src/hooks';

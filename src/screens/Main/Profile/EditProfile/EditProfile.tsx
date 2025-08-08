@@ -26,6 +26,7 @@ import { strings } from './strings';
 import {
   useGetCurrentUserProfileQuery,
   useGetProfileOptionsQuery,
+  useSetupProfileMutation,
 } from '@/src/services';
 import { useSimpleToast } from '@/src/hooks/useSimpleToast';
 import { Loader } from '@/src/components';
@@ -65,10 +66,14 @@ const EditProfile: React.FC = () => {
   const [selectedStateName, setSelectedStateName] = useState('');
   const [isSmsConsentChecked, setIsSmsConsentChecked] = useState(false);
 
-  const { data: userProfile, isLoading: isLoadingProfile } =
-    useGetCurrentUserProfileQuery();
+  const {
+    data: userProfile,
+    isLoading: isLoadingProfile,
+    refetch,
+  } = useGetCurrentUserProfileQuery();
   const { data: profileOptions, isLoading: isLoadingOptions } =
     useGetProfileOptionsQuery();
+  const [updateProfile, { isLoading: isUpdating }] = useSetupProfileMutation();
   const { showToast, ToastComponent } = useSimpleToast();
 
   // Load user data when profile is fetched
@@ -130,15 +135,44 @@ const EditProfile: React.FC = () => {
 
   const handleSave = async () => {
     try {
-      // TODO: Implement save logic
-      showToast({
-        type: 'success',
-        title: strings.profileUpdateSuccessTitle,
-        message: strings.profileUpdateSuccessMessage,
-        duration: 3000,
-      });
+      // Prepare the data for the API
+      const updateData = {
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        preferredName: formData.preferredName,
+        phoneNumber: formData.phoneNumber,
+        pronouns: formData.pronouns,
+        country: formData.country,
+        state: formData.state,
+        postalCode: formData.postalCode,
+        preferredAirport: formData.preferredAirport,
+        // Keep existing other info fields that we don't want to change
+        racialEthnic: userProfile?.data?.racialEthnic || '',
+        ageDemographic: userProfile?.data?.ageDemographic || '',
+        foodAllergies: userProfile?.data?.foodAllergies || [],
+        dietaryRestrictions: userProfile?.data?.dietaryRestrictions || '',
+        genderIdentity: userProfile?.data?.genderIdentity || '',
+        sexualOrientation: userProfile?.data?.sexualOrientation || '',
+        disabilityStatus: userProfile?.data?.disabilityStatus || '',
+      };
 
-      navigate('BottomTabs');
+      const response = await updateProfile(updateData).unwrap();
+
+      if (response.success) {
+        showToast({
+          type: 'success',
+          title: strings.profileUpdateSuccessTitle,
+          message: strings.profileUpdateSuccessMessage,
+          duration: 3000,
+        });
+      } else {
+        showToast({
+          type: 'error',
+          title: strings.profileUpdateErrorTitle,
+          message: strings.profileUpdateErrorMessage,
+          duration: 3000,
+        });
+      }
     } catch (error) {
       console.error('Profile update failed:', error);
       showToast({
@@ -469,7 +503,11 @@ const EditProfile: React.FC = () => {
           <Box className="flex-1">{renderForm()}</Box>
 
           {/* Save Button */}
-          <GradientButton title={strings.saveButton} onPress={handleSave} />
+          <GradientButton
+            title={strings.saveButton}
+            onPress={handleSave}
+            loading={isUpdating}
+          />
         </VStack>
       </ScrollView>
 

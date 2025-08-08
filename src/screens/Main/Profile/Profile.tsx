@@ -1,23 +1,28 @@
 import React from 'react';
-import {
-  SafeAreaView,
-  Image,
-  TouchableOpacity,
-  StyleSheet,
-  ScrollView,
-} from 'react-native';
-import { Text as GluestackText } from '@/components/ui/text';
+import { SafeAreaView, Image, ScrollView } from 'react-native';
 import { Box } from '@/components/ui/box';
-import { VStack } from '@/components/ui/vstack';
-import { HStack } from '@/components/ui/hstack';
 import { globalStyles } from '@/src/styles';
-import { profileStrings } from '@/src/screens/Main/Profile/strings';
 import { images } from '@/src/assets';
 import Header from '@/src/screens/Main/Profile/Header';
 import ProfileCard from '@/src/screens/Main/Profile/ProfileCard';
 import ProfileSettings from '@/src/screens/Main/Profile/ProfileSettings';
+import { useGetCurrentUserProfileQuery } from '@/src/services';
+import { useFocusEffect } from '@react-navigation/native';
 
 const Profile = () => {
+  const {
+    data: userProfile,
+    isLoading,
+    refetch,
+  } = useGetCurrentUserProfileQuery();
+
+  // Refetch user data when the screen comes into focus
+  useFocusEffect(
+    React.useCallback(() => {
+      refetch();
+    }, [refetch]),
+  );
+
   return (
     <SafeAreaView style={globalStyles.container}>
       <ScrollView showsVerticalScrollIndicator={false}>
@@ -51,39 +56,5 @@ const Profile = () => {
     </SafeAreaView>
   );
 };
-
-const styles = StyleSheet.create({
-  avatarContainer: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    backgroundColor: '#51B1C0',
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 4,
-    borderColor: 'white',
-  },
-  avatarText: {
-    fontSize: 40,
-    fontWeight: 'bold',
-    color: 'white',
-  },
-  editAvatarButton: {
-    position: 'absolute',
-    bottom: 0,
-    right: 0,
-    width: 30,
-    height: 30,
-    borderRadius: 15,
-    backgroundColor: '#51B1C0',
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 2,
-    borderColor: 'white',
-  },
-  editIcon: {
-    fontSize: 12,
-  },
-});
 
 export default Profile;
