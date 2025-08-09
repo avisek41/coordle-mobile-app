@@ -31,6 +31,10 @@
 		<key>NSAllowsLocalNetworking</key>
 		<true/>
 	</dict>
+	<key>NSCameraUsageDescription</key>
+	<string>Camera access allows you to submit photos of completed tasks and other activities.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Photo library access allows you to choose photos of completed tasks and other activities.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string/>
 	<key>RCTNewArchEnabled</key>

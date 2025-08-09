@@ -15,6 +15,9 @@ const Home = () => {
     error,
   } = useGetCurrentUserProfileQuery();
 
+  console.log('error', error);
+  console.log('userProfile', userProfile);
+
   if (isLoading) {
     return <Loader />;
   }

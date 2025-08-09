@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { TouchableOpacity, StyleSheet } from 'react-native';
 import { Text as GluestackText } from '@/components/ui/text';
 import { Box } from '@/components/ui/box';
@@ -8,7 +8,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import LinearGradient from 'react-native-linear-gradient';
 import { useGetCurrentUserProfileQuery } from '@/src/services';
-import { Loader } from '@/src/components';
+import { Loader, PhotoPicker } from '@/src/components';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { MainStackParams } from '@/src/types/allRoutes';
@@ -21,12 +21,33 @@ type ProfileNavigationProp = NativeStackNavigationProp<
 
 const ProfileCard: React.FC = () => {
   const navigation = useNavigation<ProfileNavigationProp>();
+  const [isPhotoPickerVisible, setIsPhotoPickerVisible] = useState(false);
 
   const {
     data: userProfile,
     isLoading,
     error,
   } = useGetCurrentUserProfileQuery();
+
+  const handleOpenPhotoPicker = () => {
+    setIsPhotoPickerVisible(true);
+  };
+
+  const handleClosePhotoPicker = () => {
+    setIsPhotoPickerVisible(false);
+  };
+
+  const handleSelectFromGallery = () => {
+    // TODO: Implement gallery selection logic
+    console.log('Select from gallery');
+    setIsPhotoPickerVisible(false);
+  };
+
+  const handleTakePhoto = () => {
+    // TODO: Implement camera capture logic
+    console.log('Take photo');
+    setIsPhotoPickerVisible(false);
+  };
 
   if (isLoading) {
     return <Loader />;
@@ -52,7 +73,10 @@ const ProfileCard: React.FC = () => {
             </LinearGradient>
 
             {/* Edit Avatar Button */}
-            <TouchableOpacity className="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-primary-500 justify-center items-center border-2 border-white">
+            <TouchableOpacity
+              className="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-primary-500 justify-center items-center border-2 border-white"
+              onPress={handleOpenPhotoPicker}
+            >
               <MaterialIcons name="mode-edit" size={16} color="white" />
             </TouchableOpacity>
           </Box>
@@ -117,6 +141,14 @@ const ProfileCard: React.FC = () => {
           </HStack>
         </TouchableOpacity>
       </VStack>
+
+      {/* Photo Picker Modal */}
+      <PhotoPicker
+        isVisible={isPhotoPickerVisible}
+        onClose={handleClosePhotoPicker}
+        onSelectFromGallery={handleSelectFromGallery}
+        onTakePhoto={handleTakePhoto}
+      />
     </Box>
   );
 };
