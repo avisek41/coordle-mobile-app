@@ -8,8 +8,11 @@ import ProfileCard from '@/src/screens/Main/Profile/ProfileCard';
 import ProfileSettings from '@/src/screens/Main/Profile/ProfileSettings';
 import { useGetCurrentUserProfileQuery } from '@/src/services';
 import { useFocusEffect } from '@react-navigation/native';
+import { useSimpleToast } from '@/src/hooks/useSimpleToast';
 
 const Profile = () => {
+  const { showToast, ToastComponent } = useSimpleToast();
+
   const {
     data: userProfile,
     isLoading,
@@ -22,6 +25,20 @@ const Profile = () => {
       refetch();
     }, [refetch]),
   );
+
+  const handleUploadSuccess = (profilePhotoUrl: string) => {
+    showToast({
+      type: 'success',
+      message: 'Profile photo updated successfully!',
+    });
+  };
+
+  const handleUploadError = (error: string) => {
+    showToast({
+      type: 'error',
+      message: error,
+    });
+  };
 
   return (
     <SafeAreaView style={globalStyles.container}>
@@ -45,7 +62,10 @@ const Profile = () => {
             <Header />
           </Box>
           <Box className="px-4 pt-2">
-            <ProfileCard />
+            <ProfileCard
+              onUploadSuccess={handleUploadSuccess}
+              onUploadError={handleUploadError}
+            />
           </Box>
         </Box>
         {/* Profile Settings */}
@@ -53,6 +73,9 @@ const Profile = () => {
           <ProfileSettings />
         </Box>
       </ScrollView>
+
+      {/* Toast Notification */}
+      <ToastComponent />
     </SafeAreaView>
   );
 };

@@ -19,6 +19,7 @@ import {
   Header,
   Dropdown,
   CountryStatePicker,
+  ProfileAvatar,
 } from '@/src/components';
 import { Pressable } from '@/components/ui/pressable';
 import CountryPicker from '@/src/components/CountryPicker/CountryPicker';
@@ -35,9 +36,6 @@ import { MainNavigationProps } from '@/src/types/allRoutes';
 import { useNavigation } from '@react-navigation/native';
 import { globalStyles } from '@/src/styles';
 import { images } from '@/src/assets';
-import LinearGradient from 'react-native-linear-gradient';
-
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
 const EditProfile: React.FC = () => {
   const { navigate } = useNavigation<MainNavigationProps>();
@@ -473,29 +471,22 @@ const EditProfile: React.FC = () => {
 
         {/* Avatar Section */}
         <Box className="items-center -mt-16 mb-6">
-          <Box className="relative">
-            <LinearGradient
-              colors={['#2E6F9E', '#51B1C0']}
-              style={styles.avatarGradient}
-            >
-              <Text className="text-4xl font-heading text-white">
-                {userProfile?.data?.preferredName?.charAt(0).toUpperCase() ||
-                  userProfile?.data?.firstName?.charAt(0).toUpperCase() ||
-                  'U'}
-              </Text>
-            </LinearGradient>
-
-            {/* Edit Avatar Button */}
-            <TouchableOpacity
-              className="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-primary-500 justify-center items-center border-2 border-white"
-              onPress={() => {
-                // TODO: Implement avatar edit functionality
-                console.log('Edit avatar pressed');
-              }}
-            >
-              <MaterialIcons name="mode-edit" size={16} color="white" />
-            </TouchableOpacity>
-          </Box>
+          <ProfileAvatar
+            size="medium"
+            showEditButton={true}
+            onUploadSuccess={profilePhotoUrl => {
+              showToast({
+                type: 'success',
+                message: 'Profile photo updated successfully!',
+              });
+            }}
+            onUploadError={error => {
+              showToast({
+                type: 'error',
+                message: error,
+              });
+            }}
+          />
         </Box>
 
         {/* Form Content */}
@@ -539,13 +530,6 @@ const styles = StyleSheet.create({
     resizeMode: 'cover',
     borderBottomLeftRadius: 40,
     borderBottomRightRadius: 40,
-  },
-  avatarGradient: {
-    width: 76,
-    height: 76,
-    borderRadius: 38,
-    justifyContent: 'center',
-    alignItems: 'center',
   },
 });
 

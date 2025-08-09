@@ -42,4 +42,12 @@ export { sendLoginCodeApi, useSendLoginCodeMutation } from './sendLoginCodeApi';
 export {
   userProfileApi,
   useGetCurrentUserProfileQuery,
+  type ProfilePhoto,
+  type UserProfileResponse,
 } from './userProfileApi';
+
+// Export profile photo API
+export {
+  profilePhotoApi,
+  useUploadProfilePhotoMutation,
+} from './profilePhotoApi';

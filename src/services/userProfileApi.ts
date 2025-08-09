@@ -1,6 +1,17 @@
 import { apiSlice } from './apiSlice';
 import { API_ENDPOINTS } from '../constant/apiConstant';
 
+export interface ProfilePhoto {
+  url: string;
+  publicId: string;
+  thumbnailUrl: string;
+  width: number;
+  height: number;
+  format: string;
+  bytes: number;
+  uploadedAt: string;
+}
+
 export interface UserProfileResponse {
   success: boolean;
   statusCode: number;
@@ -32,6 +43,7 @@ export interface UserProfileResponse {
     genderIdentity?: string;
     sexualOrientation?: string;
     disabilityStatus?: string;
+    profilePhoto?: ProfilePhoto;
   };
 }
 
@@ -42,6 +54,7 @@ export const userProfileApi = apiSlice.injectEndpoints({
         url: API_ENDPOINTS.GET_CURRENT_USER_PROFILE,
         method: 'GET',
       }),
+      providesTags: ['User'],
     }),
   }),
 });

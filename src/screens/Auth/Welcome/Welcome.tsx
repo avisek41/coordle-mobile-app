@@ -31,7 +31,7 @@ import { useSimpleToast } from '@/src/hooks/useSimpleToast';
 
 const Welcome = () => {
   const { navigate } = useNavigation<AuthNavigationProps>();
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState('avisek@york.ie');
   const [emailValidation, setEmailValidation] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [phoneValidation, setPhoneValidation] = useState('');

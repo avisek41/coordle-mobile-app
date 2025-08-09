@@ -1,14 +1,12 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { TouchableOpacity, StyleSheet } from 'react-native';
 import { Text as GluestackText } from '@/components/ui/text';
 import { Box } from '@/components/ui/box';
 import { VStack } from '@/components/ui/vstack';
 import { HStack } from '@/components/ui/hstack';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import LinearGradient from 'react-native-linear-gradient';
 import { useGetCurrentUserProfileQuery } from '@/src/services';
-import { Loader, PhotoPicker } from '@/src/components';
+import { Loader, ProfileAvatar } from '@/src/components';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { MainStackParams } from '@/src/types/allRoutes';
@@ -19,9 +17,16 @@ type ProfileNavigationProp = NativeStackNavigationProp<
   'EditProfile'
 >;
 
-const ProfileCard: React.FC = () => {
+interface ProfileCardProps {
+  onUploadSuccess?: (profilePhotoUrl: string) => void;
+  onUploadError?: (error: string) => void;
+}
+
+const ProfileCard: React.FC<ProfileCardProps> = ({
+  onUploadSuccess,
+  onUploadError,
+}) => {
   const navigation = useNavigation<ProfileNavigationProp>();
-  const [isPhotoPickerVisible, setIsPhotoPickerVisible] = useState(false);
 
   const {
     data: userProfile,
@@ -29,57 +34,24 @@ const ProfileCard: React.FC = () => {
     error,
   } = useGetCurrentUserProfileQuery();
 
-  const handleOpenPhotoPicker = () => {
-    setIsPhotoPickerVisible(true);
-  };
-
-  const handleClosePhotoPicker = () => {
-    setIsPhotoPickerVisible(false);
-  };
-
-  const handleSelectFromGallery = () => {
-    // TODO: Implement gallery selection logic
-    console.log('Select from gallery');
-    setIsPhotoPickerVisible(false);
-  };
-
-  const handleTakePhoto = () => {
-    // TODO: Implement camera capture logic
-    console.log('Take photo');
-    setIsPhotoPickerVisible(false);
-  };
-
   if (isLoading) {
     return <Loader />;
   }
 
   const userData = userProfile?.data;
   const userName = userData?.preferredName || userData?.firstName || 'User';
-  const userInitial = userName.charAt(0).toUpperCase();
 
   return (
     <Box className="bg-white rounded-3xl p-6 shadow-xl border border-gray-200 -mt-20">
       <VStack space="lg">
         {/* Avatar and User Info */}
         <Box className="items-center mb-6 -mt-16">
-          <Box className="relative">
-            <LinearGradient
-              colors={['#2E6F9E', '#51B1C0']}
-              style={styles.avatarGradient}
-            >
-              <GluestackText className="text-4xl font-heading text-white">
-                {userInitial}
-              </GluestackText>
-            </LinearGradient>
-
-            {/* Edit Avatar Button */}
-            <TouchableOpacity
-              className="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-primary-500 justify-center items-center border-2 border-white"
-              onPress={handleOpenPhotoPicker}
-            >
-              <MaterialIcons name="mode-edit" size={16} color="white" />
-            </TouchableOpacity>
-          </Box>
+          <ProfileAvatar
+            size="medium"
+            showEditButton={true}
+            onUploadSuccess={onUploadSuccess}
+            onUploadError={onUploadError}
+          />
 
           <VStack className="items-center mt-1" space="sm">
             <GluestackText className="text-2xl font-heading text-gray-800">
@@ -141,26 +113,12 @@ const ProfileCard: React.FC = () => {
           </HStack>
         </TouchableOpacity>
       </VStack>
-
-      {/* Photo Picker Modal */}
-      <PhotoPicker
-        isVisible={isPhotoPickerVisible}
-        onClose={handleClosePhotoPicker}
-        onSelectFromGallery={handleSelectFromGallery}
-        onTakePhoto={handleTakePhoto}
-      />
     </Box>
   );
 };
 
 const styles = StyleSheet.create({
-  avatarGradient: {
-    width: 76,
-    height: 76,
-    borderRadius: 38,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
+  // Styles can be added here if needed for other components
 });
 
 interface ProfileItemProps {
