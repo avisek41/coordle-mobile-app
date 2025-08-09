@@ -21,6 +21,7 @@ import {
 } from '@/src/components';
 import { Pressable } from '@/components/ui/pressable';
 import CountryPicker from '@/src/components/CountryPicker/CountryPicker';
+import countries from '@/src/constant/countries';
 import ProfileSetup2 from './ProfileSetup2';
 import { strings } from './strings';
 import {
@@ -32,6 +33,17 @@ import { Loader } from '@/src/components';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { AuthNavigationProps } from '@/src/types/allRoutes';
 import { useNavigation } from '@react-navigation/native';
+
+// Helper function to find country by phone code
+const findCountryByPhone = (phoneCode: string) => {
+  return (
+    countries.find(country => country.phone === phoneCode) || {
+      code: 'USA',
+      name: 'United States of America',
+      phone: '+1',
+    }
+  );
+};
 
 const ProfileSetup: React.FC = () => {
   const { navigate } = useNavigation<AuthNavigationProps>();
@@ -62,9 +74,12 @@ const ProfileSetup: React.FC = () => {
   const [showCountryStatePicker, setShowCountryStatePicker] = useState(false);
   const [pickerType, setPickerType] = useState<'country' | 'state'>('country');
   const [countryCode, setCountryCode] = useState('+1');
-  const [selectedCountry, setSelectedCountry] = useState({
-    code: 'US',
-    phone: '+1',
+  const [selectedCountry, setSelectedCountry] = useState(() => {
+    const defaultCountry = findCountryByPhone('+1');
+    return {
+      code: defaultCountry.code,
+      phone: defaultCountry.phone,
+    };
   });
   const [selectedCountryName, setSelectedCountryName] = useState('');
   const [selectedStateName, setSelectedStateName] = useState('');
@@ -115,50 +130,32 @@ const ProfileSetup: React.FC = () => {
 
   const handleProfileSetup2Next = async () => {
     try {
-      // Prepare the API request data with static data
+      // Prepare the API request data with actual form data
       const profileData = {
-        firstName: 'John',
-        lastName: 'Doe',
-        preferredName: 'John',
-        phoneNumber: '+918637222653',
-        pronouns: 'he/him',
-        country: 'IN',
-        state: 'OR',
-        postalCode: '7800032',
-        preferredAirport: 'Ahemdbad',
-        racialEthnic: 'asian',
-        ageDemographic: '25-34',
-        foodAllergies: ['all_seafood_(including_shellfish)', 'dairy'],
-        dietaryRestrictions: 'vegetarian',
-        genderIdentity: 'man',
-        sexualOrientation: 'straight',
-        disabilityStatus: 'no_disability',
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        preferredName: formData.preferredName,
+        phoneNumber: `${countryCode}${formData.phoneNumber}`,
+        country_code: countryCode,
+        pronouns: formData.pronouns,
+        country: formData.country,
+        state: formData.state,
+        postalCode: formData.postalCode,
+        preferredAirport: formData.preferredAirport,
+        racialEthnic: formData.racialEthnic,
+        ageDemographic: formData.ageDemographic,
+        foodAllergies: Array.isArray(formData.foodAllergies)
+          ? formData.foodAllergies
+          : [formData.foodAllergies],
+        dietaryRestrictions: formData.dietaryRestrictions,
+        genderIdentity: formData.genderIdentity,
+        sexualOrientation: formData.sexualOrientation
+          ? formData.sexualOrientationValue || 'Straight'
+          : 'Prefer not to say',
+        disabilityStatus: formData.disabilityStatus
+          ? formData.disabilityStatusValue || 'No disability'
+          : 'No disability',
       };
-
-      // const profileData = {
-      //   firstName: formData.firstName,
-      //   lastName: formData.lastName,
-      //   preferredName: formData.preferredName,
-      //   phoneNumber: `${countryCode}${formData.phoneNumber}`,
-      //   pronouns: formData.pronouns,
-      //   country: formData.country,
-      //   state: formData.state,
-      //   postalCode: formData.postalCode,
-      //   preferredAirport: formData.preferredAirport,
-      //   racialEthnic: formData.racialEthnic,
-      //   ageDemographic: formData.ageDemographic,
-      //   foodAllergies: Array.isArray(formData.foodAllergies)
-      //     ? formData.foodAllergies
-      //     : [formData.foodAllergies],
-      //   dietaryRestrictions: formData.dietaryRestrictions,
-      //   genderIdentity: formData.genderIdentity,
-      //   sexualOrientation: formData.sexualOrientation
-      //     ? formData.sexualOrientationValue || 'Straight'
-      //     : 'Prefer not to say',
-      //   disabilityStatus: formData.disabilityStatus
-      //     ? formData.disabilityStatusValue || 'No disability'
-      //     : 'No disability',
-      // };
 
       const response = await setupProfile(profileData).unwrap();
 
@@ -472,7 +469,11 @@ const ProfileSetup: React.FC = () => {
       <ScrollView className="flex-1" contentContainerStyle={{ flexGrow: 1 }}>
         <VStack className="flex-1 px-6 py-8">
           {/* Header */}
-          <Header onBackPress={handleBack} showBackButton={currentStep > 1} />
+          <Header
+            title=""
+            onBackPress={handleBack}
+            showBackButton={currentStep > 1}
+          />
 
           {/* Title */}
           <Text className="text-2xl font-body text-black mb-2 mt-4">

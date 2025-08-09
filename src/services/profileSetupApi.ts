@@ -6,6 +6,7 @@ export interface ProfileSetupRequest {
   lastName: string;
   preferredName?: string;
   phoneNumber: string;
+  country_code?: string;
   pronouns?: string;
   country: string;
   state: string;

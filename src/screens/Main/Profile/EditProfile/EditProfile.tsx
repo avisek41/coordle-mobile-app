@@ -23,6 +23,7 @@ import {
 } from '@/src/components';
 import { Pressable } from '@/components/ui/pressable';
 import CountryPicker from '@/src/components/CountryPicker/CountryPicker';
+import countries from '@/src/constant/countries';
 import { strings } from './strings';
 import {
   useGetCurrentUserProfileQuery,
@@ -36,6 +37,17 @@ import { MainNavigationProps } from '@/src/types/allRoutes';
 import { useNavigation } from '@react-navigation/native';
 import { globalStyles } from '@/src/styles';
 import { images } from '@/src/assets';
+
+// Helper function to find country by phone code
+const findCountryByPhone = (phoneCode: string) => {
+  return (
+    countries.find(country => country.phone === phoneCode) || {
+      code: 'USA',
+      name: 'United States of America',
+      phone: '+1',
+    }
+  );
+};
 
 const EditProfile: React.FC = () => {
   const { navigate } = useNavigation<MainNavigationProps>();
@@ -56,9 +68,12 @@ const EditProfile: React.FC = () => {
   const [showCountryStatePicker, setShowCountryStatePicker] = useState(false);
   const [pickerType, setPickerType] = useState<'country' | 'state'>('country');
   const [countryCode, setCountryCode] = useState('+1');
-  const [selectedCountry, setSelectedCountry] = useState({
-    code: 'US',
-    phone: '+1',
+  const [selectedCountry, setSelectedCountry] = useState(() => {
+    const defaultCountry = findCountryByPhone('+1');
+    return {
+      code: defaultCountry.code,
+      phone: defaultCountry.phone,
+    };
   });
   const [selectedCountryName, setSelectedCountryName] = useState('');
   const [selectedStateName, setSelectedStateName] = useState('');
@@ -90,6 +105,17 @@ const EditProfile: React.FC = () => {
         postalCode: userData.postalCode || '',
         preferredAirport: userData.preferredAirport || '',
       });
+
+      // Set country code from API response
+      if (userData.country_code) {
+        setCountryCode(userData.country_code);
+        // Find the country data by phone code
+        const countryData = findCountryByPhone(userData.country_code);
+        setSelectedCountry({
+          code: countryData.code,
+          phone: countryData.phone,
+        });
+      }
 
       // Set country code and name
       if (userData.country) {
@@ -139,6 +165,7 @@ const EditProfile: React.FC = () => {
         lastName: formData.lastName,
         preferredName: formData.preferredName,
         phoneNumber: formData.phoneNumber,
+        country_code: countryCode,
         pronouns: formData.pronouns,
         country: formData.country,
         state: formData.state,

@@ -24,6 +24,7 @@ export interface UserProfileResponse {
     lastName?: string;
     preferredName?: string;
     phoneNumber: string;
+    country_code?: string;
     isPhoneVerified: boolean;
     isEmailVerified: boolean;
     isProfileSetup: boolean;

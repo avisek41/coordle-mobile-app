@@ -32,7 +32,7 @@ const baseQueryWithReauth = async (
   //   console.log('api>>', api);
   // Make the initial query
   let result = await baseQuery(args, api, extraOptions);
-  console.log('result', result);
+  console.log('result', result?.error?.status);
 
   // Check if the result contains an error with status code 401 (Unauthorized)
   if (result?.error?.status === 401) {
