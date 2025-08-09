@@ -57,3 +57,9 @@ export {
   changePasswordApi,
   useChangePasswordMutation,
 } from './changePasswordApi';
+
+// Export document upload API
+export {
+  documentUploadApi,
+  useUploadDocumentMutation,
+} from './documentUploadApi';

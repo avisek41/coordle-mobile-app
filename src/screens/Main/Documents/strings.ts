@@ -6,4 +6,13 @@ export const documentsStrings = {
   // Search and filter
   searchPlaceholder: 'Search',
   dateFilter: 'Date',
+  // Upload functionality
+  fileTooLarge: 'File Too Large',
+  fileTooLargeMessage: 'Please select a file smaller than 3MB',
+  uploadError: 'Error',
+  uploadErrorMessage: 'Failed to select document. Please try again.',
+  uploadSuccessful: 'Upload Successful',
+  uploadSuccessfulMessage: 'Document uploaded successfully',
+  uploadFailed: 'Upload Failed',
+  uploadFailedMessage: 'Failed to upload document. Please try again.',
 } as const;

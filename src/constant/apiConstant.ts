@@ -13,4 +13,5 @@ export const API_ENDPOINTS = {
   GET_CURRENT_USER_PROFILE: '/api/users/me',
   PROFILE_PHOTO_UPLOAD: '/api/profile-photo/upload',
   CHANGE_PASSWORD: '/api/change-password',
+  DOCUMENT_UPLOAD: '/api/documents/upload',
 } as const;
