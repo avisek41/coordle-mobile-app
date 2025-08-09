@@ -27,6 +27,7 @@ export type MainStackParams = {
   Settings: undefined;
   ChangePassword: undefined;
   Notifications: undefined;
+  Documents: undefined;
 };
 
 export type MainNavigationProps = NativeStackNavigationProp<MainStackParams>;

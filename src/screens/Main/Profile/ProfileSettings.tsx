@@ -22,6 +22,10 @@ const ProfileSettings: React.FC = () => {
     navigate('Settings');
   };
 
+  const handleDocumentsPress = () => {
+    navigate('Documents');
+  };
+
   const handleSignOut = () => {
     Alert.alert(
       profileStrings.signOutConfirmTitle,
@@ -70,7 +74,7 @@ const ProfileSettings: React.FC = () => {
     <>
       <VStack space="lg" className="px-5">
         {/* Your Documents Section */}
-        <TouchableOpacity>
+        <TouchableOpacity onPress={handleDocumentsPress}>
           <Box className="bg-gray-100 rounded-xl p-4">
             <HStack className="items-center" space="md">
               <Box className="w-10 h-10 rounded-full bg-gray-200 justify-center items-center">

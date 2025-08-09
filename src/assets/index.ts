@@ -9,4 +9,5 @@ export const images = {
   account_created: require('./Images/account_created.png'),
   trip: require('./Images/trip.png'),
   cover: require('./Images/Cover.png'),
+  docs: require('./Images/docs.png'),
 };

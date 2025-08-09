@@ -8,6 +8,7 @@ import {
   ChangePassword,
   Notifications,
 } from '../../screens/Main/Settings';
+import Documents from '../../screens/Main/Documents';
 
 import { Routes } from '../NavigationUtilis';
 import { MainStackParams } from '@/src/types/allRoutes';
@@ -45,6 +46,11 @@ const MainStack = () => {
       <Stack.Screen
         name="Notifications"
         component={Notifications}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="Documents"
+        component={Documents}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>
