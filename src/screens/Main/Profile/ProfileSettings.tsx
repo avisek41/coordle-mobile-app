@@ -7,8 +7,16 @@ import { HStack } from '@/components/ui/hstack';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { Colors } from '@/src/configs/CustomTheme';
 import { profileStrings } from './strings';
+import { useNavigation } from '@react-navigation/native';
+import { MainNavigationProps } from '@/src/types/allRoutes';
 
 const ProfileSettings: React.FC = () => {
+  const { navigate } = useNavigation<MainNavigationProps>();
+
+  const handleSettingsPress = () => {
+    navigate('Settings');
+  };
+
   return (
     <VStack space="lg" className="px-5">
       {/* Your Documents Section */}
@@ -32,7 +40,7 @@ const ProfileSettings: React.FC = () => {
       </TouchableOpacity>
 
       {/* Settings Section */}
-      <TouchableOpacity>
+      <TouchableOpacity onPress={handleSettingsPress}>
         <Box className="bg-gray-100 rounded-xl p-4">
           <HStack className="items-center" space="md">
             <Box className="w-10 h-10 rounded-full bg-gray-200 justify-center items-center">

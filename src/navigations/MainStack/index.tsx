@@ -3,6 +3,11 @@ import React from 'react';
 import { Main } from '../../screens';
 import { ProfileOtherInfo } from '../../screens/Main/Profile/ProfileOtherInfo';
 import EditProfile from '../../screens/Main/Profile/EditProfile';
+import {
+  Settings,
+  ChangePassword,
+  Notifications,
+} from '../../screens/Main/Settings';
 
 import { Routes } from '../NavigationUtilis';
 import { MainStackParams } from '@/src/types/allRoutes';
@@ -25,6 +30,21 @@ const MainStack = () => {
       <Stack.Screen
         name="EditProfile"
         component={EditProfile}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="Settings"
+        component={Settings}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="ChangePassword"
+        component={ChangePassword}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="Notifications"
+        component={Notifications}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>
