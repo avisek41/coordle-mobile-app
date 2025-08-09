@@ -12,6 +12,7 @@ import { useSimpleToast } from '@/src/hooks/useSimpleToast';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { Pressable } from '@/components/ui/pressable';
 import { useChangePasswordMutation } from '@/src/services';
+import { changePasswordStrings } from './strings';
 
 const ChangePassword: React.FC = () => {
   const { goBack } = useNavigation<MainNavigationProps>();
@@ -52,8 +53,8 @@ const ChangePassword: React.FC = () => {
     ) {
       showToast({
         type: 'error',
-        title: 'Error',
-        message: 'Please fill in all fields',
+        title: changePasswordStrings.errorTitle,
+        message: changePasswordStrings.allFieldsRequired,
         duration: 3000,
       });
       return;
@@ -62,8 +63,8 @@ const ChangePassword: React.FC = () => {
     if (formData.newPassword !== formData.confirmPassword) {
       showToast({
         type: 'error',
-        title: 'Error',
-        message: 'New passwords do not match',
+        title: changePasswordStrings.errorTitle,
+        message: changePasswordStrings.passwordsDoNotMatch,
         duration: 3000,
       });
       return;
@@ -72,8 +73,8 @@ const ChangePassword: React.FC = () => {
     if (formData.newPassword.length < 8) {
       showToast({
         type: 'error',
-        title: 'Error',
-        message: 'Password must be at least 8 characters long',
+        title: changePasswordStrings.errorTitle,
+        message: changePasswordStrings.passwordTooShort,
         duration: 3000,
       });
       return;
@@ -88,8 +89,9 @@ const ChangePassword: React.FC = () => {
 
       showToast({
         type: 'success',
-        title: 'Success',
-        message: response.message || 'Password changed successfully',
+        title: changePasswordStrings.successTitle,
+        message:
+          response.message || changePasswordStrings.passwordChangedSuccessfully,
         duration: 3000,
       });
 
@@ -108,11 +110,11 @@ const ChangePassword: React.FC = () => {
       const errorMessage =
         error?.data?.message ||
         error?.data?.error ||
-        'Failed to change password. Please try again.';
+        changePasswordStrings.changePasswordFailed;
 
       showToast({
         type: 'error',
-        title: 'Error',
+        title: changePasswordStrings.errorTitle,
         message: errorMessage,
         duration: 3000,
       });
@@ -126,7 +128,7 @@ const ChangePassword: React.FC = () => {
       <VStack className="flex-1">
         {/* Header */}
         <Header
-          title="Change Password"
+          title={changePasswordStrings.title}
           onBackPress={handleBack}
           showBackButton={true}
           titleStyle={{
@@ -140,7 +142,7 @@ const ChangePassword: React.FC = () => {
           {/* Current Password */}
           <VStack className="space-y-2 mb-6">
             <Text className="text-sm font-body text-black mb-1">
-              Current Password
+              {changePasswordStrings.currentPassword}
             </Text>
             <Box className="relative">
               <Input
@@ -148,7 +150,7 @@ const ChangePassword: React.FC = () => {
                 style={{ opacity: 1 }}
               >
                 <InputField
-                  placeholder="Enter current password"
+                  placeholder={changePasswordStrings.currentPasswordPlaceholder}
                   value={formData.currentPassword}
                   onChangeText={value =>
                     updateFormData('currentPassword', value)
@@ -174,7 +176,7 @@ const ChangePassword: React.FC = () => {
           {/* New Password */}
           <VStack className="space-y-2 mb-6">
             <Text className="text-sm font-body text-black mb-1">
-              New Password
+              {changePasswordStrings.newPassword}
             </Text>
             <Box className="relative">
               <Input
@@ -182,7 +184,7 @@ const ChangePassword: React.FC = () => {
                 style={{ opacity: 1 }}
               >
                 <InputField
-                  placeholder="Enter new password"
+                  placeholder={changePasswordStrings.newPasswordPlaceholder}
                   value={formData.newPassword}
                   onChangeText={value => updateFormData('newPassword', value)}
                   secureTextEntry={!showPasswords.new}
@@ -206,7 +208,7 @@ const ChangePassword: React.FC = () => {
           {/* Confirm Password */}
           <VStack className="space-y-2 mb-8">
             <Text className="text-sm font-body text-black mb-1">
-              Confirm New Password
+              {changePasswordStrings.confirmPassword}
             </Text>
             <Box className="relative">
               <Input
@@ -214,7 +216,7 @@ const ChangePassword: React.FC = () => {
                 style={{ opacity: 1 }}
               >
                 <InputField
-                  placeholder="Confirm new password"
+                  placeholder={changePasswordStrings.confirmPasswordPlaceholder}
                   value={formData.confirmPassword}
                   onChangeText={value =>
                     updateFormData('confirmPassword', value)
@@ -241,7 +243,7 @@ const ChangePassword: React.FC = () => {
 
           {/* Save Button */}
           <GradientButton
-            title="Save"
+            title={changePasswordStrings.save}
             onPress={handleChangePassword}
             loading={isChangingPassword}
           />
