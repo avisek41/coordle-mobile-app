@@ -12,4 +12,5 @@ export const API_ENDPOINTS = {
   REGISTER: '/api/verification/register',
   GET_CURRENT_USER_PROFILE: '/api/users/me',
   PROFILE_PHOTO_UPLOAD: '/api/profile-photo/upload',
+  CHANGE_PASSWORD: '/api/change-password',
 } as const;

@@ -57,7 +57,7 @@ const Welcome = () => {
   const [sendLoginCode, { isLoading: isSendingLoginCode }] =
     useSendLoginCodeMutation();
   const { showToast, ToastComponent } = useSimpleToast();
-
+  console.log('emailData', emailData);
   const handleGoogleSignIn = () => {
     // Handle Google sign in
     console.log(welcomeStrings.googleSignInPressed);

@@ -24,4 +24,12 @@ export const profileStrings = {
   about: 'About',
   signOut: 'Sign Out',
   deleteAccount: 'Delete Account',
+  // Sign Out confirmation
+  signOutConfirmTitle: 'Sign Out',
+  signOutConfirmMessage: 'Are you sure you want to sign out of your account?',
+  cancel: 'Cancel',
+  signOutSuccess: 'Signed Out',
+  signOutSuccessMessage: 'You have been successfully signed out.',
+  signOutError: 'Error',
+  signOutErrorMessage: 'Failed to sign out. Please try again.',
 } as const;

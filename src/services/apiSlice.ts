@@ -28,8 +28,8 @@ const baseQueryWithReauth = async (
   api?: any, // API object (possibly Redux store or similar)
   extraOptions?: any, // Extra options for the query
 ) => {
-  //   console.log('args>>', args);
-  //   console.log('api>>', api);
+  console.log('args>>', args);
+  console.log('api>>', api);
   // Make the initial query
   let result = await baseQuery(args, api, extraOptions);
   console.log('result', result?.error?.status);

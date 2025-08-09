@@ -11,10 +11,14 @@ import { globalStyles } from '@/src/styles';
 import { useSimpleToast } from '@/src/hooks/useSimpleToast';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { Pressable } from '@/components/ui/pressable';
+import { useChangePasswordMutation } from '@/src/services';
 
 const ChangePassword: React.FC = () => {
   const { goBack } = useNavigation<MainNavigationProps>();
   const { showToast, ToastComponent } = useSimpleToast();
+  const [changePassword, { isLoading: isChangingPassword, error }] =
+    useChangePasswordMutation();
+  console.log('error', error);
 
   const [formData, setFormData] = useState({
     currentPassword: '',
@@ -27,8 +31,6 @@ const ChangePassword: React.FC = () => {
     new: false,
     confirm: false,
   });
-
-  const [isLoading, setIsLoading] = useState(false);
 
   const handleBack = () => {
     goBack();
@@ -77,21 +79,17 @@ const ChangePassword: React.FC = () => {
       return;
     }
 
-    setIsLoading(true);
     try {
-      // TODO: Implement API call to change password
-      // const response = await changePasswordApi({
-      //   currentPassword: formData.currentPassword,
-      //   newPassword: formData.newPassword,
-      // });
-
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      const response = await changePassword({
+        currentPassword: formData.currentPassword,
+        newPassword: formData.newPassword,
+        confirmPassword: formData.confirmPassword,
+      }).unwrap();
 
       showToast({
         type: 'success',
         title: 'Success',
-        message: 'Password changed successfully',
+        message: response.message || 'Password changed successfully',
         duration: 3000,
       });
 
@@ -101,15 +99,23 @@ const ChangePassword: React.FC = () => {
         newPassword: '',
         confirmPassword: '',
       });
-    } catch (error) {
+
+      // Navigate back after successful password change
+      setTimeout(() => {
+        goBack();
+      }, 2000);
+    } catch (error: any) {
+      const errorMessage =
+        error?.data?.message ||
+        error?.data?.error ||
+        'Failed to change password. Please try again.';
+
       showToast({
         type: 'error',
         title: 'Error',
-        message: 'Failed to change password. Please try again.',
+        message: errorMessage,
         duration: 3000,
       });
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -237,7 +243,7 @@ const ChangePassword: React.FC = () => {
           <GradientButton
             title="Save"
             onPress={handleChangePassword}
-            loading={isLoading}
+            loading={isChangingPassword}
           />
         </VStack>
       </VStack>

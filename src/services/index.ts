@@ -51,3 +51,9 @@ export {
   profilePhotoApi,
   useUploadProfilePhotoMutation,
 } from './profilePhotoApi';
+
+// Export change password API
+export {
+  changePasswordApi,
+  useChangePasswordMutation,
+} from './changePasswordApi';

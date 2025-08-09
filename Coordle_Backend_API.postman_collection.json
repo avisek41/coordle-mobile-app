@@ -172,6 +172,39 @@
             }
           },
           "response": []
+        },
+        {
+          "name": "Change Password",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"currentPassword\": \"current_password_here\",\n  \"newPassword\": \"new_password_here\",\n  \"confirmPassword\": \"new_password_here\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/change-password",
+              "host": ["{{base_url}}"],
+              "path": ["api", "change-password"]
+            }
+          },
+          "response": []
         }
       ]
     },
