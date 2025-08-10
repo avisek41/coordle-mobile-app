@@ -4,8 +4,11 @@ export const documentsStrings = {
   uploadDescription: 'Gather all of your trip document here',
   privacyNotice: 'Your documents are private and not accessible to others',
   // Search and filter
-  searchPlaceholder: 'Search',
+  searchPlaceholder: 'Search documents...',
   dateFilter: 'Date',
+  searchNoResults: 'No documents found',
+  searchNoResultsMessage:
+    'Try adjusting your search terms or upload a new document.',
   // Upload functionality
   fileTooLarge: 'File Too Large',
   fileTooLargeMessage: 'Please select a file smaller than 3MB',

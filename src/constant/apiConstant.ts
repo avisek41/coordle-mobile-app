@@ -15,4 +15,5 @@ export const API_ENDPOINTS = {
   CHANGE_PASSWORD: '/api/change-password',
   DOCUMENT_UPLOAD: '/api/documents/upload',
   GET_DOCUMENTS: '/api/documents',
+  UPDATE_DOCUMENT: '/api/documents',
 } as const;

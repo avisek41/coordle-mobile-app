@@ -36,6 +36,19 @@ export interface DocumentsResponse {
   };
 }
 
+export interface UpdateDocumentRequest {
+  documentId: string;
+  fileName: string;
+}
+
+export interface UpdateDocumentResponse {
+  success: boolean;
+  statusCode: number;
+  message: string;
+  timestamp: string;
+  data: Document;
+}
+
 export interface DocumentsQueryParams {
   page?: number;
   limit?: number;
@@ -64,8 +77,25 @@ export const documentsApi = apiSlice.injectEndpoints({
       },
       providesTags: ['Documents'],
     }),
+    updateDocument: builder.mutation<
+      UpdateDocumentResponse,
+      UpdateDocumentRequest
+    >({
+      query: ({ documentId, fileName }) => ({
+        url: `${API_ENDPOINTS.UPDATE_DOCUMENT}/${documentId}`,
+        method: 'PUT',
+        body: {
+          fileName,
+        },
+      }),
+      invalidatesTags: ['Documents'],
+    }),
   }),
   overrideExisting: false,
 });
 
-export const { useGetDocumentsQuery, useLazyGetDocumentsQuery } = documentsApi;
+export const {
+  useGetDocumentsQuery,
+  useLazyGetDocumentsQuery,
+  useUpdateDocumentMutation,
+} = documentsApi;

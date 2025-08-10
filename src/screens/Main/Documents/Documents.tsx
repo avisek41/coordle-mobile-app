@@ -8,11 +8,11 @@ import { useNavigation } from '@react-navigation/native';
 import { MainNavigationProps } from '@/src/types/allRoutes';
 import { globalStyles } from '@/src/styles';
 import { documentsStrings } from './strings';
-import NoData from './NoData';
 import SearchField from './SearchField';
 import FilterButton from './FilterButton';
 import DocumentList from './DocumentList';
 import DocumentActionSheet from './DocumentActionSheet';
+import RenameModal from './RenameModal';
 import { Box } from '@/components/ui/box';
 import DocumentPicker, {
   DocumentPickerResponse,
@@ -20,9 +20,11 @@ import DocumentPicker, {
 import {
   useUploadDocumentMutation,
   useGetDocumentsQuery,
+  useUpdateDocumentMutation,
   Document,
 } from '@/src/services';
 import { useSimpleToast } from '@/src/hooks/useSimpleToast';
+import UploadDoc from './UploadDoc';
 
 const Documents: React.FC = () => {
   const { goBack, navigate } = useNavigation<MainNavigationProps>();
@@ -36,8 +38,14 @@ const Documents: React.FC = () => {
   const [documentToDelete, setDocumentToDelete] = useState<Document | null>(
     null,
   );
+  const [showRenameModal, setShowRenameModal] = useState(false);
+  const [documentToRename, setDocumentToRename] = useState<Document | null>(
+    null,
+  );
   const [uploadDocument, { isLoading: isUploading, reset }] =
     useUploadDocumentMutation();
+  const [updateDocument, { isLoading: isUpdating }] =
+    useUpdateDocumentMutation();
   const { showToast, ToastComponent } = useSimpleToast();
 
   // Get documents data to check if list is empty
@@ -47,8 +55,6 @@ const Documents: React.FC = () => {
     error,
     isLoading,
   } = useGetDocumentsQuery({ page: 1, limit: 10 }, { skip: false });
-
-  console.log('error', error);
 
   const hasDocuments =
     documentsData?.data?.documents && documentsData.data.documents.length > 0;
@@ -168,14 +174,45 @@ const Documents: React.FC = () => {
   };
 
   const handleRename = (document: Document) => {
-    // TODO: Implement rename functionality
-    console.log('Rename document:', document.fileName);
-    showToast({
-      type: 'info',
-      title: 'Rename',
-      message: `Rename functionality for ${document.fileName} will be implemented soon`,
-      duration: 3000,
-    });
+    setDocumentToRename(document);
+    setShowRenameModal(true);
+    setIsActionSheetOpen(false);
+  };
+
+  const handleRenameSubmit = async (documentId: string, newTitle: string) => {
+    try {
+      const response = await updateDocument({
+        documentId,
+        fileName: newTitle,
+      }).unwrap();
+
+      showToast({
+        type: 'success',
+        title: 'Document Renamed',
+        message: response.message || 'Document renamed successfully',
+        duration: 3000,
+      });
+
+      setShowRenameModal(false);
+      setDocumentToRename(null);
+    } catch (error: any) {
+      const errorMessage =
+        error?.data?.message ||
+        error?.message ||
+        'Failed to rename document. Please try again.';
+
+      showToast({
+        type: 'error',
+        title: 'Rename Failed',
+        message: errorMessage,
+        duration: 3000,
+      });
+    }
+  };
+
+  const handleRenameCancel = () => {
+    setShowRenameModal(false);
+    setDocumentToRename(null);
   };
 
   const handleFileInfo = (document: Document) => {
@@ -239,14 +276,15 @@ const Documents: React.FC = () => {
       </HStack>
 
       {/* Content */}
-      {!hasDocuments ? (
-        <NoData onUploadPress={handleUploadDocument} />
+      {!searchText.trim() && !hasDocuments ? (
+        <UploadDoc onUploadPress={handleUploadDocument} />
       ) : (
         <VStack className="flex-1">
           <DocumentList
             searchText={searchText}
             onDocumentPress={handleDocumentPress}
             onRefetch={handleRefetch}
+            onUploadPress={handleUploadDocument}
           />
         </VStack>
       )}
@@ -285,6 +323,15 @@ const Documents: React.FC = () => {
         onCancel={handleDeleteCancel}
         onConfirm={handleDeleteConfirm}
         isDestructive={true}
+      />
+
+      {/* Rename Modal */}
+      <RenameModal
+        isVisible={showRenameModal}
+        onClose={handleRenameCancel}
+        document={documentToRename}
+        onRename={handleRenameSubmit}
+        isLoading={isUpdating}
       />
     </SafeAreaView>
   );

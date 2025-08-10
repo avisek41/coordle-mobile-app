@@ -7,20 +7,24 @@ import { useGetDocumentsQuery, Document } from '@/src/services';
 import DocumentCard from './DocumentCard';
 import { Loader } from '@/src/components';
 import { documentsStrings } from './strings';
+import UploadDoc from './UploadDoc';
 
 interface DocumentListProps {
   searchText?: string;
   onDocumentPress?: (document: Document) => void;
   onRefetch?: () => void;
+  onUploadPress?: () => void;
 }
 
 const DocumentList: React.FC<DocumentListProps> = ({
   searchText = '',
   onDocumentPress,
   onRefetch,
+  onUploadPress,
 }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [allDocuments, setAllDocuments] = useState<Document[]>([]);
+  const [filteredDocuments, setFilteredDocuments] = useState<Document[]>([]);
   const [hasLoadedInitial, setHasLoadedInitial] = useState(false);
 
   const {
@@ -33,7 +37,6 @@ const DocumentList: React.FC<DocumentListProps> = ({
     {
       page: currentPage,
       limit: 10,
-      search: searchText.trim() || undefined,
     },
     {
       skip: false,
@@ -43,8 +46,8 @@ const DocumentList: React.FC<DocumentListProps> = ({
   // Update documents when data changes
   React.useEffect(() => {
     if (documentsData?.data?.documents) {
-      if (currentPage === 1 || searchText !== '') {
-        // Reset list for first page or when searching
+      if (currentPage === 1) {
+        // Reset list for first page
         setAllDocuments(documentsData.data.documents);
       } else {
         // Append for pagination
@@ -57,14 +60,19 @@ const DocumentList: React.FC<DocumentListProps> = ({
       }
       setHasLoadedInitial(true);
     }
-  }, [documentsData, currentPage, searchText]);
+  }, [documentsData, currentPage]);
 
-  // Reset pagination when search changes
+  // Filter documents based on search text
   React.useEffect(() => {
-    if (hasLoadedInitial) {
-      setCurrentPage(1);
+    if (searchText.trim()) {
+      const filtered = allDocuments.filter(doc =>
+        doc.fileName.toLowerCase().includes(searchText.toLowerCase()),
+      );
+      setFilteredDocuments(filtered);
+    } else {
+      setFilteredDocuments(allDocuments);
     }
-  }, [searchText]);
+  }, [searchText, allDocuments]);
 
   const handleRefresh = useCallback(() => {
     setCurrentPage(1);
@@ -120,21 +128,22 @@ const DocumentList: React.FC<DocumentListProps> = ({
       );
     }
 
-    if (searchText.trim() && allDocuments.length === 0) {
+    if (searchText.trim() && filteredDocuments.length === 0) {
       return (
-        <Box className="flex-1 items-center justify-center py-20">
-          <Text className="font-body text-base text-gray-500 text-center">
-            {documentsStrings.noSearchResults}
-          </Text>
-          <Text className="font-body text-sm text-gray-400 text-center mt-2">
-            {documentsStrings.noSearchResultsMessage}
-          </Text>
+        <Box className="flex-1">
+          <UploadDoc onUploadPress={onUploadPress || (() => {})} />
         </Box>
       );
     }
 
     return null;
-  }, [isLoading, hasLoadedInitial, error, searchText, allDocuments.length]);
+  }, [
+    isLoading,
+    hasLoadedInitial,
+    error,
+    searchText,
+    filteredDocuments.length,
+  ]);
 
   const keyExtractor = useCallback((item: Document) => item._id, []);
 
@@ -149,7 +158,7 @@ const DocumentList: React.FC<DocumentListProps> = ({
   return (
     <VStack className="flex-1">
       <FlatList
-        data={allDocuments}
+        data={filteredDocuments}
         renderItem={renderDocument}
         keyExtractor={keyExtractor}
         contentContainerStyle={styles.listContainer}

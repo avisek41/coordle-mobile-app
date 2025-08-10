@@ -69,7 +69,10 @@ export {
   documentsApi,
   useGetDocumentsQuery,
   useLazyGetDocumentsQuery,
+  useUpdateDocumentMutation,
   type Document,
   type DocumentsResponse,
   type DocumentsQueryParams,
+  type UpdateDocumentRequest,
+  type UpdateDocumentResponse,
 } from './documentsApi';
