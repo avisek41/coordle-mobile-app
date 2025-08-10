@@ -14,6 +14,8 @@ interface DocumentListProps {
   onDocumentPress?: (document: Document) => void;
   onRefetch?: () => void;
   onUploadPress?: () => void;
+  sortBy?: 'date' | 'name';
+  sortOrder?: 'asc' | 'desc';
 }
 
 const DocumentList: React.FC<DocumentListProps> = ({
@@ -21,6 +23,8 @@ const DocumentList: React.FC<DocumentListProps> = ({
   onDocumentPress,
   onRefetch,
   onUploadPress,
+  sortBy = 'date',
+  sortOrder = 'desc',
 }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [allDocuments, setAllDocuments] = useState<Document[]>([]);
@@ -62,17 +66,35 @@ const DocumentList: React.FC<DocumentListProps> = ({
     }
   }, [documentsData, currentPage]);
 
-  // Filter documents based on search text
+  // Filter and sort documents
   React.useEffect(() => {
+    let filtered = allDocuments;
+
+    // Apply search filter
     if (searchText.trim()) {
-      const filtered = allDocuments.filter(doc =>
+      filtered = allDocuments.filter(doc =>
         doc.fileName.toLowerCase().includes(searchText.toLowerCase()),
       );
-      setFilteredDocuments(filtered);
-    } else {
-      setFilteredDocuments(allDocuments);
     }
-  }, [searchText, allDocuments]);
+
+    // Apply sorting
+    const sorted = [...filtered].sort((a, b) => {
+      if (sortBy === 'name') {
+        const nameA = a.fileName.toLowerCase();
+        const nameB = b.fileName.toLowerCase();
+        return sortOrder === 'asc'
+          ? nameA.localeCompare(nameB)
+          : nameB.localeCompare(nameA);
+      } else {
+        // Sort by date
+        const dateA = new Date(a.createdAt).getTime();
+        const dateB = new Date(b.createdAt).getTime();
+        return sortOrder === 'asc' ? dateA - dateB : dateB - dateA;
+      }
+    });
+
+    setFilteredDocuments(sorted);
+  }, [searchText, allDocuments, sortBy, sortOrder]);
 
   const handleRefresh = useCallback(() => {
     setCurrentPage(1);

@@ -3,7 +3,13 @@ import { SafeAreaView, Alert } from 'react-native';
 import { Text } from '@/components/ui/text';
 import { VStack } from '@/components/ui/vstack';
 import { HStack } from '@/components/ui/hstack';
-import { GradientButton, Header, Loader, CustomAlert } from '@/src/components';
+import {
+  GradientButton,
+  Header,
+  Loader,
+  CustomAlert,
+  CustomActionSheet,
+} from '@/src/components';
 import { useNavigation } from '@react-navigation/native';
 import { MainNavigationProps } from '@/src/types/allRoutes';
 import { globalStyles } from '@/src/styles';
@@ -25,6 +31,7 @@ import {
 } from '@/src/services';
 import { useSimpleToast } from '@/src/hooks/useSimpleToast';
 import UploadDoc from './UploadDoc';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
 const Documents: React.FC = () => {
   const { goBack, navigate } = useNavigation<MainNavigationProps>();
@@ -42,6 +49,9 @@ const Documents: React.FC = () => {
   const [documentToRename, setDocumentToRename] = useState<Document | null>(
     null,
   );
+  const [isSortActionSheetOpen, setIsSortActionSheetOpen] = useState(false);
+  const [sortBy, setSortBy] = useState<'date' | 'name'>('date');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const [uploadDocument, { isLoading: isUploading, reset }] =
     useUploadDocumentMutation();
   const [updateDocument, { isLoading: isUpdating }] =
@@ -148,8 +158,23 @@ const Documents: React.FC = () => {
   };
 
   const handleDateFilter = () => {
-    // TODO: Implement date filter functionality
-    console.log('Date filter pressed');
+    setIsSortActionSheetOpen(true);
+  };
+
+  const handleSortByDate = () => {
+    setSortBy('date');
+    setSortOrder('desc'); // Newest first
+    setIsSortActionSheetOpen(false);
+  };
+
+  const handleSortByName = () => {
+    setSortBy('name');
+    setSortOrder('asc'); // A-Z
+    setIsSortActionSheetOpen(false);
+  };
+
+  const handleCloseSortActionSheet = () => {
+    setIsSortActionSheetOpen(false);
   };
 
   const handleDocumentPress = (document: Document) => {
@@ -272,7 +297,11 @@ const Documents: React.FC = () => {
       {/* Search and Filter Bar */}
       <HStack className="px-5 py-4 justify-between">
         <SearchField value={searchText} onChangeText={setSearchText} />
-        <FilterButton onPress={handleDateFilter} />
+        <FilterButton
+          onPress={handleDateFilter}
+          sortBy={sortBy}
+          sortOrder={sortOrder}
+        />
       </HStack>
 
       {/* Content */}
@@ -285,6 +314,8 @@ const Documents: React.FC = () => {
             onDocumentPress={handleDocumentPress}
             onRefetch={handleRefetch}
             onUploadPress={handleUploadDocument}
+            sortBy={sortBy}
+            sortOrder={sortOrder}
           />
         </VStack>
       )}
@@ -332,6 +363,32 @@ const Documents: React.FC = () => {
         document={documentToRename}
         onRename={handleRenameSubmit}
         isLoading={isUpdating}
+      />
+
+      {/* Sort Action Sheet */}
+      <CustomActionSheet
+        isOpen={isSortActionSheetOpen}
+        onClose={handleCloseSortActionSheet}
+        title="Sort by"
+        actions={[
+          {
+            id: 'date',
+            title: 'Date',
+            onPress: handleSortByDate,
+            icon: (
+              <Ionicons name="calendar-outline" size={20} color="#374151" />
+            ),
+          },
+          {
+            id: 'name',
+            title: 'Name',
+            onPress: handleSortByName,
+            icon: <Ionicons name="text-outline" size={20} color="#374151" />,
+          },
+        ]}
+        showCancelButton={true}
+        cancelButtonText="Cancel"
+        onCancelPress={handleCloseSortActionSheet}
       />
     </SafeAreaView>
   );
