@@ -79,3 +79,11 @@ export {
   type DeleteDocumentRequest,
   type DeleteDocumentResponse,
 } from './documentsApi';
+
+// Export banners API
+export {
+  bannersApi,
+  useGetBannersQuery,
+  type Banner,
+  type BannersResponse,
+} from './bannersApi';

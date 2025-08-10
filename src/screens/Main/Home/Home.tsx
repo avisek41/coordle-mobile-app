@@ -1,9 +1,12 @@
 import React from 'react';
-import { SafeAreaView } from 'react-native';
-import { useGetCurrentUserProfileQuery } from '@/src/services';
+import { SafeAreaView, Linking } from 'react-native';
+import {
+  useGetCurrentUserProfileQuery,
+  useGetBannersQuery,
+} from '@/src/services';
 import { Text as GluestackText } from '@/components/ui/text';
 import { Box } from '@/components/ui/box';
-import { Loader } from '@/src/components';
+import { Loader, BannerCarousel } from '@/src/components';
 import { homeStrings } from './strings';
 import Header from './Header';
 import NoTrips from './NoTrips';
@@ -11,19 +14,28 @@ import NoTrips from './NoTrips';
 const Home = () => {
   const {
     data: userProfile,
-    isLoading,
-    error,
+    isLoading: isProfileLoading,
+    error: profileError,
   } = useGetCurrentUserProfileQuery();
 
-  console.log('error', error);
-  console.log('userProfile', userProfile);
+  const {
+    data: bannersData,
+    isLoading: isBannersLoading,
+    error: bannersError,
+  } = useGetBannersQuery();
 
-  if (isLoading) {
+  if (isProfileLoading || isBannersLoading) {
     return <Loader />;
   }
 
   const userName =
     userProfile?.data?.preferredName || userProfile?.data?.firstName || 'User';
+
+  const handleBannerPress = (banner: any) => {
+    if (banner.linkUrl) {
+      Linking.openURL(banner.linkUrl);
+    }
+  };
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#F5F5F5' }}>
@@ -40,6 +52,18 @@ const Home = () => {
           <GluestackText className="text-xl font-heading text-black-800 mb-6">
             {homeStrings.mediaTitle}
           </GluestackText>
+          {/* Banner Carousel */}
+          {bannersData?.data && bannersData.data.length > 0 && (
+            <Box className="mb-6">
+              <BannerCarousel
+                banners={bannersData?.data || []}
+                height={180}
+                autoPlay={true}
+                autoPlayInterval={4000}
+                onBannerPress={handleBannerPress}
+              />
+            </Box>
+          )}
 
           {/* Coordle Logo */}
         </Box>

@@ -12,4 +12,5 @@ export { default as CustomActionSheet } from './CustomActionSheet';
 export type { ActionItem } from './CustomActionSheet';
 export { default as CustomAlert } from './CustomAlert';
 export { default as NoData } from './NoData';
+export { default as BannerCarousel } from './BannerCarousel';
 export { ToastProvider, useToast } from './ToastProvider';

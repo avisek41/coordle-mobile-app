@@ -17,4 +17,5 @@ export const API_ENDPOINTS = {
   GET_DOCUMENTS: '/api/documents',
   UPDATE_DOCUMENT: '/api/documents',
   DELETE_DOCUMENT: '/api/documents',
+  GET_BANNERS: '/api/banners',
 } as const;

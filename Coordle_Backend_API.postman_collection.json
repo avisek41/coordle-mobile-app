@@ -577,6 +577,60 @@
           ]
         }
       ]
+    },
+    {
+      "name": "Banners",
+      "item": [
+        {
+          "name": "Get Banners",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/banners",
+              "host": ["{{base_url}}"],
+              "path": ["api", "banners"]
+            }
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{auth_token}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/banners",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "banners"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"statusCode\": 200,\n    \"message\": \"Banners retrieved successfully\",\n    \"timestamp\": \"2025-08-09T19:05:53.333Z\",\n    \"data\": {\n        \"banners\": [\n            {\n                \"_id\": \"68979bd980841c07d1896a84\",\n                \"title\": \"Welcome to Coordle\",\n                \"description\": \"Plan your next adventure with ease\",\n                \"imageUrl\": \"https://res.cloudinary.com/dvy2fizdf/image/upload/v1754766293/coordle/banners/welcome_banner.jpg\",\n                \"linkUrl\": \"https://coordle.com/welcome\",\n                \"isActive\": true,\n                \"order\": 1,\n                \"createdAt\": \"2025-08-09T19:04:57.013Z\",\n                \"updatedAt\": \"2025-08-09T19:04:57.013Z\"\n            },\n            {\n                \"_id\": \"68979bd980841c07d1896a85\",\n                \"title\": \"Discover New Destinations\",\n                \"description\": \"Explore amazing places around the world\",\n                \"imageUrl\": \"https://res.cloudinary.com/dvy2fizdf/image/upload/v1754766293/coordle/banners/discover_banner.jpg\",\n                \"linkUrl\": \"https://coordle.com/discover\",\n                \"isActive\": true,\n                \"order\": 2,\n                \"createdAt\": \"2025-08-09T19:04:57.013Z\",\n                \"updatedAt\": \"2025-08-09T19:04:57.013Z\"\n            }\n        ]\n    }\n}"
+            }
+          ]
+        }
+      ]
     }
   ],
   "variable": [
