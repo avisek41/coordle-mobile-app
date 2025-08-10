@@ -3,7 +3,7 @@ import { SafeAreaView, Alert } from 'react-native';
 import { Text } from '@/components/ui/text';
 import { VStack } from '@/components/ui/vstack';
 import { HStack } from '@/components/ui/hstack';
-import { GradientButton, Header, Loader } from '@/src/components';
+import { GradientButton, Header, Loader, CustomAlert } from '@/src/components';
 import { useNavigation } from '@react-navigation/native';
 import { MainNavigationProps } from '@/src/types/allRoutes';
 import { globalStyles } from '@/src/styles';
@@ -11,22 +11,47 @@ import { documentsStrings } from './strings';
 import NoData from './NoData';
 import SearchField from './SearchField';
 import FilterButton from './FilterButton';
+import DocumentList from './DocumentList';
+import DocumentActionSheet from './DocumentActionSheet';
 import { Box } from '@/components/ui/box';
 import DocumentPicker, {
   DocumentPickerResponse,
 } from 'react-native-document-picker';
-import { useUploadDocumentMutation } from '@/src/services';
+import {
+  useUploadDocumentMutation,
+  useGetDocumentsQuery,
+  Document,
+} from '@/src/services';
 import { useSimpleToast } from '@/src/hooks/useSimpleToast';
 
 const Documents: React.FC = () => {
-  const { goBack } = useNavigation<MainNavigationProps>();
+  const { goBack, navigate } = useNavigation<MainNavigationProps>();
   const [searchText, setSearchText] = useState('');
-  const [documents, setDocuments] = useState<any[]>([]); // Empty array means no documents
   const [selectedDocument, setSelectedDocument] =
     useState<DocumentPickerResponse | null>(null);
-  const [uploadDocument, { isLoading: isUploading }] =
+  const [selectedDocumentForAction, setSelectedDocumentForAction] =
+    useState<Document | null>(null);
+  const [isActionSheetOpen, setIsActionSheetOpen] = useState(false);
+  const [showDeleteAlert, setShowDeleteAlert] = useState(false);
+  const [documentToDelete, setDocumentToDelete] = useState<Document | null>(
+    null,
+  );
+  const [uploadDocument, { isLoading: isUploading, reset }] =
     useUploadDocumentMutation();
   const { showToast, ToastComponent } = useSimpleToast();
+
+  // Get documents data to check if list is empty
+  const {
+    data: documentsData,
+    refetch: refetchDocuments,
+    error,
+    isLoading,
+  } = useGetDocumentsQuery({ page: 1, limit: 10 }, { skip: false });
+
+  console.log('error', error);
+
+  const hasDocuments =
+    documentsData?.data?.documents && documentsData.data.documents.length > 0;
 
   const handleBack = () => {
     goBack();
@@ -76,6 +101,8 @@ const Documents: React.FC = () => {
           duration: 3000,
         });
       }
+    } finally {
+      reset();
     }
   };
 
@@ -97,8 +124,7 @@ const Documents: React.FC = () => {
         duration: 3000,
       });
 
-      // Add uploaded document to the list
-      setDocuments(prev => [...prev, response.data]);
+      // Documents list will be automatically updated via cache invalidation
       setSelectedDocument(null);
     } catch (error: any) {
       const errorMessage =
@@ -120,7 +146,75 @@ const Documents: React.FC = () => {
     console.log('Date filter pressed');
   };
 
-  if (isUploading) {
+  const handleDocumentPress = (document: Document) => {
+    setSelectedDocumentForAction(document);
+    setIsActionSheetOpen(true);
+  };
+
+  const handleActionSheetClose = () => {
+    setIsActionSheetOpen(false);
+    setSelectedDocumentForAction(null);
+  };
+
+  const handleDownload = (document: Document) => {
+    // TODO: Implement download functionality
+    console.log('Download document:', document.fileName);
+    showToast({
+      type: 'success',
+      title: 'Download Started',
+      message: `Downloading ${document.fileName}`,
+      duration: 3000,
+    });
+  };
+
+  const handleRename = (document: Document) => {
+    // TODO: Implement rename functionality
+    console.log('Rename document:', document.fileName);
+    showToast({
+      type: 'info',
+      title: 'Rename',
+      message: `Rename functionality for ${document.fileName} will be implemented soon`,
+      duration: 3000,
+    });
+  };
+
+  const handleFileInfo = (document: Document) => {
+    navigate('FileInformation', { document });
+    setIsActionSheetOpen(false);
+  };
+
+  const handleDelete = (document: Document) => {
+    setDocumentToDelete(document);
+    setShowDeleteAlert(true);
+    setIsActionSheetOpen(false);
+  };
+
+  const handleDeleteConfirm = () => {
+    if (documentToDelete) {
+      // TODO: Implement actual delete functionality
+      console.log('Delete document:', documentToDelete.fileName);
+      showToast({
+        type: 'success',
+        title: 'Document Deleted',
+        message: `${documentToDelete.fileName} has been deleted`,
+        duration: 3000,
+      });
+    }
+    setShowDeleteAlert(false);
+    setDocumentToDelete(null);
+  };
+
+  const handleDeleteCancel = () => {
+    setShowDeleteAlert(false);
+    setDocumentToDelete(null);
+  };
+
+  const handleRefetch = () => {
+    // Called when pull-to-refresh is triggered
+    refetchDocuments();
+  };
+
+  if (isUploading || isLoading) {
     return <Loader />;
   }
 
@@ -145,14 +239,15 @@ const Documents: React.FC = () => {
       </HStack>
 
       {/* Content */}
-      {documents.length === 0 ? (
+      {!hasDocuments ? (
         <NoData onUploadPress={handleUploadDocument} />
       ) : (
-        <VStack className="flex-1 px-6 py-4">
-          {/* Document List will go here when documents exist */}
-          <Text className="text-center text-lg font-body text-gray-600 mt-8">
-            Document list will be implemented here
-          </Text>
+        <VStack className="flex-1">
+          <DocumentList
+            searchText={searchText}
+            onDocumentPress={handleDocumentPress}
+            onRefetch={handleRefetch}
+          />
         </VStack>
       )}
 
@@ -164,6 +259,33 @@ const Documents: React.FC = () => {
           loading={isUploading}
         />
       </Box>
+
+      {/* Document Action Sheet */}
+      <DocumentActionSheet
+        isOpen={isActionSheetOpen}
+        onClose={handleActionSheetClose}
+        document={selectedDocumentForAction}
+        onDownload={handleDownload}
+        onRename={handleRename}
+        onFileInfo={handleFileInfo}
+        onDelete={handleDelete}
+      />
+
+      {/* Delete Confirmation Alert */}
+      <CustomAlert
+        isOpen={showDeleteAlert}
+        title={documentsStrings.deleteConfirmation}
+        message={
+          documentToDelete
+            ? `${documentToDelete.fileName} will be deleted forever. Do you really want to delete?`
+            : ''
+        }
+        cancelText={documentsStrings.cancel}
+        confirmText={documentsStrings.delete}
+        onCancel={handleDeleteCancel}
+        onConfirm={handleDeleteConfirm}
+        isDestructive={true}
+      />
     </SafeAreaView>
   );
 };

@@ -63,3 +63,13 @@ export {
   documentUploadApi,
   useUploadDocumentMutation,
 } from './documentUploadApi';
+
+// Export documents API
+export {
+  documentsApi,
+  useGetDocumentsQuery,
+  useLazyGetDocumentsQuery,
+  type Document,
+  type DocumentsResponse,
+  type DocumentsQueryParams,
+} from './documentsApi';

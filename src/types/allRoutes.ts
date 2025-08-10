@@ -3,6 +3,8 @@ import {
   NativeStackNavigationProp,
   NativeStackScreenProps,
 } from '@react-navigation/native-stack';
+import { Document } from '@/src/services';
+
 export type AuthStackParams = {
   Welcome: undefined;
   Login: undefined;
@@ -28,6 +30,9 @@ export type MainStackParams = {
   ChangePassword: undefined;
   Notifications: undefined;
   Documents: undefined;
+  FileInformation: {
+    document: Document;
+  };
 };
 
 export type MainNavigationProps = NativeStackNavigationProp<MainStackParams>;

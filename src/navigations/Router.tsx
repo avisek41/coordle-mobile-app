@@ -12,6 +12,7 @@ const Routes = () => {
   const dispatch = useAppDispatch();
   const { isLoggedIn } = useAppSelector(state => state?.auth);
   const authCheck = getItem('Login');
+  console.log('authCheck', authCheck);
   React.useEffect(() => {
     if (authCheck) {
       dispatch(logIn());

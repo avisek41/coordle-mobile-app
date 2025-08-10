@@ -14,12 +14,12 @@ const FilterButton: React.FC<FilterButtonProps> = ({ onPress }) => {
   return (
     <TouchableOpacity onPress={onPress}>
       <Box className="bg-white border border-gray-300 rounded-lg h-12 px-4 justify-center items-center ml-4">
-        <HStack className="items-center space-x-2">
+        <HStack className="items-center " space="sm">
           <Ionicons name="funnel-outline" size={18} color="#374151" />
           <Text className="text-base font-body text-gray-700">
             {documentsStrings.dateFilter}
           </Text>
-          <Ionicons name="chevron-down" size={16} color="#374151" />
+          <Ionicons name="arrow-down-outline" size={16} color="#374151" />
         </HStack>
       </Box>
     </TouchableOpacity>

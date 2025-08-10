@@ -1,9 +1,10 @@
-import React from 'react';
-import { TouchableOpacity, Alert } from 'react-native';
+import React, { useState } from 'react';
+import { TouchableOpacity } from 'react-native';
 import { Text as GluestackText } from '@/components/ui/text';
 import { Box } from '@/components/ui/box';
 import { VStack } from '@/components/ui/vstack';
 import { HStack } from '@/components/ui/hstack';
+import { CustomAlert } from '@/src/components';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { Colors } from '@/src/configs/CustomTheme';
 import { profileStrings } from './strings';
@@ -17,6 +18,7 @@ const ProfileSettings: React.FC = () => {
   const { navigate } = useNavigation<MainNavigationProps>();
   const { handleLogout } = useBasicFunctions();
   const { showToast, ToastComponent } = useSimpleToast();
+  const [showSignOutAlert, setShowSignOutAlert] = useState(false);
 
   const handleSettingsPress = () => {
     navigate('Settings');
@@ -27,47 +29,39 @@ const ProfileSettings: React.FC = () => {
   };
 
   const handleSignOut = () => {
-    Alert.alert(
-      profileStrings.signOutConfirmTitle,
-      profileStrings.signOutConfirmMessage,
-      [
-        {
-          text: profileStrings.cancel,
-          style: 'cancel',
-        },
-        {
-          text: profileStrings.signOut,
-          style: 'destructive',
-          onPress: () => {
-            try {
-              // Clear additional storage items
-              removeItem('accessToken');
-              removeItem('isLoggedIn');
-              removeItem('refreshToken');
+    setShowSignOutAlert(true);
+  };
 
-              // Call logout from hook
-              handleLogout();
+  const handleSignOutConfirm = () => {
+    try {
+      // Clear additional storage items
+      removeItem('accessToken');
+      removeItem('isLoggedIn');
+      removeItem('refreshToken');
 
-              // Show success toast
-              showToast({
-                type: 'success',
-                title: profileStrings.signOutSuccess,
-                message: profileStrings.signOutSuccessMessage,
-                duration: 2000,
-              });
-            } catch (error) {
-              showToast({
-                type: 'error',
-                title: profileStrings.signOutError,
-                message: profileStrings.signOutErrorMessage,
-                duration: 3000,
-              });
-            }
-          },
-        },
-      ],
-      { cancelable: true },
-    );
+      // Call logout from hook
+      handleLogout();
+
+      // Show success toast
+      showToast({
+        type: 'success',
+        title: profileStrings.signOutSuccess,
+        message: profileStrings.signOutSuccessMessage,
+        duration: 2000,
+      });
+    } catch (error) {
+      showToast({
+        type: 'error',
+        title: profileStrings.signOutError,
+        message: profileStrings.signOutErrorMessage,
+        duration: 3000,
+      });
+    }
+    setShowSignOutAlert(false);
+  };
+
+  const handleSignOutCancel = () => {
+    setShowSignOutAlert(false);
   };
 
   return (
@@ -171,6 +165,17 @@ const ProfileSettings: React.FC = () => {
         </VStack>
       </VStack>
       <ToastComponent />
+      
+      <CustomAlert
+        isOpen={showSignOutAlert}
+        title={profileStrings.signOutConfirmTitle}
+        message={profileStrings.signOutConfirmMessage}
+        cancelText={profileStrings.cancel}
+        confirmText={profileStrings.signOut}
+        onCancel={handleSignOutCancel}
+        onConfirm={handleSignOutConfirm}
+        isDestructive={true}
+      />
     </>
   );
 };

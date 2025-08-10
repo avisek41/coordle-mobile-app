@@ -15,4 +15,20 @@ export const documentsStrings = {
   uploadSuccessfulMessage: 'Document uploaded successfully',
   uploadFailed: 'Upload Failed',
   uploadFailedMessage: 'Failed to upload document. Please try again.',
+  // Document list
+  loadError: 'Failed to Load Documents',
+  loadErrorMessage: 'Please check your connection and try again.',
+  noSearchResults: 'No documents found',
+  noSearchResultsMessage: 'Try adjusting your search terms.',
+  loadingMore: 'Loading more documents...',
+  // Document actions
+  download: 'Download',
+  rename: 'Rename',
+  fileInformation: 'File information',
+  delete: 'Delete',
+  deleteConfirmation: 'Delete Document',
+  deleteMessage:
+    'Are you sure you want to delete this document? This action cannot be undone.',
+  cancel: 'Cancel',
+  confirm: 'Confirm',
 } as const;

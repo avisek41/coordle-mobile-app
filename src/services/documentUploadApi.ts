@@ -22,6 +22,7 @@ export const documentUploadApi = apiSlice.injectEndpoints({
         body: formData,
         formData: true,
       }),
+      invalidatesTags: ['Documents'],
     }),
   }),
 });

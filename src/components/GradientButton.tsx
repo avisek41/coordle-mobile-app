@@ -15,6 +15,7 @@ interface GradientButtonProps {
   disabled?: boolean;
   colors?: string[];
   style?: ViewStyle;
+  gradientStyle?: ViewStyle;
   textStyle?: TextStyle;
   size?: 'small' | 'medium' | 'large';
   loading?: boolean;
@@ -26,6 +27,7 @@ const GradientButton: React.FC<GradientButtonProps> = ({
   disabled = false,
   colors = ['#2E6F9E', '#51B1C0'],
   style,
+  gradientStyle,
   textStyle,
   loading = false,
 }) => {
@@ -33,12 +35,16 @@ const GradientButton: React.FC<GradientButtonProps> = ({
     <TouchableOpacity
       onPress={onPress}
       disabled={disabled || loading}
-      style={[styles.container, style, { opacity: disabled || loading ? 0.5 : 1 }]}
+      style={[
+        styles.container,
+        style,
+        { opacity: disabled || loading ? 0.5 : 1 },
+      ]}
       activeOpacity={0.8}
     >
       <LinearGradient
         colors={colors}
-        style={[styles.gradient]}
+        style={[styles.gradient, gradientStyle]}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 0 }}
       >

@@ -9,6 +9,7 @@ import {
   Notifications,
 } from '../../screens/Main/Settings';
 import Documents from '../../screens/Main/Documents';
+import FileInformation from '../../screens/Main/Documents/FileInformation';
 
 import { Routes } from '../NavigationUtilis';
 import { MainStackParams } from '@/src/types/allRoutes';
@@ -51,6 +52,11 @@ const MainStack = () => {
       <Stack.Screen
         name="Documents"
         component={Documents}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="FileInformation"
+        component={FileInformation}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>

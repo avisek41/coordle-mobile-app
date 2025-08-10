@@ -4,3 +4,4 @@ export { Chat } from './Chat';
 export { Profile } from './Profile';
 export { Settings, ChangePassword, Notifications } from './Settings';
 export { default as Documents } from './Documents';
+export { default as FileInformation } from './Documents/FileInformation';
