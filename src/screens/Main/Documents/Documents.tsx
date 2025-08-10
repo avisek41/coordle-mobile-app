@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { SafeAreaView, Alert } from 'react-native';
+import { SafeAreaView, Alert, Linking } from 'react-native';
 import { Text } from '@/components/ui/text';
 import { VStack } from '@/components/ui/vstack';
 import { HStack } from '@/components/ui/hstack';
@@ -27,6 +27,7 @@ import {
   useUploadDocumentMutation,
   useGetDocumentsQuery,
   useUpdateDocumentMutation,
+  useDeleteDocumentMutation,
   Document,
 } from '@/src/services';
 import { useSimpleToast } from '@/src/hooks/useSimpleToast';
@@ -56,6 +57,8 @@ const Documents: React.FC = () => {
     useUploadDocumentMutation();
   const [updateDocument, { isLoading: isUpdating }] =
     useUpdateDocumentMutation();
+  const [deleteDocument, { isLoading: isDeleting, reset: resetDelete }] =
+    useDeleteDocumentMutation();
   const { showToast, ToastComponent } = useSimpleToast();
 
   // Get documents data to check if list is empty
@@ -188,14 +191,22 @@ const Documents: React.FC = () => {
   };
 
   const handleDownload = (document: Document) => {
-    // TODO: Implement download functionality
-    console.log('Download document:', document.fileName);
-    showToast({
-      type: 'success',
-      title: 'Download Started',
-      message: `Downloading ${document.fileName}`,
-      duration: 3000,
-    });
+    try {
+      Linking.openURL(document.fileUrl);
+      showToast({
+        type: 'success',
+        title: documentsStrings.downloadSuccess,
+        message: documentsStrings.downloadSuccessMessage,
+        duration: 3000,
+      });
+    } catch (error) {
+      showToast({
+        type: 'error',
+        title: documentsStrings.downloadFailed,
+        message: documentsStrings.downloadFailedMessage,
+        duration: 3000,
+      });
+    }
   };
 
   const handleRename = (document: Document) => {
@@ -251,16 +262,35 @@ const Documents: React.FC = () => {
     setIsActionSheetOpen(false);
   };
 
-  const handleDeleteConfirm = () => {
+  const handleDeleteConfirm = async () => {
     if (documentToDelete) {
-      // TODO: Implement actual delete functionality
-      console.log('Delete document:', documentToDelete.fileName);
-      showToast({
-        type: 'success',
-        title: 'Document Deleted',
-        message: `${documentToDelete.fileName} has been deleted`,
-        duration: 3000,
-      });
+      try {
+        const response = await deleteDocument({
+          documentId: documentToDelete._id,
+        }).unwrap();
+
+        showToast({
+          type: 'success',
+          title: documentsStrings.deleteSuccess,
+          message: response.message || documentsStrings.deleteSuccessMessage,
+          duration: 3000,
+        });
+      } catch (error: any) {
+        const errorMessage =
+          error?.data?.message ||
+          error?.message ||
+          documentsStrings.deleteFailedMessage;
+
+        showToast({
+          type: 'error',
+          title: documentsStrings.deleteFailed,
+          message: errorMessage,
+          duration: 3000,
+        });
+      } finally {
+        // Reset the mutation state
+        resetDelete();
+      }
     }
     setShowDeleteAlert(false);
     setDocumentToDelete(null);
@@ -276,7 +306,7 @@ const Documents: React.FC = () => {
     refetchDocuments();
   };
 
-  if (isUploading || isLoading) {
+  if (isUploading || isLoading || isDeleting) {
     return <Loader />;
   }
 

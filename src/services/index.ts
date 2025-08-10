@@ -70,9 +70,12 @@ export {
   useGetDocumentsQuery,
   useLazyGetDocumentsQuery,
   useUpdateDocumentMutation,
+  useDeleteDocumentMutation,
   type Document,
   type DocumentsResponse,
   type DocumentsQueryParams,
   type UpdateDocumentRequest,
   type UpdateDocumentResponse,
+  type DeleteDocumentRequest,
+  type DeleteDocumentResponse,
 } from './documentsApi';

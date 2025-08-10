@@ -81,7 +81,7 @@ const DocumentCard: React.FC<DocumentCardProps> = ({ document, onPress }) => {
         </VStack>
 
         {/* More Options */}
-        <TouchableOpacity style={styles.moreButton}>
+        <TouchableOpacity onPress={handlePress} style={styles.moreButton}>
           <Ionicon name="ellipsis-vertical" size={21} color={Colors.darkGray} />
         </TouchableOpacity>
       </HStack>

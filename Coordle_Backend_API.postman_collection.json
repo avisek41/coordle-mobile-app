@@ -519,6 +519,62 @@
             }
           },
           "response": []
+        },
+        {
+          "name": "Delete Document",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/documents/:documentId",
+              "host": ["{{base_url}}"],
+              "path": ["api", "documents", ":documentId"],
+              "variable": [
+                {
+                  "key": "documentId",
+                  "value": "68979bd980841c07d1896a83",
+                  "description": "Document ID to delete"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{auth_token}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/documents/68979bd980841c07d1896a83",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "documents", "68979bd980841c07d1896a83"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"statusCode\": 200,\n    \"message\": \"Document deleted successfully\",\n    \"timestamp\": \"2025-08-09T19:05:53.333Z\",\n    \"data\": {\n        \"deletedDocument\": {\n            \"_id\": \"68979bd980841c07d1896a83\",\n            \"userId\": \"689452c56a3c22c49f65bb1b\",\n            \"fileUrl\": \"https://res.cloudinary.com/dvy2fizdf/image/upload/v1754766293/coordle/users/689452c56a3c22c49f65bb1b/documents/document_1754766293162.jpg\",\n            \"publicId\": \"coordle/users/689452c56a3c22c49f65bb1b/documents/document_1754766293162\",\n            \"fileSize\": 6684,\n            \"mimeType\": \"application/pdf\",\n            \"isVerified\": false,\n            \"createdAt\": \"2025-08-09T19:04:57.013Z\",\n            \"updatedAt\": \"2025-08-09T19:04:57.013Z\",\n            \"__v\": 0,\n            \"fileName\": \"dummy.pdf\",\n            \"previewUrl\": \"https://res.cloudinary.com/dvy2fizdf/image/upload/c_fit,f_auto,h_600,pg_1,q_auto,w_800/v1/coordle/users/689452c56a3c22c49f65bb1b/documents/document_1754766293162?_a=BAMAK+Rj0\",\n            \"thumbnailUrl\": \"https://res.cloudinary.com/dvy2fizdf/image/upload/c_fit,f_auto,h_200,pg_1,q_auto,w_200/v1/coordle/users/689452c56a3c22c49f65bb1b/documents/document_1754766293162?_a=BAMAK+Rj0\",\n            \"isExpired\": false,\n            \"daysUntilExpiry\": null\n        }\n    }\n}"
+            }
+          ]
         }
       ]
     }

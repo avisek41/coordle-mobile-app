@@ -16,4 +16,5 @@ export const API_ENDPOINTS = {
   DOCUMENT_UPLOAD: '/api/documents/upload',
   GET_DOCUMENTS: '/api/documents',
   UPDATE_DOCUMENT: '/api/documents',
+  DELETE_DOCUMENT: '/api/documents',
 } as const;

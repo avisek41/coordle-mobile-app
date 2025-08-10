@@ -26,12 +26,20 @@ export const documentsStrings = {
   loadingMore: 'Loading more documents...',
   // Document actions
   download: 'Download',
+  downloadSuccess: 'Document Opened',
+  downloadSuccessMessage: 'Document is opening in your browser',
+  downloadFailed: 'Download Failed',
+  downloadFailedMessage: 'Unable to open document. Please try again.',
   rename: 'Rename',
   fileInformation: 'File information',
   delete: 'Delete',
   deleteConfirmation: 'Delete Document',
   deleteMessage:
     'Are you sure you want to delete this document? This action cannot be undone.',
+  deleteSuccess: 'Document Deleted',
+  deleteSuccessMessage: 'Document has been deleted successfully',
+  deleteFailed: 'Delete Failed',
+  deleteFailedMessage: 'Failed to delete document. Please try again.',
   cancel: 'Cancel',
   confirm: 'Confirm',
 } as const;

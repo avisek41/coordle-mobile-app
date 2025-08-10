@@ -49,6 +49,20 @@ export interface UpdateDocumentResponse {
   data: Document;
 }
 
+export interface DeleteDocumentRequest {
+  documentId: string;
+}
+
+export interface DeleteDocumentResponse {
+  success: boolean;
+  statusCode: number;
+  message: string;
+  timestamp: string;
+  data: {
+    deletedDocument: Document;
+  };
+}
+
 export interface DocumentsQueryParams {
   page?: number;
   limit?: number;
@@ -90,6 +104,16 @@ export const documentsApi = apiSlice.injectEndpoints({
       }),
       invalidatesTags: ['Documents'],
     }),
+    deleteDocument: builder.mutation<
+      DeleteDocumentResponse,
+      DeleteDocumentRequest
+    >({
+      query: ({ documentId }) => ({
+        url: `${API_ENDPOINTS.DELETE_DOCUMENT}/${documentId}`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: ['Documents'],
+    }),
   }),
   overrideExisting: false,
 });
@@ -98,4 +122,5 @@ export const {
   useGetDocumentsQuery,
   useLazyGetDocumentsQuery,
   useUpdateDocumentMutation,
+  useDeleteDocumentMutation,
 } = documentsApi;
