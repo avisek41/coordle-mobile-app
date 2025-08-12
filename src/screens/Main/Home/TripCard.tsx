@@ -1,5 +1,5 @@
 import React from 'react';
-import { Image, TouchableOpacity } from 'react-native';
+import { Image, StyleSheet, TouchableOpacity } from 'react-native';
 import { Box } from '@/components/ui/box';
 import { Text } from '@/components/ui/text';
 import { Trip } from '@/src/types/trip';
@@ -16,18 +16,14 @@ const TripCard: React.FC<TripCardProps> = ({ trip, onPress }) => {
 
   return (
     <TouchableOpacity onPress={onPress} activeOpacity={0.8}>
-      <Box className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+      <Box className="bg-white rounded-2xl shadow-sm border border-gray-300 overflow-hidden">
         <Image
           source={
             trip.cover_image?.url
               ? { uri: trip.cover_image.url }
               : require('@/src/assets/Images/trip.png')
           }
-          style={{
-            width: '100%',
-            height: 120,
-            resizeMode: 'cover',
-          }}
+          style={styles.image}
         />
         <Box className="p-4">
           <Text className="text-lg font-heading text-gray-800 mb-1">
@@ -48,3 +44,13 @@ const TripCard: React.FC<TripCardProps> = ({ trip, onPress }) => {
 };
 
 export default TripCard;
+
+const styles = StyleSheet.create({
+  image: {
+    width: '100%',
+    height: 200,
+    resizeMode: 'cover',
+    padding: 10,
+    borderRadius: 10,
+  },
+});

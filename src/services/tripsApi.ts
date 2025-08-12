@@ -31,6 +31,7 @@ export const tripsApi = apiSlice.injectEndpoints({
         url: '/api/trips',
         method: 'GET',
       }),
+      providesTags: ['Trips'],
     }),
     createTrip: builder.mutation<CreateTripResponse, FormData>({
       query: formData => ({

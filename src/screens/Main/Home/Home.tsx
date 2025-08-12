@@ -38,6 +38,7 @@ const Home = () => {
     data: tripsData,
     isLoading: isTripsLoading,
     error: tripsError,
+    refetch,
   } = useGetTripsQuery();
 
   if (isTripsLoading) {
@@ -46,6 +47,7 @@ const Home = () => {
 
   const userName =
     userProfile?.data?.preferredName || userProfile?.data?.firstName || 'User';
+  const userImage = userProfile?.data?.profilePhoto?.url || '';
 
   const trips = tripsData?.data?.trips || [];
   const hasTrips = trips.length > 0;
@@ -67,7 +69,7 @@ const Home = () => {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#F5F5F5' }}>
-      <Header userName={userName} />
+      <Header userName={userName} userImage={userImage} />
 
       <Box className="flex-1 px-5 pt-6">
         {hasTrips ? (

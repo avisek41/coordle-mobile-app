@@ -1,5 +1,5 @@
 import React from 'react';
-import { TouchableOpacity, StyleSheet } from 'react-native';
+import { TouchableOpacity, StyleSheet, Image } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { Text as GluestackText } from '@/components/ui/text';
 import { Box } from '@/components/ui/box';
@@ -10,21 +10,30 @@ import { homeStrings } from './strings';
 
 interface HeaderProps {
   userName: string;
+  userImage: string;
 }
 
-const Header: React.FC<HeaderProps> = ({ userName }) => {
+const Header: React.FC<HeaderProps> = ({ userName, userImage }) => {
   return (
     <Box className="px-5 py-4">
       <HStack className="justify-between items-center" space="md">
         {/* User Avatar */}
-        <LinearGradient
-          colors={['#2E6F9E', '#51B1C0']}
-          style={styles.avatarGradient}
-        >
-          <GluestackText size="lg" className="text-white font-heading">
-            {userName.charAt(0).toUpperCase()}
-          </GluestackText>
-        </LinearGradient>
+        {userImage ? (
+          <Image
+            source={{ uri: userImage }}
+            style={styles.avatarGradient}
+            className="w-10 h-10 rounded-full"
+          />
+        ) : (
+          <LinearGradient
+            colors={['#2E6F9E', '#51B1C0']}
+            style={styles.avatarGradient}
+          >
+            <GluestackText size="lg" className="text-white font-heading">
+              {userName.charAt(0).toUpperCase()}
+            </GluestackText>
+          </LinearGradient>
+        )}
 
         {/* User Greeting */}
         <VStack className="flex-1 ml-3">
@@ -65,4 +74,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Header; 
+export default Header;
