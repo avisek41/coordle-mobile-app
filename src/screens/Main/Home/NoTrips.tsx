@@ -55,7 +55,7 @@ const NoTrips: React.FC = () => {
 
         {/* Create Trip Button - Only show if user has paid */}
         {hasPaid && (
-          <Box className="w-full mt-4">
+          <Box className="w-full ">
             <GradientButton
               title={homeStrings.createTripButton}
               onPress={handleCreateTrip}

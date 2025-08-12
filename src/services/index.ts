@@ -87,3 +87,6 @@ export {
   type Banner,
   type BannersResponse,
 } from './bannersApi';
+
+// Export trips API
+export { tripsApi, useGetTripsQuery } from './tripsApi';
