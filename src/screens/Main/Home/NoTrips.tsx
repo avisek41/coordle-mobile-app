@@ -5,8 +5,27 @@ import { Box } from '@/components/ui/box';
 import { VStack } from '@/components/ui/vstack';
 import { homeStrings } from './strings';
 import { images } from '@/src/assets';
+import { useGetPaymentHistoryQuery } from '@/src/services/paymentHistoryApi';
+import GradientButton from '@/src/components/GradientButton';
 
 const NoTrips: React.FC = () => {
+  const {
+    data: paymentHistory,
+    isLoading,
+    error,
+  } = useGetPaymentHistoryQuery({
+    page: 1,
+    limit: 10,
+  });
+
+  // Check if user has any successful payments
+  const hasPaid = paymentHistory?.data?.payments?.length ?? 0 > 0;
+
+  const handleCreateTrip = () => {
+    // TODO: Navigate to create trip screen
+    console.log('Navigate to create trip');
+  };
+
   return (
     <Box className="bg-white rounded-xl p-6 mb-8 shadow-sm border border-gray-200">
       <VStack className="items-center" space="lg">
@@ -31,6 +50,20 @@ const NoTrips: React.FC = () => {
             {homeStrings.noTripsSubtitle}
           </GluestackText>
         </VStack>
+
+        {/* Create Trip Button - Only show if user has paid */}
+        {hasPaid && (
+          <Box className="w-full mt-4">
+            <GradientButton
+              title={homeStrings.createTripButton}
+              onPress={handleCreateTrip}
+              style={{
+                width: '50%',
+                alignSelf: 'center',
+              }}
+            />
+          </Box>
+        )}
       </VStack>
     </Box>
   );

@@ -631,6 +631,82 @@
           ]
         }
       ]
+    },
+    {
+      "name": "Payments",
+      "item": [
+        {
+          "name": "Get Payment History",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/payments/history?page=1&limit=10",
+              "host": ["{{base_url}}"],
+              "path": ["api", "payments", "history"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Page number for pagination"
+                },
+                {
+                  "key": "limit",
+                  "value": "10",
+                  "description": "Number of items per page"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{auth_token}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/payments/history?page=1&limit=10",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "payments", "history"],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "10"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"statusCode\": 200,\n    \"message\": \"Payment history retrieved successfully\",\n    \"timestamp\": \"2025-08-11T16:14:03.772Z\",\n    \"data\": {\n        \"payments\": [\n            {\n                \"_id\": \"6899ea74a6782e5a051fb5b7\",\n                \"userId\": \"689452c56a3c22c49f65bb1b\",\n                \"planId\": {\n                    \"_id\": \"6899c569c0cdef6ca1165f8e\",\n                    \"planName\": \"Organizations Plan\",\n                    \"price\": 840,\n                    \"currency\": \"USD\",\n                    \"features\": [\n                        \"Unlimited trips\",\n                        \"Invite unlimited members\",\n                        \"3 Hosts per trip\",\n                        \"15 Days free trial\"\n                    ],\n                    \"allowedHost\": 3,\n                    \"trialDays\": 15\n                },\n                \"stripeSessionId\": \"cs_test_a1UMTePZLNqzPfAmzUS2y65KpO12PmaV8JIWAFWgR5QCMsj1PN8QOCT3hS\",\n                \"amount\": 840,\n                \"currency\": \"USD\",\n                \"status\": \"succeeded\",\n                \"createdAt\": \"2025-08-11T13:04:52.824Z\",\n                \"updatedAt\": \"2025-08-11T13:05:20.244Z\",\n                \"__v\": 0,\n                \"stripePaymentIntentId\": \"pi_3RuvPeDOa8XlJno72546oLo6\"\n            }\n        ],\n        \"pagination\": {\n            \"page\": 1,\n            \"limit\": 10,\n            \"total\": 1,\n            \"pages\": 1\n        }\n    }\n}"
+            }
+          ]
+        }
+      ]
     }
   ],
   "variable": [

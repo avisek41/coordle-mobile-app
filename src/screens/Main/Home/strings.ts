@@ -3,4 +3,5 @@ export const homeStrings = {
   noTripsTitle: 'No trips',
   noTripsSubtitle: 'Easy itinerary planning & management',
   mediaTitle: 'Media',
+  createTripButton: 'Create Trip',
 } as const;
