@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useGetCurrentUserProfileQuery } from '@/src/services';
+import { useGetCurrentUserProfileQuery, useUploadProfilePhotoMutation } from '@/src/services';
 
 interface UseProfilePhotoProps {
   onUploadSuccess?: (profilePhotoUrl: string) => void;
@@ -12,6 +12,8 @@ export const useProfilePhoto = ({
 }: UseProfilePhotoProps = {}) => {
   const [isPhotoPickerVisible, setIsPhotoPickerVisible] = useState(false);
   const [isPhotoUploading, setIsPhotoUploading] = useState(false);
+
+  const [uploadProfilePhoto] = useUploadProfilePhotoMutation();
 
   const {
     data: userProfile,
@@ -32,14 +34,36 @@ export const useProfilePhoto = ({
     setIsPhotoPickerVisible(false);
   };
 
-  const handleUploadStart = () => {
-    setIsPhotoUploading(true);
-  };
+  const handleImageSelected = async (imageData: {
+    uri: string;
+    mimeType: string;
+    fileName: string;
+  }) => {
+    try {
+      setIsPhotoUploading(true);
 
-  const handleUploadSuccess = (profilePhotoUrl: string) => {
-    setIsPhotoUploading(false);
-    onUploadSuccess?.(profilePhotoUrl);
-    refetch(); // Refetch user profile to update UI
+      const formData = new FormData();
+      formData.append('profilePhoto', {
+        uri: imageData.uri,
+        type: imageData.mimeType,
+        name: imageData.fileName,
+      } as any);
+
+      const response = await uploadProfilePhoto(formData).unwrap();
+
+      if (response.success) {
+        setIsPhotoUploading(false);
+        onUploadSuccess?.(response.data.profilePhotoUrl);
+        refetch(); // Refetch user profile to update UI
+      } else {
+        setIsPhotoUploading(false);
+        onUploadError?.(response.message || 'Upload failed');
+      }
+    } catch (error: any) {
+      console.error('Photo upload error:', error);
+      setIsPhotoUploading(false);
+      onUploadError?.(error?.data?.message || 'Failed to upload photo');
+    }
   };
 
   const handleUploadError = (error: string) => {
@@ -63,8 +87,7 @@ export const useProfilePhoto = ({
     // Handlers
     handleOpenPhotoPicker,
     handleClosePhotoPicker,
-    handleUploadStart,
-    handleUploadSuccess,
+    handleImageSelected,
     handleUploadError,
     refetch,
   };

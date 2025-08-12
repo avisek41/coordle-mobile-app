@@ -8,6 +8,7 @@ import { Box } from '@/components/ui/box';
 
 import { Document } from '@/src/services';
 import { Colors } from '@/src/configs/CustomTheme';
+import moment from 'moment';
 
 interface DocumentCardProps {
   document: Document;
@@ -24,12 +25,7 @@ const DocumentCard: React.FC<DocumentCardProps> = ({ document, onPress }) => {
   };
 
   const formatDate = (dateString: string): string => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-      month: '2-digit',
-      day: '2-digit',
-      year: 'numeric',
-    });
+    return moment(dateString).format('MM/DD/YYYY');
   };
 
   const getFileIcon = (mimeType: string): string => {

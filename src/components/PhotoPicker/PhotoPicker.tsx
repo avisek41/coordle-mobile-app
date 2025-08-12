@@ -1,99 +1,96 @@
 import React from 'react';
-import { TouchableOpacity, StyleSheet, Modal, Alert } from 'react-native';
+import { TouchableOpacity, StyleSheet, Modal } from 'react-native';
 import { Box } from '@/components/ui/box';
 import { HStack } from '@/components/ui/hstack';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import ImagePicker from 'react-native-image-crop-picker';
 import { Colors } from '@/src/configs/CustomTheme';
-import { useUploadProfilePhotoMutation } from '@/src/services';
 
 interface PhotoPickerProps {
   isVisible: boolean;
   onClose: () => void;
-  onUploadStart?: () => void;
-  onUploadSuccess?: (profilePhotoUrl: string) => void;
-  onUploadError?: (error: string) => void;
+  onImageSelected?: (imageData: {
+    uri: string;
+    mimeType: string;
+    fileName: string;
+  }) => void;
+  onError?: (error: string) => void;
+  cropping?: boolean;
+  cropperCircleOverlay?: boolean;
+  width?: number;
+  height?: number;
+  compressImageQuality?: number;
 }
 
 const PhotoPicker: React.FC<PhotoPickerProps> = ({
   isVisible,
   onClose,
-  onUploadStart,
-  onUploadSuccess,
-  onUploadError,
+  onImageSelected,
+  onError,
+  cropping = true,
+  cropperCircleOverlay = true,
+  width = 400,
+  height = 400,
+  compressImageQuality = 0.8,
 }) => {
-  const [uploadProfilePhoto, { isLoading: isUploading }] =
-    useUploadProfilePhotoMutation();
-
-  const handleImageUpload = async (
+  const handleImageSelected = (
     imageUri: string,
     mimeType: string,
     fileName: string,
   ) => {
     try {
-      onUploadStart?.(); // Notify parent that upload is starting
-
-      const formData = new FormData();
-      formData.append('profilePhoto', {
+      onImageSelected?.({
         uri: imageUri,
-        type: mimeType,
-        name: fileName,
-      } as any);
-
-      const response = await uploadProfilePhoto(formData).unwrap();
-
-      if (response.success) {
-        onUploadSuccess?.(response.data.profilePhotoUrl);
-        onClose();
-      } else {
-        onUploadError?.(response.message || 'Upload failed');
-      }
+        mimeType,
+        fileName,
+      });
+      onClose();
     } catch (error: any) {
-      console.error('Photo upload error:', error);
-      onUploadError?.(error?.data?.message || 'Failed to upload photo');
+      console.error('Image selection error:', error);
+      onError?.('Failed to process selected image');
     }
   };
 
   const handleSelectFromGallery = () => {
     ImagePicker.openPicker({
-      width: 400,
-      height: 400,
-      cropping: true,
-      cropperCircleOverlay: true,
+      width,
+      height,
+      cropping,
+      cropperCircleOverlay,
       mediaType: 'photo',
       includeBase64: false,
-      compressImageQuality: 0.8,
+      compressImageQuality,
     })
       .then((image: any) => {
-        const fileName = `profile_photo_${Date.now()}.jpg`;
-        handleImageUpload(image.path, image.mime, fileName);
+        const fileName = `image_${Date.now()}.jpg`;
+        handleImageSelected(image.path, image.mime, fileName);
       })
       .catch(error => {
         if (error.code !== 'E_PICKER_CANCELLED') {
           console.error('Gallery picker error:', error);
-          Alert.alert('Error', 'Failed to select image from gallery');
+          onError?.('Failed to select image from gallery');
         }
       });
   };
 
   const handleTakePhoto = () => {
     ImagePicker.openCamera({
-      width: 400,
-      height: 400,
-      cropping: true,
-      cropperCircleOverlay: true,
+      width,
+      height,
+      cropping,
+      cropperCircleOverlay,
       mediaType: 'photo',
       includeBase64: false,
-      compressImageQuality: 0.8,
+      compressImageQuality,
     })
       .then((image: any) => {
-        const fileName = `profile_photo_${Date.now()}.jpg`;
-        handleImageUpload(image.path, image.mime, fileName);
+        const fileName = `image_${Date.now()}.jpg`;
+        handleImageSelected(image.path, image.mime, fileName);
       })
       .catch(error => {
         if (error.code !== 'E_PICKER_CANCELLED') {
           console.error('Camera error:', error);
-          Alert.alert('Error', 'Failed to take photo');
+          onError?.('Failed to take photo');
         }
       });
   };
@@ -125,7 +122,6 @@ const PhotoPicker: React.FC<PhotoPickerProps> = ({
                     style={styles.optionButton}
                     onPress={handleSelectFromGallery}
                     activeOpacity={0.7}
-                    disabled={isUploading}
                   >
                     <Box
                       className="w-16 h-16 
@@ -142,7 +138,6 @@ const PhotoPicker: React.FC<PhotoPickerProps> = ({
                     style={styles.optionButton}
                     onPress={handleTakePhoto}
                     activeOpacity={0.7}
-                    disabled={isUploading}
                   >
                     <Box
                       className="w-16 h-16 

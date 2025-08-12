@@ -89,4 +89,10 @@ export {
 } from './bannersApi';
 
 // Export trips API
-export { tripsApi, useGetTripsQuery } from './tripsApi';
+export {
+  tripsApi,
+  useGetTripsQuery,
+  useCreateTripMutation,
+  type CreateTripFormData,
+  type CreateTripResponse,
+} from './tripsApi';

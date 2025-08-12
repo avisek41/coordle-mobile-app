@@ -34,8 +34,7 @@ const ProfileAvatar: React.FC<ProfileAvatarProps> = ({
     isPhotoUploading: hookIsUploading,
     handleOpenPhotoPicker,
     handleClosePhotoPicker,
-    handleUploadStart,
-    handleUploadSuccess,
+    handleImageSelected,
     handleUploadError,
   } = useProfilePhoto({ onUploadSuccess, onUploadError });
 
@@ -130,9 +129,10 @@ const ProfileAvatar: React.FC<ProfileAvatarProps> = ({
         <PhotoPicker
           isVisible={isPhotoPickerVisible}
           onClose={handleClosePhotoPicker}
-          onUploadStart={handleUploadStart}
-          onUploadSuccess={handleUploadSuccess}
-          onUploadError={handleUploadError}
+          onImageSelected={handleImageSelected}
+          onError={handleUploadError}
+          cropping={true}
+          cropperCircleOverlay={true}
         />
       )}
     </>
