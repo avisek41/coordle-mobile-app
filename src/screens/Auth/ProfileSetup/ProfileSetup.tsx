@@ -33,6 +33,8 @@ import { Loader } from '@/src/components';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { AuthNavigationProps } from '@/src/types/allRoutes';
 import { useNavigation } from '@react-navigation/native';
+import { useAppDispatch, useAppSelector } from '@/src/hooks';
+import { setCredentials } from '@/src/features';
 
 // Helper function to find country by phone code
 const findCountryByPhone = (phoneCode: string) => {
@@ -47,6 +49,7 @@ const findCountryByPhone = (phoneCode: string) => {
 
 const ProfileSetup: React.FC = () => {
   const { navigate } = useNavigation<AuthNavigationProps>();
+  const dispatch = useAppDispatch();
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState({
     firstName: '',
@@ -160,6 +163,17 @@ const ProfileSetup: React.FC = () => {
       const response = await setupProfile(profileData).unwrap();
 
       if (response.success) {
+        // Store userId if available in response
+        if (response.data?.id) {
+          const currentCredentials = useAppSelector(state => state.auth);
+          dispatch(
+            setCredentials({
+              token: currentCredentials.token,
+              userId: response.data.id,
+            }),
+          );
+        }
+
         showToast({
           type: 'success',
           title: strings.profileSetupSuccessTitle,

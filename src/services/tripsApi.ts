@@ -26,10 +26,11 @@ export interface CreateTripResponse {
 
 export const tripsApi = apiSlice.injectEndpoints({
   endpoints: builder => ({
-    getTrips: builder.query<TripsResponse, void>({
-      query: () => ({
+    getTrips: builder.query<TripsResponse, { status?: string } | void>({
+      query: (params) => ({
         url: '/api/trips',
         method: 'GET',
+        params: params || {},
       }),
       providesTags: ['Trips'],
     }),

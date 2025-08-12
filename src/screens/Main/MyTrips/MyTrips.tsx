@@ -1,6 +1,11 @@
 import React, { useState } from 'react';
 import { SafeAreaView, TouchableOpacity } from 'react-native';
-import { useGetCurrentUserProfileQuery } from '@/src/services';
+import {
+  useGetCurrentUserProfileQuery,
+  useGetTripsQuery,
+} from '@/src/services';
+import { useAppSelector } from '@/src/hooks';
+import { selectCurrentUserId } from '@/src/features';
 import { Text as GluestackText } from '@/components/ui/text';
 import { Box } from '@/components/ui/box';
 import { VStack } from '@/components/ui/vstack';
@@ -11,19 +16,37 @@ import { Colors } from '@/src/configs/CustomTheme';
 import { globalStyles } from '@/src/styles';
 import Header from './Header';
 import NoData from './NoData';
+import UpcomingTrips from './UpcomingTrips';
+import PastTrips from './PastTrips';
+import { Trip } from '@/src/types/trip';
 
 const MyTrips = () => {
   const [activeTab, setActiveTab] = useState<'upcoming' | 'past'>('upcoming');
 
   const {
     data: userProfile,
-    isLoading,
-    error,
+    isLoading: isProfileLoading,
+    error: profileError,
   } = useGetCurrentUserProfileQuery();
 
-  if (isLoading) {
+  const {
+    data: upcomingTripsData,
+    isLoading: isUpcomingTripsLoading,
+    error: upcomingTripsError,
+  } = useGetTripsQuery({ status: 'upcoming' });
+
+  const {
+    data: pastTripsData,
+    isLoading: isPastTripsLoading,
+    error: pastTripsError,
+  } = useGetTripsQuery({ status: 'past' });
+
+  if (isProfileLoading || isUpcomingTripsLoading || isPastTripsLoading) {
     return <Loader />;
   }
+
+  const upcomingTrips = upcomingTripsData?.data?.trips || [];
+  const pastTrips = pastTripsData?.data?.trips || [];
 
   return (
     <SafeAreaView style={globalStyles.container}>
@@ -93,14 +116,33 @@ const MyTrips = () => {
         </Box>
 
         {/* Content Area */}
-        <NoData
-          title={myTripsStrings.noData}
-          subtitle={
-            activeTab === 'upcoming'
-              ? myTripsStrings.noUpcomingTrips
-              : myTripsStrings.noPastTrips
-          }
-        />
+        {activeTab === 'upcoming' ? (
+          upcomingTrips.length > 0 ? (
+            <UpcomingTrips
+              trips={upcomingTrips}
+              onTripPress={(trip: Trip) => {
+                console.log('Upcoming trip pressed:', trip);
+              }}
+            />
+          ) : (
+            <NoData
+              title={myTripsStrings.noData}
+              subtitle={myTripsStrings.noUpcomingTrips}
+            />
+          )
+        ) : pastTrips.length > 0 ? (
+          <PastTrips
+            trips={pastTrips}
+            onTripPress={(trip: Trip) => {
+              console.log('Past trip pressed:', trip);
+            }}
+          />
+        ) : (
+          <NoData
+            title={myTripsStrings.noData}
+            subtitle={myTripsStrings.noPastTrips}
+          />
+        )}
       </Box>
     </SafeAreaView>
   );

@@ -53,11 +53,13 @@ const Login: React.FC = () => {
       }).unwrap();
 
       if (response.success) {
-        // Store the access token
+        console.log('response', response);
+        // Store the access token and userId
         const accessToken = response.data.token;
+        const userId = response.data.id;
         if (accessToken) {
-          // Store token in Redux store
-          dispatch(setCredentials({ token: accessToken }));
+          // Store token and userId in Redux store
+          dispatch(setCredentials({ token: accessToken, userId }));
           // Store token in local storage
           setItem('accessToken', accessToken);
           setItem('isLoggedIn', 'true');

@@ -63,10 +63,11 @@ const PhoneVerification = () => {
         }).unwrap();
 
         if (loginResponse.success) {
-          // Store the token
+          // Store the token and userId
           const token = loginResponse.data.token;
+          const userId = loginResponse.data.id;
           if (token) {
-            dispatch(setCredentials({ token }));
+            dispatch(setCredentials({ token, userId }));
             setItem('accessToken', token);
             setItem('isLoggedIn', 'true');
           }
@@ -89,11 +90,12 @@ const PhoneVerification = () => {
         console.log('verifyResponse', verifyResponse);
 
         if (verifyResponse.success) {
-          // Store the token
+          // Store the token and userId
           const token = verifyResponse.data.token;
+          const userId = verifyResponse.data.id;
           if (token) {
-            // Store token in Redux store
-            dispatch(setCredentials({ token }));
+            // Store token and userId in Redux store
+            dispatch(setCredentials({ token, userId }));
             // Store token in local storage
             setItem('accessToken', token);
           }
