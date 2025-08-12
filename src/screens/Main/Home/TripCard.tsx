@@ -28,8 +28,6 @@ const TripCard: React.FC<TripCardProps> = ({
   const isOwner = trip.owner_id === userId;
   const userCount = trip.users?.length || 0;
 
-  console.log('isOwner', isOwner);
-
   return (
     <TouchableOpacity onPress={onPress} activeOpacity={0.8}>
       <Box className="bg-white rounded-2xl shadow-sm border border-gray-300 overflow-hidden">
