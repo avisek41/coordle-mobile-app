@@ -7,8 +7,11 @@ import { homeStrings } from './strings';
 import { images } from '@/src/assets';
 import { useGetPaymentHistoryQuery } from '@/src/services/paymentHistoryApi';
 import GradientButton from '@/src/components/GradientButton';
+import { useNavigation } from '@react-navigation/native';
+import { MainNavigationProps } from '@/src/types/allRoutes';
 
 const NoTrips: React.FC = () => {
+  const { navigate } = useNavigation<MainNavigationProps>();
   const {
     data: paymentHistory,
     isLoading,
@@ -22,8 +25,7 @@ const NoTrips: React.FC = () => {
   const hasPaid = paymentHistory?.data?.payments?.length ?? 0 > 0;
 
   const handleCreateTrip = () => {
-    // TODO: Navigate to create trip screen
-    console.log('Navigate to create trip');
+    navigate('CreateTrip');
   };
 
   return (

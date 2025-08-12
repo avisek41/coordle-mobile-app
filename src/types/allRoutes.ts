@@ -33,6 +33,7 @@ export type MainStackParams = {
   FileInformation: {
     document: Document;
   };
+  CreateTrip: undefined;
 };
 
 export type MainNavigationProps = NativeStackNavigationProp<MainStackParams>;

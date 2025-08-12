@@ -8,4 +8,5 @@ export const Routes = {
   PhoneVerification: 'PhoneVerification',
   ProfileSetup: 'ProfileSetup',
   ForgotPassword: 'ForgotPassword',
+  CreateTrip: 'CreateTrip',
 } as const;
