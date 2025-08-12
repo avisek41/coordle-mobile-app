@@ -10,7 +10,7 @@ interface AddNewTripCardProps {
 
 const AddNewTripCard: React.FC<AddNewTripCardProps> = ({ onPress }) => {
   return (
-    <Box className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
+    <Box className="bg-white rounded-lg p-4 shadow-sm border border-gray-200">
       <HStack className="justify-between items-center space-x-4">
         <Text className="text-lg font-heading text-gray-800 flex-1">
           Add a new trip

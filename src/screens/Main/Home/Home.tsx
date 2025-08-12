@@ -18,6 +18,7 @@ import AddNewTripCard from './AddNewTripCard';
 import { useNavigation } from '@react-navigation/native';
 import { MainNavigationProps } from '@/src/types/allRoutes';
 import { Trip } from '@/src/types/trip';
+import { globalStyles } from '@/src/styles';
 
 const Home = () => {
   const navigation = useNavigation<MainNavigationProps>();
@@ -68,7 +69,7 @@ const Home = () => {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: '#F5F5F5' }}>
+    <SafeAreaView style={globalStyles.container}>
       <Header userName={userName} userImage={userImage} />
 
       <Box className="flex-1 px-5 pt-6">
