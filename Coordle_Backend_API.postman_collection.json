@@ -763,6 +763,99 @@
             }
           },
           "response": []
+        },
+        {
+          "name": "Update Trip",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "name",
+                  "value": "Updated Trip to Paris",
+                  "type": "text"
+                },
+                {
+                  "key": "to_address",
+                  "value": "Paris, France",
+                  "type": "text"
+                },
+                {
+                  "key": "to_location_latitude",
+                  "value": "48.8566",
+                  "type": "text"
+                },
+                {
+                  "key": "to_location_longitude",
+                  "value": "2.3522",
+                  "type": "text"
+                },
+                {
+                  "key": "from_address",
+                  "value": "New York, USA",
+                  "type": "text"
+                },
+                {
+                  "key": "display_start",
+                  "value": "2025-08-15",
+                  "type": "text"
+                },
+                {
+                  "key": "display_end",
+                  "value": "2025-08-20",
+                  "type": "text"
+                },
+                {
+                  "key": "start_date",
+                  "value": "2025-08-15T00:00:00.000Z",
+                  "type": "text"
+                },
+                {
+                  "key": "end_date",
+                  "value": "2025-08-20T23:59:59.999Z",
+                  "type": "text"
+                },
+                {
+                  "key": "coverImage",
+                  "type": "file",
+                  "src": []
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/trips/{{trip_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "trips", "{{trip_id}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Trip",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/trips/{{trip_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "trips", "{{trip_id}}"]
+            }
+          },
+          "response": []
         }
       ]
     },

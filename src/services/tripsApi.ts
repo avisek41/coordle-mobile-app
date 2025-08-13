@@ -60,8 +60,26 @@ export const tripsApi = apiSlice.injectEndpoints({
       }),
       providesTags: (result, error, tripId) => [{ type: 'Trips', id: tripId }],
     }),
+    updateTrip: builder.mutation<CreateTripResponse, { tripId: string; formData: FormData }>({
+      query: ({ tripId, formData }) => ({
+        url: `/api/trips/${tripId}`,
+        method: 'PUT',
+        body: formData,
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      }),
+      invalidatesTags: ['Trips'],
+    }),
+    deleteTrip: builder.mutation<{ success: boolean; message: string }, string>({
+      query: (tripId) => ({
+        url: `/api/trips/${tripId}`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: ['Trips'],
+    }),
   }),
   overrideExisting: false,
 });
 
-export const { useGetTripsQuery, useCreateTripMutation, useGetTripByIdQuery } = tripsApi;
+export const { useGetTripsQuery, useCreateTripMutation, useGetTripByIdQuery, useUpdateTripMutation, useDeleteTripMutation } = tripsApi;

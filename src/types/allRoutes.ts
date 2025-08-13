@@ -33,7 +33,10 @@ export type MainStackParams = {
   FileInformation: {
     document: Document;
   };
-  CreateTrip: undefined;
+  CreateTrip: {
+    isEditMode?: boolean;
+    tripId?: string;
+  };
   TripDetails: {
     tripId: string;
     isPastTrip?: boolean;

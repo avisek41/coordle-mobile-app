@@ -38,12 +38,9 @@ const TripDetails: React.FC = () => {
   };
 
   const handleEditPress = () => {
-    // TODO: Navigate to edit trip screen
-    showToast({
-      type: 'info',
-      title: tripDetailsStrings.editTrip,
-      message: tripDetailsStrings.editComingSoon,
-      duration: 2000,
+    navigation.navigate('CreateTrip', {
+      isEditMode: true,
+      tripId: trip._id,
     });
   };
 

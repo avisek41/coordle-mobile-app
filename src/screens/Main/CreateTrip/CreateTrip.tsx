@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   SafeAreaView,
   ScrollView,
@@ -24,16 +24,27 @@ import DateTimePicker, {
 import { Platform } from 'react-native';
 import { Colors } from '@/src/configs/CustomTheme';
 import PhotoPicker from '@/src/components/PhotoPicker/PhotoPicker';
-import { useCreateTripMutation } from '@/src/services';
-import { useNavigation } from '@react-navigation/native';
-import { MainNavigationProps } from '@/src/types/allRoutes';
+import {
+  useCreateTripMutation,
+  useUpdateTripMutation,
+  useDeleteTripMutation,
+  useGetTripByIdQuery,
+} from '@/src/services';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import { MainNavigationProps, MainRouteProps } from '@/src/types/allRoutes';
 
 import moment from 'moment';
 import { useSimpleToast } from '@/src/hooks/useSimpleToast';
+import ShareTripSection from './ShareTripSection';
 
 const CreateTrip = () => {
   const navigation = useNavigation<MainNavigationProps>();
+  const route = useRoute<MainRouteProps<'CreateTrip'>>();
+  const { isEditMode = false, tripId } = route.params;
+
   const [createTrip, { isLoading: isCreating }] = useCreateTripMutation();
+  const [updateTrip, { isLoading: isUpdating }] = useUpdateTripMutation();
+  const [deleteTrip, { isLoading: isDeleting }] = useDeleteTripMutation();
   const { showToast, ToastComponent } = useSimpleToast();
 
   const [tripName, setTripName] = useState('');
@@ -44,6 +55,25 @@ const CreateTrip = () => {
   const [showBeginsPicker, setShowBeginsPicker] = useState(false);
   const [showEndsPicker, setShowEndsPicker] = useState(false);
   const [showPhotoPicker, setShowPhotoPicker] = useState(false);
+  const [tripMembers, setTripMembers] = useState('');
+
+  // Fetch trip data for edit mode
+  const { data: tripData, isLoading: isLoadingTrip } = useGetTripByIdQuery(
+    tripId || '',
+    { skip: !isEditMode || !tripId },
+  );
+
+  // Populate form data when editing
+  useEffect(() => {
+    if (isEditMode && tripData?.data) {
+      const trip = tripData.data;
+      setTripName(trip.name || '');
+      setDestination(trip.to_address || '');
+      setTripBegins(new Date(trip.start_date));
+      setTripEnds(new Date(trip.end_date));
+      setSelectedImage(trip.cover_image?.url || null);
+    }
+  }, [isEditMode, tripData]);
 
   const handleImagePicker = () => {
     setShowPhotoPicker(true);
@@ -72,7 +102,30 @@ const CreateTrip = () => {
     setShowPhotoPicker(false);
   };
 
-  const handleCreateTrip = async () => {
+  const handleDeleteTrip = async () => {
+    if (!isEditMode || !tripId) return;
+
+    try {
+      await deleteTrip(tripId).unwrap();
+      showToast({
+        type: 'success',
+        title: 'Success',
+        message: 'Trip deleted successfully!',
+      });
+      setTimeout(() => {
+        navigation.goBack();
+      }, 1500);
+    } catch (error) {
+      console.error('Failed to delete trip:', error);
+      showToast({
+        type: 'error',
+        title: 'Error',
+        message: 'Failed to delete trip. Please try again.',
+      });
+    }
+  };
+
+  const handleSaveTrip = async () => {
     // Validate all required fields
     if (!tripName.trim()) {
       showToast({
@@ -126,7 +179,7 @@ const CreateTrip = () => {
 
       // Add trip data
       formData.append('name', tripName.trim());
-      formData.append('to_address', 'Jaipur, Rajasthan, India');
+      formData.append('to_address', destination.trim());
       formData.append('to_location_latitude', '26.9124');
       formData.append('to_location_longitude', '75.7873');
       formData.append('from_address', '');
@@ -146,27 +199,41 @@ const CreateTrip = () => {
         } as any);
       }
 
-      await createTrip(formData).unwrap();
+      if (isEditMode && tripId) {
+        // Update existing trip
+        await updateTrip({ tripId, formData }).unwrap();
+        showToast({
+          type: 'success',
+          title: 'Success',
+          message: 'Trip updated successfully!',
+        });
+      } else {
+        // Create new trip
+        await createTrip(formData).unwrap();
+        showToast({
+          type: 'success',
+          title: 'Success',
+          message: 'Trip created successfully!',
+        });
+      }
 
-      // Show success toast
-      showToast({
-        type: 'success',
-        title: 'Success',
-        message: 'Trip created successfully!',
-      });
-
-      // Navigate back to home after successful creation
+      // Navigate back after successful operation
       setTimeout(() => {
         navigation.goBack();
       }, 1500);
     } catch (error) {
-      console.error('Failed to create trip:', error);
+      console.error(
+        `Failed to ${isEditMode ? 'update' : 'create'} trip:`,
+        error,
+      );
 
       // Show error toast
       showToast({
         type: 'error',
         title: 'Error',
-        message: 'Failed to create trip. Please try again.',
+        message: `Failed to ${
+          isEditMode ? 'update' : 'create'
+        } trip. Please try again.`,
       });
     }
   };
@@ -176,7 +243,11 @@ const CreateTrip = () => {
       <ScrollView showsVerticalScrollIndicator={false}>
         <Box className="relative">
           <Image
-            source={images.cover}
+            source={
+              isEditMode && tripData?.data?.cover_image?.url
+                ? { uri: tripData?.data?.cover_image?.url }
+                : images.cover
+            }
             style={{
               width: '100%',
               height: 230,
@@ -283,14 +354,40 @@ const CreateTrip = () => {
           </Box>
         </Box>
 
-        <Box className="px-4 mt-6 mb-8">
-          <GradientButton
-            title={CREATE_TRIP_STRINGS.CREATE_TRIP_BUTTON}
-            onPress={handleCreateTrip}
-            colors={['#2E6F9E', '#51B1C0']}
-            loading={isCreating}
-            disabled={isCreating}
+        {/* Share Trip Section */}
+        <Box className="px-4 mt-6">
+          <ShareTripSection
+            tripMembers={tripMembers}
+            onTripMembersChange={setTripMembers}
           />
+        </Box>
+
+        <Box className="px-4 mt-6 mb-8">
+          <VStack space="md">
+            <GradientButton
+              title={
+                isEditMode
+                  ? CREATE_TRIP_STRINGS.SAVE_TRIP_BUTTON
+                  : CREATE_TRIP_STRINGS.CREATE_TRIP_BUTTON
+              }
+              onPress={handleSaveTrip}
+              colors={['#2E6F9E', '#51B1C0']}
+              loading={isCreating || isUpdating}
+              disabled={isCreating || isUpdating}
+            />
+
+            {isEditMode && (
+              <TouchableOpacity
+                onPress={handleDeleteTrip}
+                disabled={isDeleting}
+                className="py-3"
+              >
+                <Text className="text-center text-primary-500 font-heading">
+                  {CREATE_TRIP_STRINGS.DELETE_TRIP_BUTTON}
+                </Text>
+              </TouchableOpacity>
+            )}
+          </VStack>
         </Box>
       </ScrollView>
 

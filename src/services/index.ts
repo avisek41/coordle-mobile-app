@@ -93,6 +93,8 @@ export {
   tripsApi,
   useGetTripsQuery,
   useCreateTripMutation,
+  useUpdateTripMutation,
+  useDeleteTripMutation,
   useGetTripByIdQuery,
   type CreateTripFormData,
   type CreateTripResponse,
