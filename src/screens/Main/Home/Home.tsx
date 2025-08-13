@@ -40,7 +40,7 @@ const Home = () => {
     isLoading: isTripsLoading,
     error: tripsError,
     refetch,
-  } = useGetTripsQuery();
+  } = useGetTripsQuery({ status: 'upcoming' });
 
   if (isTripsLoading) {
     return <Loader />;

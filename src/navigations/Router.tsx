@@ -13,9 +13,10 @@ const Routes = () => {
     const restoreAuth = async () => {
       const loginFlag = await getItem('isLoggedIn');
       const token = await getItem('accessToken'); // already parsed
+      const userId = await getItem('userId'); // already parsed
 
       if (loginFlag === 'true' && token) {
-        dispatch(setCredentials({ token })); // no JSON.parse needed
+        dispatch(setCredentials({ token, userId })); // no JSON.parse needed
         dispatch(logIn());
       }
     };

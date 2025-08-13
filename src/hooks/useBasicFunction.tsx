@@ -1,5 +1,5 @@
 import { logIn, logOut } from '../features';
-import { setItem } from '../utils';
+import { setItem, removeItem } from '../utils';
 import { useAppDispatch } from './index';
 
 const useBasicFunctions = () => {
@@ -12,6 +12,7 @@ const useBasicFunctions = () => {
 
   const handleLogout = () => {
     setItem('Login', false);
+    removeItem('userId');
     dispatch(logOut());
   };
   return {

@@ -172,6 +172,8 @@ const ProfileSetup: React.FC = () => {
               userId: response.data.id,
             }),
           );
+          // Store userId in MMKV
+          setItem('userId', response.data.id);
         }
 
         showToast({

@@ -60,8 +60,9 @@ const Login: React.FC = () => {
         if (accessToken) {
           // Store token and userId in Redux store
           dispatch(setCredentials({ token: accessToken, userId }));
-          // Store token in local storage
+          // Store token and userId in local storage
           setItem('accessToken', accessToken);
+          setItem('userId', userId);
           setItem('isLoggedIn', 'true');
         }
 

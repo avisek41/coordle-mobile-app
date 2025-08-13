@@ -38,6 +38,7 @@ const ProfileSettings: React.FC = () => {
       removeItem('accessToken');
       removeItem('isLoggedIn');
       removeItem('refreshToken');
+      removeItem('userId');
 
       // Call logout from hook
       handleLogout();
@@ -165,7 +166,7 @@ const ProfileSettings: React.FC = () => {
         </VStack>
       </VStack>
       <ToastComponent />
-      
+
       <CustomAlert
         isOpen={showSignOutAlert}
         title={profileStrings.signOutConfirmTitle}

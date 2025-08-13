@@ -2,7 +2,7 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
 import { RootState } from '../redux/Store';
 import { BASE_URL } from '../configs';
-import { getItem, setItem } from '../utils';
+import { getItem, setItem, removeItem } from '../utils';
 import { logOut, setCredentials } from '../features';
 
 const baseQuery = fetchBaseQuery({
@@ -41,6 +41,7 @@ const baseQueryWithReauth = async (
     api.dispatch(logOut());
     setItem('isLoggedIn', 'false');
     setItem('accessToken', '');
+    removeItem('userId');
   }
 
   return result; // Return the result of the query

@@ -69,6 +69,7 @@ const PhoneVerification = () => {
           if (token) {
             dispatch(setCredentials({ token, userId }));
             setItem('accessToken', token);
+            setItem('userId', userId);
             setItem('isLoggedIn', 'true');
           }
 
@@ -96,8 +97,9 @@ const PhoneVerification = () => {
           if (token) {
             // Store token and userId in Redux store
             dispatch(setCredentials({ token, userId }));
-            // Store token in local storage
+            // Store token and userId in local storage
             setItem('accessToken', token);
+            setItem('userId', userId);
           }
 
           // Check if profile setup is required based on verify response
