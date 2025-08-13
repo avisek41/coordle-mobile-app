@@ -10,9 +10,9 @@ interface NoDataProps {
 
 const NoData: React.FC<NoDataProps> = ({ title, subtitle }) => {
   return (
-    <Box className="flex-1 justify-center items-center bg-white p-6">
+    <Box className="py-20 px-6">
       {/* No Data Text */}
-      <VStack className="items-center justify-center flex-1" space="sm">
+      <VStack space="sm" style={{ alignItems: 'center' }}>
         <GluestackText className="text-xl font-heading text-gray-800 text-center">
           {title}
         </GluestackText>

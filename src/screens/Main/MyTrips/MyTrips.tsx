@@ -11,18 +11,15 @@ import {
 } from '@/src/services';
 import { useAppSelector } from '@/src/hooks';
 import { selectCurrentUserId } from '@/src/features';
-import { Text as GluestackText } from '@/components/ui/text';
 import { Box } from '@/components/ui/box';
-import { VStack } from '@/components/ui/vstack';
-import { HStack } from '@/components/ui/hstack';
 import { Loader } from '@/src/components';
 import { myTripsStrings } from '@/src/screens/Main/MyTrips/strings';
-import { Colors } from '@/src/configs/CustomTheme';
 import { globalStyles } from '@/src/styles';
 import Header from './Header';
 import NoData from './NoData';
 import UpcomingTrips from './UpcomingTrips';
 import PastTrips from './PastTrips';
+import TripTabs from './TripTabs';
 import { Trip } from '@/src/types/trip';
 import { useNavigation } from '@react-navigation/native';
 import { MainNavigationProps } from '@/src/types/allRoutes';
@@ -88,66 +85,10 @@ const MyTrips = () => {
         }
       >
         {/* Tabs */}
-        <Box className="mb-6">
-          <HStack space="sm">
-            <TouchableOpacity
-              onPress={() => setActiveTab('upcoming')}
-              style={{ flex: 1 }}
-            >
-              <VStack space="xs">
-                <GluestackText
-                  className={`font-heading ${
-                    activeTab === 'upcoming' ? 'font-heading' : 'text-gray-600'
-                  }`}
-                  style={{
-                    color:
-                      activeTab === 'upcoming' ? Colors.primary : undefined,
-                  }}
-                >
-                  {myTripsStrings.upcomingTrip}
-                </GluestackText>
-                {activeTab === 'upcoming' && (
-                  <Box
-                    className="h-0.5"
-                    style={{
-                      backgroundColor: Colors.primary,
-                      width: '20%',
-                    }}
-                  />
-                )}
-              </VStack>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              onPress={() => setActiveTab('past')}
-              style={{ flex: 1 }}
-            >
-              <VStack space="xs">
-                <GluestackText
-                  className={`font-heading ${
-                    activeTab === 'past' ? 'font-heading' : 'text-gray-600'
-                  }`}
-                  style={{
-                    color: activeTab === 'past' ? Colors.primary : undefined,
-                  }}
-                >
-                  {myTripsStrings.pastTrip}
-                </GluestackText>
-                {activeTab === 'past' && (
-                  <Box
-                    className="h-0.5"
-                    style={{
-                      backgroundColor: Colors.primary,
-                      width: '20%',
-                    }}
-                  />
-                )}
-              </VStack>
-            </TouchableOpacity>
-          </HStack>
-        </Box>
+        <TripTabs activeTab={activeTab} onTabChange={setActiveTab} />
 
         {/* Content Area */}
+
         {activeTab === 'upcoming' ? (
           upcomingTrips.length > 0 ? (
             <UpcomingTrips
