@@ -58,7 +58,7 @@ const TripCard: React.FC<TripCardProps> = ({
               {/* Group Trip Badge */}
               {userCount > 0 && (
                 <Box className="bg-white px-3 py-1 rounded-full">
-                  <Text className="text-red-5000 text-xs font-heading">
+                  <Text className="text-red-500 text-xs font-heading">
                     Group Trip
                   </Text>
                 </Box>
