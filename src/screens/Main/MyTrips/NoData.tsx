@@ -10,17 +10,15 @@ interface NoDataProps {
 
 const NoData: React.FC<NoDataProps> = ({ title, subtitle }) => {
   return (
-    <Box className="flex-1 bg-white rounded-xl p-6">
-      <VStack className="flex-1 justify-center items-center" space="lg">
-        {/* No Data Text */}
-        <VStack className="items-center" space="sm">
-          <GluestackText className="text-xl font-heading text-gray-800 text-center">
-            {title}
-          </GluestackText>
-          <GluestackText className="text-md text-gray-500 text-center">
-            {subtitle}
-          </GluestackText>
-        </VStack>
+    <Box className="flex-1 justify-center items-center bg-white p-6">
+      {/* No Data Text */}
+      <VStack className="items-center justify-center flex-1" space="sm">
+        <GluestackText className="text-xl font-heading text-gray-800 text-center">
+          {title}
+        </GluestackText>
+        <GluestackText className="text-md text-gray-500 text-center">
+          {subtitle}
+        </GluestackText>
       </VStack>
     </Box>
   );

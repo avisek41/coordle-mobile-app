@@ -60,7 +60,7 @@ const Home = () => {
   };
 
   const handleCreateTrip = () => {
-    navigation.navigate('CreateTrip');
+    navigation.navigate('CreateTrip', { isEditMode: false });
   };
 
   const handleTripPress = (trip: Trip) => {

@@ -6,6 +6,7 @@ import { HStack } from '@/components/ui/hstack';
 import { Trip } from '@/src/types/trip';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useAppSelector } from '@/src/hooks';
+import { formatDateRange } from '@/src/utils';
 
 interface TripCardProps {
   trip: Trip;
@@ -21,14 +22,8 @@ const TripCard: React.FC<TripCardProps> = ({
 }) => {
   const { userId } = useAppSelector(state => state?.auth);
 
-  const formatDateRange = (startDate: string, endDate: string) => {
-    return `${startDate} - ${endDate}`;
-  };
-
   const isOwner = trip.owner_id === userId;
   const userCount = trip.users?.length || 0;
-
-  console.log('userId', userId);
 
   return (
     <TouchableOpacity onPress={onPress} activeOpacity={0.8}>

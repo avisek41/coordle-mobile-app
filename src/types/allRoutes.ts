@@ -34,7 +34,7 @@ export type MainStackParams = {
     document: Document;
   };
   CreateTrip: {
-    isEditMode?: boolean;
+    isEditMode: boolean;
     tripId?: string;
   };
   TripDetails: {

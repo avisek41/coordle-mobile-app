@@ -24,6 +24,7 @@ import DateTimePicker, {
 import { Platform } from 'react-native';
 import { Colors } from '@/src/configs/CustomTheme';
 import PhotoPicker from '@/src/components/PhotoPicker/PhotoPicker';
+import CustomAlert from '@/src/components/CustomAlert';
 import {
   useCreateTripMutation,
   useUpdateTripMutation,
@@ -40,7 +41,11 @@ import ShareTripSection from './ShareTripSection';
 const CreateTrip = () => {
   const navigation = useNavigation<MainNavigationProps>();
   const route = useRoute<MainRouteProps<'CreateTrip'>>();
-  const { isEditMode = false, tripId } = route.params;
+
+  const { isEditMode, tripId } = route.params ?? {
+    isEditMode: false,
+    tripId: undefined,
+  };
 
   const [createTrip, { isLoading: isCreating }] = useCreateTripMutation();
   const [updateTrip, { isLoading: isUpdating }] = useUpdateTripMutation();
@@ -56,6 +61,7 @@ const CreateTrip = () => {
   const [showEndsPicker, setShowEndsPicker] = useState(false);
   const [showPhotoPicker, setShowPhotoPicker] = useState(false);
   const [tripMembers, setTripMembers] = useState('');
+  const [showDeleteAlert, setShowDeleteAlert] = useState(false);
 
   // Fetch trip data for edit mode
   const { data: tripData, isLoading: isLoadingTrip } = useGetTripByIdQuery(
@@ -102,18 +108,24 @@ const CreateTrip = () => {
     setShowPhotoPicker(false);
   };
 
-  const handleDeleteTrip = async () => {
+  const handleDeleteTrip = () => {
+    if (!isEditMode || !tripId) return;
+    setShowDeleteAlert(true);
+  };
+
+  const handleConfirmDeleteTrip = async () => {
     if (!isEditMode || !tripId) return;
 
     try {
       await deleteTrip(tripId).unwrap();
+      setShowDeleteAlert(false);
       showToast({
         type: 'success',
         title: 'Success',
         message: 'Trip deleted successfully!',
       });
       setTimeout(() => {
-        navigation.goBack();
+        navigation.navigate('BottomTabs');
       }, 1500);
     } catch (error) {
       console.error('Failed to delete trip:', error);
@@ -123,6 +135,10 @@ const CreateTrip = () => {
         message: 'Failed to delete trip. Please try again.',
       });
     }
+  };
+
+  const handleCancelDeleteTrip = () => {
+    setShowDeleteAlert(false);
   };
 
   const handleSaveTrip = async () => {
@@ -355,12 +371,14 @@ const CreateTrip = () => {
         </Box>
 
         {/* Share Trip Section */}
-        <Box className="px-4 mt-6">
-          <ShareTripSection
-            tripMembers={tripMembers}
-            onTripMembersChange={setTripMembers}
-          />
-        </Box>
+        {isEditMode && (
+          <Box className="px-4 mt-6">
+            <ShareTripSection
+              tripMembers={tripMembers}
+              onTripMembersChange={setTripMembers}
+            />
+          </Box>
+        )}
 
         <Box className="px-4 mt-6 mb-8">
           <VStack space="md">
@@ -482,6 +500,18 @@ const CreateTrip = () => {
         onError={handlePhotoPickerError}
         cropping={false}
         cropperCircleOverlay={false}
+      />
+
+      {/* Delete Trip Confirmation Alert */}
+      <CustomAlert
+        isOpen={showDeleteAlert}
+        title="Delete Trip"
+        message="Are you sure you want to delete this trip? This action cannot be undone."
+        cancelText="Cancel"
+        confirmText="Delete"
+        onCancel={handleCancelDeleteTrip}
+        onConfirm={handleConfirmDeleteTrip}
+        isDestructive={true}
       />
 
       {/* Toast Component */}

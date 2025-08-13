@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   SafeAreaView,
   ScrollView,
@@ -10,8 +10,8 @@ import { Text } from '@/components/ui/text';
 import { VStack } from '@/components/ui/vstack';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { MainNavigationProps, MainRouteProps } from '@/src/types/allRoutes';
-import { useGetTripByIdQuery } from '@/src/services';
-import { Loader } from '@/src/components';
+import { useGetTripByIdQuery, useDeleteTripMutation } from '@/src/services';
+import { Loader, CustomAlert } from '@/src/components';
 import { useSimpleToast } from '@/src/hooks/useSimpleToast';
 import { useAppSelector } from '@/src/hooks';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -32,6 +32,8 @@ const TripDetails: React.FC = () => {
   const { userId } = useAppSelector(state => state?.auth);
 
   const { data: tripData, isLoading, error } = useGetTripByIdQuery(tripId);
+  const [deleteTrip, { isLoading: isDeleting }] = useDeleteTripMutation();
+  const [showDeleteAlert, setShowDeleteAlert] = useState(false);
 
   const handleBackPress = () => {
     navigation.goBack();
@@ -72,6 +74,38 @@ const TripDetails: React.FC = () => {
       message: tripDetailsStrings.addComingSoon,
       duration: 2000,
     });
+  };
+
+  const handleDeletePress = () => {
+    setShowDeleteAlert(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    try {
+      setShowDeleteAlert(false);
+      await deleteTrip(tripId).unwrap();
+
+      showToast({
+        type: 'success',
+        title: 'Success',
+        message: tripDetailsStrings.deleteTripSuccess,
+        duration: 2000,
+      });
+
+      // Navigate to MyTrips after successful deletion
+      navigation.navigate('BottomTabs');
+    } catch (error) {
+      showToast({
+        type: 'error',
+        title: 'Error',
+        message: tripDetailsStrings.deleteTripError,
+        duration: 3000,
+      });
+    }
+  };
+
+  const handleDeleteCancel = () => {
+    setShowDeleteAlert(false);
   };
 
   if (isLoading) {
@@ -146,6 +180,18 @@ const TripDetails: React.FC = () => {
           <Ionicons name="add" size={28} color="red" />
         </TouchableOpacity>
       )}
+
+      {/* Delete Confirmation Alert */}
+      <CustomAlert
+        isOpen={showDeleteAlert}
+        title={tripDetailsStrings.deleteTripTitle}
+        message={tripDetailsStrings.deleteTripMessage}
+        cancelText="Cancel"
+        confirmText="Delete"
+        onCancel={handleDeleteCancel}
+        onConfirm={handleDeleteConfirm}
+        isDestructive={true}
+      />
     </SafeAreaView>
   );
 };

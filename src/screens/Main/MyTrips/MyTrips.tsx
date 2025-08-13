@@ -77,7 +77,7 @@ const MyTrips = () => {
 
       {/* Main Content */}
       <ScrollView
-        className="flex-1 px-5 pt-3"
+        style={{ paddingHorizontal: 16, paddingTop: 16 }}
         refreshControl={
           <RefreshControl
             refreshing={refreshing}

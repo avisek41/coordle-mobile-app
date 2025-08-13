@@ -2,6 +2,7 @@ import React from 'react';
 import { TouchableOpacity, StyleSheet, Image } from 'react-native';
 import { Box } from '@/components/ui/box';
 import { Text } from '@/components/ui/text';
+import { HStack } from '@/components/ui/hstack';
 import { Trip } from '@/src/types/trip';
 import { tripDetailsStrings } from './strings';
 import { Colors } from '@/src/configs/CustomTheme';
@@ -13,6 +14,7 @@ interface CoverImageProps {
   userCount: number;
   onBackPress: () => void;
   onEditPress: () => void;
+
   isPast: boolean;
 }
 
@@ -21,6 +23,7 @@ const CoverImage: React.FC<CoverImageProps> = ({
   userCount,
   onBackPress,
   onEditPress,
+
   isPast,
 }) => {
   return (

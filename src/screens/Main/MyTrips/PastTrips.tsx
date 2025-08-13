@@ -4,6 +4,8 @@ import { VStack } from '@/components/ui/vstack';
 import { Text } from '@/components/ui/text';
 import TripCard from '../Home/TripCard';
 import { Trip } from '@/src/types/trip';
+import NoData from './NoData';
+import { myTripsStrings } from './strings';
 
 interface PastTripsProps {
   trips: Trip[];
