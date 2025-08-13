@@ -1,5 +1,10 @@
 import React, { useState } from 'react';
-import { SafeAreaView, TouchableOpacity } from 'react-native';
+import {
+  SafeAreaView,
+  TouchableOpacity,
+  RefreshControl,
+  ScrollView,
+} from 'react-native';
 import {
   useGetCurrentUserProfileQuery,
   useGetTripsQuery,
@@ -25,6 +30,7 @@ import { MainNavigationProps } from '@/src/types/allRoutes';
 const MyTrips = () => {
   const navigation = useNavigation<MainNavigationProps>();
   const [activeTab, setActiveTab] = useState<'upcoming' | 'past'>('upcoming');
+  const [refreshing, setRefreshing] = useState(false);
 
   const {
     data: userProfile,
@@ -36,13 +42,26 @@ const MyTrips = () => {
     data: upcomingTripsData,
     isLoading: isUpcomingTripsLoading,
     error: upcomingTripsError,
+    refetch: refetchUpcomingTrips,
   } = useGetTripsQuery({ status: 'upcoming' });
 
   const {
     data: pastTripsData,
     isLoading: isPastTripsLoading,
     error: pastTripsError,
+    refetch: refetchPastTrips,
   } = useGetTripsQuery({ status: 'past' });
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    try {
+      await Promise.all([refetchUpcomingTrips(), refetchPastTrips()]);
+    } catch (error) {
+      console.error('Error refreshing trips:', error);
+    } finally {
+      setRefreshing(false);
+    }
+  };
 
   if (isProfileLoading || isUpcomingTripsLoading || isPastTripsLoading) {
     return <Loader />;
@@ -57,7 +76,17 @@ const MyTrips = () => {
       <Header />
 
       {/* Main Content */}
-      <Box className="flex-1 px-5 pt-3">
+      <ScrollView
+        className="flex-1 px-5 pt-3"
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            colors={['#51B1C0']} // Primary color
+            tintColor="#51B1C0"
+          />
+        }
+      >
         {/* Tabs */}
         <Box className="mb-6">
           <HStack space="sm">
@@ -124,7 +153,10 @@ const MyTrips = () => {
             <UpcomingTrips
               trips={upcomingTrips}
               onTripPress={(trip: Trip) => {
-                navigation.navigate('TripDetails', { tripId: trip._id, isPastTrip: false });
+                navigation.navigate('TripDetails', {
+                  tripId: trip._id,
+                  isPastTrip: false,
+                });
               }}
             />
           ) : (
@@ -137,7 +169,10 @@ const MyTrips = () => {
           <PastTrips
             trips={pastTrips}
             onTripPress={(trip: Trip) => {
-              navigation.navigate('TripDetails', { tripId: trip._id, isPastTrip: true });
+              navigation.navigate('TripDetails', {
+                tripId: trip._id,
+                isPastTrip: true,
+              });
             }}
           />
         ) : (
@@ -146,7 +181,7 @@ const MyTrips = () => {
             subtitle={myTripsStrings.noPastTrips}
           />
         )}
-      </Box>
+      </ScrollView>
     </SafeAreaView>
   );
 };
