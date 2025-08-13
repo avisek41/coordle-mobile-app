@@ -11,6 +11,7 @@ import {
 import Documents from '../../screens/Main/Documents';
 import FileInformation from '../../screens/Main/Documents/FileInformation';
 import { CreateTrip } from '../../screens/Main/CreateTrip';
+import TripDetails from '../../screens/Main/TripDetails';
 
 import { Routes } from '../NavigationUtilis';
 import { MainStackParams } from '@/src/types/allRoutes';
@@ -63,6 +64,11 @@ const MainStack = () => {
       <Stack.Screen
         name="CreateTrip"
         component={CreateTrip}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="TripDetails"
+        component={TripDetails}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>

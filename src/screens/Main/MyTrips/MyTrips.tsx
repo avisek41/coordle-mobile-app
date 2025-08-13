@@ -19,8 +19,11 @@ import NoData from './NoData';
 import UpcomingTrips from './UpcomingTrips';
 import PastTrips from './PastTrips';
 import { Trip } from '@/src/types/trip';
+import { useNavigation } from '@react-navigation/native';
+import { MainNavigationProps } from '@/src/types/allRoutes';
 
 const MyTrips = () => {
+  const navigation = useNavigation<MainNavigationProps>();
   const [activeTab, setActiveTab] = useState<'upcoming' | 'past'>('upcoming');
 
   const {
@@ -121,7 +124,7 @@ const MyTrips = () => {
             <UpcomingTrips
               trips={upcomingTrips}
               onTripPress={(trip: Trip) => {
-                console.log('Upcoming trip pressed:', trip);
+                navigation.navigate('TripDetails', { tripId: trip._id, isPastTrip: false });
               }}
             />
           ) : (
@@ -134,7 +137,7 @@ const MyTrips = () => {
           <PastTrips
             trips={pastTrips}
             onTripPress={(trip: Trip) => {
-              console.log('Past trip pressed:', trip);
+              navigation.navigate('TripDetails', { tripId: trip._id, isPastTrip: true });
             }}
           />
         ) : (

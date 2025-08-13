@@ -17,3 +17,7 @@ export const getItem = <T>(key: string): T | null => {
 export const removeItem = (key: string) => {
   storage.delete(key);
 };
+
+export const formatDateRange = (startDate: string, endDate: string): string => {
+  return `${startDate} - ${endDate}`;
+};

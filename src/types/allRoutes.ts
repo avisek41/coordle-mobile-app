@@ -34,6 +34,10 @@ export type MainStackParams = {
     document: Document;
   };
   CreateTrip: undefined;
+  TripDetails: {
+    tripId: string;
+    isPastTrip?: boolean;
+  };
 };
 
 export type MainNavigationProps = NativeStackNavigationProp<MainStackParams>;

@@ -24,6 +24,14 @@ export interface CreateTripResponse {
   timestamp: string;
 }
 
+export interface TripResponse {
+  success: boolean;
+  statusCode: number;
+  message: string;
+  data: Trip;
+  timestamp: string;
+}
+
 export const tripsApi = apiSlice.injectEndpoints({
   endpoints: builder => ({
     getTrips: builder.query<TripsResponse, { status?: string } | void>({
@@ -45,8 +53,15 @@ export const tripsApi = apiSlice.injectEndpoints({
       }),
       invalidatesTags: ['Trips'],
     }),
+    getTripById: builder.query<TripResponse, string>({
+      query: (tripId) => ({
+        url: `/api/trips/${tripId}`,
+        method: 'GET',
+      }),
+      providesTags: (result, error, tripId) => [{ type: 'Trips', id: tripId }],
+    }),
   }),
   overrideExisting: false,
 });
 
-export const { useGetTripsQuery, useCreateTripMutation } = tripsApi;
+export const { useGetTripsQuery, useCreateTripMutation, useGetTripByIdQuery } = tripsApi;

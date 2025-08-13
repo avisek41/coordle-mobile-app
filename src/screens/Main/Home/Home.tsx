@@ -64,8 +64,8 @@ const Home = () => {
   };
 
   const handleTripPress = (trip: Trip) => {
-    // Handle trip press - navigate to trip details
-    console.log('Trip pressed:', trip);
+    // Navigate to trip details
+    navigation.navigate('TripDetails', { tripId: trip._id });
   };
 
   return (
