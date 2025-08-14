@@ -28,7 +28,7 @@ const TripCard: React.FC<TripCardProps> = ({
   return (
     <TouchableOpacity onPress={onPress} activeOpacity={0.8}>
       <Box className="bg-white rounded-2xl shadow-sm border border-gray-300 overflow-hidden">
-        <Box>
+        <Box className="p-3">
           <Image
             source={
               trip.cover_image?.url
@@ -103,9 +103,8 @@ export default TripCard;
 const styles = StyleSheet.create({
   image: {
     width: '100%',
-    height: 200,
+    height: 150,
     resizeMode: 'cover',
     borderRadius: 10,
-    padding: 10,
   },
 });

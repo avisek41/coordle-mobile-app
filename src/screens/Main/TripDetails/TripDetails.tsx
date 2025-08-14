@@ -129,7 +129,7 @@ const TripDetails: React.FC = () => {
   const userCount = trip.users?.length || 0;
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <SafeAreaView style={globalStyles.container}>
       <ToastComponent />
 
       <ScrollView
