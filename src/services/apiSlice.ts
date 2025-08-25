@@ -29,10 +29,11 @@ const baseQueryWithReauth = async (
   extraOptions?: any, // Extra options for the query
 ) => {
   console.log('args>>', args);
+  // full url = base url + end point
+
   console.log('api>>', api);
   // Make the initial query
   let result = await baseQuery(args, api, extraOptions);
-  console.log('result', result?.error?.status);
 
   // Check if the result contains an error with status code 401 (Unauthorized)
   if (result?.error?.status === 401) {
@@ -52,3 +53,6 @@ export const apiSlice = createApi({
   tagTypes: ['User', 'Profile', 'Documents', 'Trips'],
   endpoints: builder => ({}),
 });
+
+// https://coordle-backend-4.onrender.com/api/trips
+// https://coordle-backend-4.onrender.com/api/trips

@@ -6,13 +6,13 @@ import { VStack } from '@/components/ui/vstack';
 import { HStack } from '@/components/ui/hstack';
 import { Box } from '@/components/ui/box';
 
-import { Document } from '@/src/services';
+import { Document, TripDocument } from '@/src/services';
 import { Colors } from '@/src/configs/CustomTheme';
 import moment from 'moment';
 
 interface DocumentCardProps {
-  document: Document;
-  onPress?: (document: Document) => void;
+  document: Document | TripDocument;
+  onPress?: (document: Document | TripDocument) => void;
 }
 
 const DocumentCard: React.FC<DocumentCardProps> = ({ document, onPress }) => {
@@ -26,17 +26,6 @@ const DocumentCard: React.FC<DocumentCardProps> = ({ document, onPress }) => {
 
   const formatDate = (dateString: string): string => {
     return moment(dateString).format('MM/DD/YYYY');
-  };
-
-  const getFileIcon = (mimeType: string): string => {
-    if (mimeType.includes('pdf')) {
-      return '📄'; // PDF icon
-    } else if (mimeType.includes('image')) {
-      return '🖼️'; // Image icon
-    } else if (mimeType.includes('doc') || mimeType.includes('word')) {
-      return '📝'; // Document icon
-    }
-    return '📋'; // Default document icon
   };
 
   const handlePress = () => {
@@ -63,7 +52,7 @@ const DocumentCard: React.FC<DocumentCardProps> = ({ document, onPress }) => {
         {/* Document Info */}
         <VStack className="flex-1 space-y-1">
           <Text className="font-body text-base text-gray-900" numberOfLines={1}>
-            {document.fileName}
+            {document.originalFileName || document.fileName}
           </Text>
           <HStack className="items-center space-x-2">
             <Text className="font-body text-sm text-gray-500">

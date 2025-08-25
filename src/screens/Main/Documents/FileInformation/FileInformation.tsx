@@ -62,7 +62,7 @@ const FileInformation: React.FC = () => {
           <Ionicon name="document-text" size={24} color={Colors.primary} />
         </Box>
         <Text className="font-body text-lg mt-2 text-black">
-          {document?.fileName || 'Document.pdf'}
+          {document?.originalFileName || document?.fileName}
         </Text>
         {/* Divider */}
         <Box className="h-px w-full bg-gray-200 mb-6 mt-4" />
@@ -74,7 +74,7 @@ const FileInformation: React.FC = () => {
           {fileInformationStrings.type}
         </Text>
         <Text className="font-body text-black text-base mt-1">
-          .{getFileExtension(document?.fileName || 'Document.pdf')}
+          .{getFileExtension(document?.originalFileName || 'Document.pdf')}
         </Text>
 
         <Text className="font-body text-gray-500 text-base mt-2">

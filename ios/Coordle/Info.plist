@@ -35,6 +35,8 @@
 	<string>Camera access allows you to submit photos of completed tasks and other activities.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Photo library access allows you to choose photos of completed tasks and other activities.</string>
+	<key>NSDocumentsFolderUsageDescription</key>
+	<string>Document access allows you to upload files for your trips and activities.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string/>
 	<key>RCTNewArchEnabled</key>

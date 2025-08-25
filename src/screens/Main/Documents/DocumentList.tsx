@@ -3,7 +3,12 @@ import { FlatList, RefreshControl, StyleSheet } from 'react-native';
 import { Text } from '@/components/ui/text';
 import { VStack } from '@/components/ui/vstack';
 import { Box } from '@/components/ui/box';
-import { useGetDocumentsQuery, Document } from '@/src/services';
+import {
+  useGetDocumentsQuery,
+  Document,
+  useGetTripDocumentsQuery,
+  TripDocument,
+} from '@/src/services';
 import DocumentCard from './DocumentCard';
 import { Loader } from '@/src/components';
 import { documentsStrings } from './strings';
@@ -11,11 +16,13 @@ import UploadDoc from './UploadDoc';
 
 interface DocumentListProps {
   searchText?: string;
-  onDocumentPress?: (document: Document) => void;
+  onDocumentPress?: (document: Document | TripDocument) => void;
   onRefetch?: () => void;
   onUploadPress?: () => void;
   sortBy?: 'date' | 'name';
   sortOrder?: 'asc' | 'desc';
+  isTripDocuments?: boolean;
+  tripId?: string;
 }
 
 const DocumentList: React.FC<DocumentListProps> = ({
@@ -25,27 +32,45 @@ const DocumentList: React.FC<DocumentListProps> = ({
   onUploadPress,
   sortBy = 'date',
   sortOrder = 'desc',
+  isTripDocuments = false,
+  tripId,
 }) => {
   const [currentPage, setCurrentPage] = useState(1);
-  const [allDocuments, setAllDocuments] = useState<Document[]>([]);
-  const [filteredDocuments, setFilteredDocuments] = useState<Document[]>([]);
+  const [allDocuments, setAllDocuments] = useState<(Document | TripDocument)[]>(
+    [],
+  );
+  const [filteredDocuments, setFilteredDocuments] = useState<
+    (Document | TripDocument)[]
+  >([]);
   const [hasLoadedInitial, setHasLoadedInitial] = useState(false);
 
+  // Use appropriate query based on document type
   const {
     data: documentsData,
     isLoading,
     isFetching,
     error,
     refetch,
-  } = useGetDocumentsQuery(
-    {
-      page: currentPage,
-      limit: 10,
-    },
-    {
-      skip: false,
-    },
-  );
+  } = isTripDocuments && tripId
+    ? useGetTripDocumentsQuery(
+        {
+          tripId,
+          page: currentPage,
+          limit: 10,
+        },
+        {
+          skip: false,
+        },
+      )
+    : useGetDocumentsQuery(
+        {
+          page: currentPage,
+          limit: 10,
+        },
+        {
+          skip: false,
+        },
+      );
 
   // Update documents when data changes
   React.useEffect(() => {
@@ -73,15 +98,17 @@ const DocumentList: React.FC<DocumentListProps> = ({
     // Apply search filter
     if (searchText.trim()) {
       filtered = allDocuments.filter(doc =>
-        doc.fileName.toLowerCase().includes(searchText.toLowerCase()),
+        (doc.originalFileName || doc.fileName)
+          .toLowerCase()
+          .includes(searchText.toLowerCase()),
       );
     }
 
     // Apply sorting
     const sorted = [...filtered].sort((a, b) => {
       if (sortBy === 'name') {
-        const nameA = a.fileName.toLowerCase();
-        const nameB = b.fileName.toLowerCase();
+        const nameA = a.originalFileName || a.fileName.toLowerCase();
+        const nameB = b.originalFileName || b.fileName.toLowerCase();
         return sortOrder === 'asc'
           ? nameA.localeCompare(nameB)
           : nameB.localeCompare(nameA);
@@ -112,7 +139,7 @@ const DocumentList: React.FC<DocumentListProps> = ({
   }, [documentsData?.data?.pagination?.hasNext, isFetching, isLoading]);
 
   const renderDocument = useCallback(
-    ({ item }: { item: Document }) => (
+    ({ item }: { item: Document | TripDocument }) => (
       <DocumentCard document={item} onPress={onDocumentPress} />
     ),
     [onDocumentPress],
@@ -167,7 +194,10 @@ const DocumentList: React.FC<DocumentListProps> = ({
     filteredDocuments.length,
   ]);
 
-  const keyExtractor = useCallback((item: Document) => item._id, []);
+  const keyExtractor = useCallback(
+    (item: Document | TripDocument) => item._id,
+    [],
+  );
 
   if (!hasLoadedInitial && isLoading) {
     return (

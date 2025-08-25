@@ -41,6 +41,13 @@ export type MainStackParams = {
     tripId: string;
     isPastTrip?: boolean;
   };
+  TripDocuments: {
+    tripId: string;
+    tripTitle?: string;
+  };
+  AddTripMembers: {
+    tripId?: string;
+  };
 };
 
 export type MainNavigationProps = NativeStackNavigationProp<MainStackParams>;

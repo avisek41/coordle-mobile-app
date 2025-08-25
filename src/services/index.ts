@@ -99,3 +99,20 @@ export {
   type CreateTripFormData,
   type CreateTripResponse,
 } from './tripsApi';
+
+// Export trip documents API
+export {
+  tripDocumentsApi,
+  useGetTripDocumentsQuery,
+  useLazyGetTripDocumentsQuery,
+  useUploadTripDocumentMutation,
+  useUpdateTripDocumentMutation,
+  useDeleteTripDocumentMutation,
+  type TripDocument,
+  type TripDocumentsResponse,
+  type TripDocumentsQueryParams,
+  type UpdateTripDocumentRequest,
+  type UpdateTripDocumentResponse,
+  type DeleteTripDocumentRequest,
+  type DeleteTripDocumentResponse,
+} from './tripDocumentsApi';

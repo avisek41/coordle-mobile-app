@@ -35,7 +35,7 @@ export interface TripResponse {
 export const tripsApi = apiSlice.injectEndpoints({
   endpoints: builder => ({
     getTrips: builder.query<TripsResponse, { status?: string } | void>({
-      query: (params) => ({
+      query: params => ({
         url: '/api/trips',
         method: 'GET',
         params: params || {},
@@ -47,20 +47,20 @@ export const tripsApi = apiSlice.injectEndpoints({
         url: '/api/trips',
         method: 'POST',
         body: formData,
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
       }),
       invalidatesTags: ['Trips'],
     }),
     getTripById: builder.query<TripResponse, string>({
-      query: (tripId) => ({
+      query: tripId => ({
         url: `/api/trips/${tripId}`,
         method: 'GET',
       }),
       providesTags: (result, error, tripId) => [{ type: 'Trips', id: tripId }],
     }),
-    updateTrip: builder.mutation<CreateTripResponse, { tripId: string; formData: FormData }>({
+    updateTrip: builder.mutation<
+      CreateTripResponse,
+      { tripId: string; formData: FormData }
+    >({
       query: ({ tripId, formData }) => ({
         url: `/api/trips/${tripId}`,
         method: 'PUT',
@@ -71,15 +71,23 @@ export const tripsApi = apiSlice.injectEndpoints({
       }),
       invalidatesTags: ['Trips'],
     }),
-    deleteTrip: builder.mutation<{ success: boolean; message: string }, string>({
-      query: (tripId) => ({
-        url: `/api/trips/${tripId}`,
-        method: 'DELETE',
-      }),
-      invalidatesTags: ['Trips'],
-    }),
+    deleteTrip: builder.mutation<{ success: boolean; message: string }, string>(
+      {
+        query: tripId => ({
+          url: `/api/trips/${tripId}`,
+          method: 'DELETE',
+        }),
+        invalidatesTags: ['Trips'],
+      },
+    ),
   }),
   overrideExisting: false,
 });
 
-export const { useGetTripsQuery, useCreateTripMutation, useGetTripByIdQuery, useUpdateTripMutation, useDeleteTripMutation } = tripsApi;
+export const {
+  useGetTripsQuery,
+  useCreateTripMutation,
+  useGetTripByIdQuery,
+  useUpdateTripMutation,
+  useDeleteTripMutation,
+} = tripsApi;

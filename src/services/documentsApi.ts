@@ -13,6 +13,7 @@ export interface Document {
   updatedAt: string;
   __v: number;
   fileName: string;
+  originalFileName: string;
   previewUrl: string;
   thumbnailUrl: string;
   isExpired: boolean;
@@ -38,7 +39,7 @@ export interface DocumentsResponse {
 
 export interface UpdateDocumentRequest {
   documentId: string;
-  fileName: string;
+  originalFileName: string;
 }
 
 export interface UpdateDocumentResponse {
@@ -95,11 +96,11 @@ export const documentsApi = apiSlice.injectEndpoints({
       UpdateDocumentResponse,
       UpdateDocumentRequest
     >({
-      query: ({ documentId, fileName }) => ({
+      query: ({ documentId, originalFileName }) => ({
         url: `${API_ENDPOINTS.UPDATE_DOCUMENT}/${documentId}`,
         method: 'PUT',
         body: {
-          fileName,
+          originalFileName,
         },
       }),
       invalidatesTags: ['Documents'],

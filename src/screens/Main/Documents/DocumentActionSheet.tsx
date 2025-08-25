@@ -1,16 +1,16 @@
 import React from 'react';
 import { CustomActionSheet, ActionItem } from '@/src/components';
 import { documentsStrings } from './strings';
-import { Document } from '@/src/services';
+import { Document, TripDocument } from '@/src/services';
 
 interface DocumentActionSheetProps {
   isOpen: boolean;
   onClose: () => void;
-  document: Document | null;
-  onDownload?: (document: Document) => void;
-  onRename?: (document: Document) => void;
-  onFileInfo?: (document: Document) => void;
-  onDelete?: (document: Document) => void;
+  document: (Document | TripDocument) | null;
+  onDownload?: (document: Document | TripDocument) => void;
+  onRename?: (document: Document | TripDocument) => void;
+  onFileInfo?: (document: Document | TripDocument) => void;
+  onDelete?: (document: Document | TripDocument) => void;
 }
 
 const DocumentActionSheet: React.FC<DocumentActionSheetProps> = ({
@@ -76,7 +76,7 @@ const DocumentActionSheet: React.FC<DocumentActionSheetProps> = ({
     <CustomActionSheet
       isOpen={isOpen}
       onClose={onClose}
-      title={document.fileName}
+      title={document.originalFileName || document.fileName}
       actions={actions}
     />
   );

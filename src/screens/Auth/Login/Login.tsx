@@ -113,7 +113,7 @@ const Login: React.FC = () => {
 
       <ScrollView className="flex-1" contentContainerStyle={{ flexGrow: 1 }}>
         {/* Header */}
-        <Header onBackPress={handleBackPress} showBackButton={true} />
+        <Header title="" onBackPress={handleBackPress} showBackButton={true} />
         <VStack className="flex-1 px-4 py-8">
           {/* Title */}
           <Text className="text-2xl font-heading text-black mb-2 mt-4">

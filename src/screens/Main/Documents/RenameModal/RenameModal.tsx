@@ -7,13 +7,13 @@ import { Box } from '@/components/ui/box';
 import { Input, InputField } from '@/components/ui/input';
 import { GradientButton } from '@/src/components';
 import { renameModalStrings } from './strings';
-import { Document } from '@/src/services';
+import { Document, TripDocument } from '@/src/services';
 import { Colors } from '@/src/configs/CustomTheme';
 
 interface RenameModalProps {
   isVisible: boolean;
   onClose: () => void;
-  document: Document | null;
+  document: (Document | TripDocument) | null;
   onRename: (documentId: string, newTitle: string) => void;
   isLoading?: boolean;
 }
@@ -30,7 +30,8 @@ const RenameModal: React.FC<RenameModalProps> = ({
   useEffect(() => {
     if (document && isVisible) {
       // Remove file extension for editing
-      const nameWithoutExtension = document.fileName.replace(/\.[^/.]+$/, '');
+      const nameWithoutExtension =
+        document.originalFileName || document.fileName.replace(/\.[^/.]+$/, '');
       setFileName(nameWithoutExtension);
     }
   }, [document, isVisible]);
@@ -38,7 +39,8 @@ const RenameModal: React.FC<RenameModalProps> = ({
   const handleRename = () => {
     if (document && fileName.trim()) {
       // Add back the file extension
-      const fileExtension = document.fileName.split('.').pop();
+      const fileExtension =
+        document.originalFileName || document.fileName.split('.').pop();
       const newFileName = `${fileName.trim()}.${fileExtension}`;
       onRename(document._id, newFileName);
     }
@@ -82,7 +84,7 @@ const RenameModal: React.FC<RenameModalProps> = ({
             </Input>
             {document && (
               <Text className="font-body text-xs text-gray-500 mt-1">
-                File extension: .{getFileExtension(document.fileName)}
+                File extension: .{getFileExtension(document.originalFileName)}
               </Text>
             )}
           </Box>

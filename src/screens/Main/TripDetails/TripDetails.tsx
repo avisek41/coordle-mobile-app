@@ -57,13 +57,20 @@ const TripDetails: React.FC = () => {
   };
 
   const handleFeaturePress = (feature: string) => {
-    // TODO: Navigate to respective feature screens
-    showToast({
-      type: 'info',
-      title: feature,
-      message: `${feature} ${tripDetailsStrings.featureComingSoon}`,
-      duration: 2000,
-    });
+    if (feature === 'Documents') {
+      navigation.navigate('TripDocuments', {
+        tripId: trip._id,
+        tripTitle: trip.name,
+      });
+    } else {
+      // TODO: Navigate to respective feature screens
+      showToast({
+        type: 'info',
+        title: feature,
+        message: `${feature} ${tripDetailsStrings.featureComingSoon}`,
+        duration: 2000,
+      });
+    }
   };
 
   const handleAddPress = () => {
@@ -150,7 +157,9 @@ const TripDetails: React.FC = () => {
         >
           <TripHeader
             trip={trip}
-            onAddMembersPress={() => handleFeaturePress('Add Trip Members')}
+            onAddMembersPress={() =>
+              navigation.navigate('AddTripMembers', { tripId: trip._id })
+            }
             isPast={isPastTrip}
           />
 

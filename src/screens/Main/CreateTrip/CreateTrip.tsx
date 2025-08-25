@@ -376,6 +376,7 @@ const CreateTrip = () => {
             <ShareTripSection
               tripMembers={tripMembers}
               onTripMembersChange={setTripMembers}
+              tripId={tripId}
             />
           </Box>
         )}
