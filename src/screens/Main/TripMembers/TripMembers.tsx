@@ -5,7 +5,7 @@ import { Text } from '@/components/ui/text';
 import { VStack } from '@/components/ui/vstack';
 import { HStack } from '@/components/ui/hstack';
 import { TRIP_MEMBERS_STRINGS } from './strings';
-import { GradientAvatar, Header } from '@/src/components';
+import { GradientAvatar, GradientFabButton, Header } from '@/src/components';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { MainNavigationProps, MainRouteProps } from '@/src/types/allRoutes';
 import { useGetTripMembersQuery } from '@/src/services';
@@ -16,7 +16,7 @@ import moment from 'moment';
 const TripMembers = () => {
   const navigation = useNavigation<MainNavigationProps>();
   const route = useRoute<MainRouteProps<'TripMembers'>>();
-  const { tripId, duration } = route.params;
+  const { tripId, start, end } = route.params;
 
   // State variables for different member types
   const [owners, setOwners] = useState<
@@ -77,12 +77,6 @@ const TripMembers = () => {
     return name.length > 3 ? name.substring(0, 3) : name;
   };
 
-  const formatDateRange = (startDate: string, endDate: string) => {
-    const start = moment(startDate).format('MM/DD/YYYY');
-    const end = moment(endDate).format('MM/DD/YYYY');
-    return `${start} - ${end}`;
-  };
-
   if (isLoading) {
     return <Loader />;
   }
@@ -100,7 +94,7 @@ const TripMembers = () => {
     );
   }
 
-  const { tripName, totalMembers } = tripMembersData.data;
+  const { tripName } = tripMembersData.data;
 
   return (
     <SafeAreaView style={styles.container}>
@@ -113,7 +107,9 @@ const TripMembers = () => {
             <Text className="text-lg font-heading text-gray-900">
               {tripName}
             </Text>
-            <Text className="text-sm font-body text-gray-500">{duration}</Text>
+            <Text className="text-sm font-body text-gray-500">
+              {start} - {end}
+            </Text>
           </HStack>
 
           {owners.map(host => (
@@ -133,7 +129,7 @@ const TripMembers = () => {
                   </Text>
                 </HStack>
                 <Box className="bg-primary-500 rounded-lg px-3 py-1">
-                  <Text className="text-white font-body text-sm">
+                  <Text className="text-white font-heading text-sm">
                     {TRIP_MEMBERS_STRINGS.OWNER}
                   </Text>
                 </Box>
@@ -141,7 +137,7 @@ const TripMembers = () => {
             </Box>
           ))}
         </VStack>
-        {/* Hosts Section */}
+
         <VStack space="md" className="px-4">
           <HStack className="justify-between items-center">
             <Text className="text-base font-heading text-gray-900">
@@ -152,7 +148,7 @@ const TripMembers = () => {
             </Text>
           </HStack>
 
-          {hosts.map(host => (
+          {hosts?.map(host => (
             <Box
               key={host.userId}
               className="bg-gray-100 border border-gray-200 rounded-lg p-3"
@@ -168,11 +164,6 @@ const TripMembers = () => {
                     {getDisplayName(host.email)}
                   </Text>
                 </HStack>
-                <Box className="bg-primary-500 rounded-lg px-3 py-1">
-                  <Text className="text-white font-body text-sm">
-                    {TRIP_MEMBERS_STRINGS.OWNER}
-                  </Text>
-                </Box>
               </HStack>
             </Box>
           ))}
@@ -221,13 +212,15 @@ const TripMembers = () => {
           ))}
         </VStack>
         {/* Floating Action Button */}
-        <TouchableOpacity
+        <GradientFabButton
           onPress={handleAddMembers}
-          style={styles.fab}
-          activeOpacity={0.8}
-        >
-          <Ionicons name="add" size={28} color="#FFFFFF" />
-        </TouchableOpacity>
+          iconName="add"
+          iconSize={28}
+          iconColor="#FFFFFF"
+          size="medium"
+          colors={['#14B8A6', '#0EA5E9']}
+          position="bottom-right"
+        />
       </VStack>
     </SafeAreaView>
   );
@@ -237,22 +230,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#FFFFFF',
-  },
-  fab: {
-    position: 'absolute',
-    bottom: 24,
-    right: 24,
-    backgroundColor: '#14B8A6',
-    borderRadius: 28,
-    width: 56,
-    height: 56,
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 8,
   },
 });
 

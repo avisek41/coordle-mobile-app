@@ -71,7 +71,8 @@ const TripDetails: React.FC = () => {
     } else if (feature === tripDetailsStrings.tripMembers) {
       navigation.navigate('TripMembers', {
         tripId: trip._id,
-        duration: trip.duration,
+        start: trip.display_start,
+        end: trip.display_end,
       });
     } else {
       // TODO: Navigate to respective feature screens

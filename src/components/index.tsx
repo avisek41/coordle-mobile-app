@@ -1,5 +1,6 @@
 export { default as GradientButton } from './GradientButton';
 export { default as GradientAvatar } from './GradientAvatar';
+export { default as GradientFabButton } from './GradientFabButton';
 export { default as Header } from './Header';
 export { default as TabLabel } from './TabLable';
 export { default as ToastMessage } from './ToastMessage';

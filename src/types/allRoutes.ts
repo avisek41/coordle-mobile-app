@@ -54,7 +54,8 @@ export type MainStackParams = {
   };
   TripMembers: {
     tripId: string;
-    duration?: string;
+    start: string;
+    end: string;
   };
 };
 
