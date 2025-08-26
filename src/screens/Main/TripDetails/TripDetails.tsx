@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   SafeAreaView,
   ScrollView,
@@ -31,7 +31,12 @@ const TripDetails: React.FC = () => {
 
   const { userId } = useAppSelector(state => state?.auth);
 
-  const { data: tripData, isLoading, error } = useGetTripByIdQuery(tripId);
+  const {
+    data: tripData,
+    isLoading,
+    error,
+    refetch,
+  } = useGetTripByIdQuery(tripId);
   const [deleteTrip, { isLoading: isDeleting }] = useDeleteTripMutation();
   const [showDeleteAlert, setShowDeleteAlert] = useState(false);
 
@@ -114,6 +119,12 @@ const TripDetails: React.FC = () => {
   const handleDeleteCancel = () => {
     setShowDeleteAlert(false);
   };
+
+  useEffect(() => {
+    if (tripId) {
+      refetch();
+    }
+  }, [tripId]);
 
   if (isLoading) {
     return <Loader />;

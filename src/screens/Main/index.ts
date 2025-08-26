@@ -8,3 +8,4 @@ export { default as FileInformation } from './Documents/FileInformation';
 export { CreateTrip } from './CreateTrip';
 export { default as TripDetails } from './TripDetails';
 export { AddTripMembers } from './AddTripMembers';
+export { InviteTripMember } from './InviteTripMember';

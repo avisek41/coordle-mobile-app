@@ -205,6 +205,39 @@
             }
           },
           "response": []
+        },
+        {
+          "name": "Invite Users to Trip",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tripId\": \"68ad47ac2047345c0cbb3184\",\n  \"users\": [\n    {\n      \"email\": \"user1@example.com\",\n      \"userRole\": \"traveller\",\n      \"isInvited\": true\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/users/invite-to-trip",
+              "host": ["{{base_url}}"],
+              "path": ["api", "users", "invite-to-trip"]
+            }
+          },
+          "response": []
         }
       ]
     },
@@ -1036,6 +1069,39 @@
               "raw": "{{base_url}}/api/trips/{{trip_id}}",
               "host": ["{{base_url}}"],
               "path": ["api", "trips", "{{trip_id}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Add Trip Participant",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"64f1a2b3c4d5e6f7g8h9i0j1\",\n  \"userRole\": \"traveller\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/trips/{{trip_id}}/participants",
+              "host": ["{{base_url}}"],
+              "path": ["api", "trips", "{{trip_id}}", "participants"]
             }
           },
           "response": []

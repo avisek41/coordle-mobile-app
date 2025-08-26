@@ -116,3 +116,21 @@ export {
   type DeleteTripDocumentRequest,
   type DeleteTripDocumentResponse,
 } from './tripDocumentsApi';
+
+// Export register invited user API
+export {
+  registerInvitedUserApi,
+  useRegisterInvitedUserMutation,
+} from './registerInvitedUserApi';
+
+// Export add trip participant API
+export {
+  addTripParticipantApi,
+  useAddTripParticipantMutation,
+} from './addTripParticipantApi';
+
+// Export invite users API
+export {
+  inviteUsersApi,
+  useInviteUsersToTripMutation,
+} from './inviteUsersApi';

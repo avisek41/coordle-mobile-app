@@ -23,7 +23,12 @@ const ShareTripSection: React.FC<ShareTripSectionProps> = ({
   const navigation = useNavigation<MainNavigationProps>();
 
   const handleAddMembersPress = () => {
-    navigation.navigate('AddTripMembers', { tripId });
+    if (!tripId) {
+      // If no tripId, we're in create mode, so navigate to AddTripMembers without tripId
+      navigation.navigate('AddTripMembers', {});
+    } else {
+      navigation.navigate('AddTripMembers', { tripId });
+    }
   };
 
   return (

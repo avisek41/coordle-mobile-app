@@ -22,20 +22,36 @@ const AddTripMembers = () => {
   };
 
   const handleEmailInvite = () => {
-    showToast({
-      type: 'info',
-      title: 'Email Invite',
-      message: 'Email invite functionality coming soon!',
-      duration: 2000,
+    if (!tripId) {
+      showToast({
+        type: 'error',
+        title: 'Trip ID Required',
+        message: 'Trip ID is missing. Please try again.',
+        duration: 2000,
+      });
+      return;
+    }
+
+    navigation.navigate('InviteTripMember', {
+      tripId,
+      inviteType: 'email',
     });
   };
 
   const handlePhoneInvite = () => {
-    showToast({
-      type: 'info',
-      title: 'Phone Invite',
-      message: 'Phone invite functionality coming soon!',
-      duration: 2000,
+    if (!tripId) {
+      showToast({
+        type: 'error',
+        title: 'Trip ID Required',
+        message: 'Trip ID is missing. Please try again.',
+        duration: 2000,
+      });
+      return;
+    }
+
+    navigation.navigate('InviteTripMember', {
+      tripId,
+      inviteType: 'phone',
     });
   };
 
