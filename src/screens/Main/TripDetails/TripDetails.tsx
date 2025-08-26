@@ -4,6 +4,7 @@ import {
   ScrollView,
   TouchableOpacity,
   StyleSheet,
+  Alert,
 } from 'react-native';
 import { Box } from '@/components/ui/box';
 import { Text } from '@/components/ui/text';
@@ -66,6 +67,11 @@ const TripDetails: React.FC = () => {
       navigation.navigate('TripDocuments', {
         tripId: trip._id,
         tripTitle: trip.name,
+      });
+    } else if (feature === tripDetailsStrings.tripMembers) {
+      navigation.navigate('TripMembers', {
+        tripId: trip._id,
+        duration: trip.duration,
       });
     } else {
       // TODO: Navigate to respective feature screens

@@ -52,6 +52,10 @@ export type MainStackParams = {
     tripId: string;
     inviteType: 'email' | 'phone';
   };
+  TripMembers: {
+    tripId: string;
+    duration?: string;
+  };
 };
 
 export type MainNavigationProps = NativeStackNavigationProp<MainStackParams>;

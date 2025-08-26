@@ -130,7 +130,7 @@ export {
 } from './addTripParticipantApi';
 
 // Export invite users API
-export {
-  inviteUsersApi,
-  useInviteUsersToTripMutation,
-} from './inviteUsersApi';
+export { inviteUsersApi, useInviteUsersToTripMutation } from './inviteUsersApi';
+
+// Export trip members API
+export { tripMembersApi, useGetTripMembersQuery } from './tripMembersApi';
