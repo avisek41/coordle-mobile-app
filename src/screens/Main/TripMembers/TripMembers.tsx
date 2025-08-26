@@ -5,7 +5,12 @@ import { Text } from '@/components/ui/text';
 import { VStack } from '@/components/ui/vstack';
 import { HStack } from '@/components/ui/hstack';
 import { TRIP_MEMBERS_STRINGS } from './strings';
-import { GradientAvatar, GradientFabButton, Header } from '@/src/components';
+import {
+  CustomActionSheet,
+  GradientAvatar,
+  GradientFabButton,
+  Header,
+} from '@/src/components';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { MainNavigationProps, MainRouteProps } from '@/src/types/allRoutes';
 import { useGetTripMembersQuery } from '@/src/services';
@@ -41,6 +46,14 @@ const TripMembers = () => {
     }>
   >([]);
 
+  // Action sheet state
+  const [isActionSheetOpen, setIsActionSheetOpen] = useState(false);
+  const [selectedParticipant, setSelectedParticipant] = useState<{
+    userId: string;
+    email: string;
+    userRole: string;
+  } | null>(null);
+
   const {
     data: tripMembersData,
     isLoading,
@@ -66,6 +79,30 @@ const TripMembers = () => {
 
   const handleAddMembers = () => {
     navigation.navigate('AddTripMembers', { tripId });
+  };
+
+  const handleParticipantMenuPress = (participant: {
+    userId: string;
+    email: string;
+    userRole: string;
+  }) => {
+    setSelectedParticipant(participant);
+    setIsActionSheetOpen(true);
+  };
+
+  const handleRemindParticipant = () => {
+    // TODO: Implement remind functionality
+    console.log('Remind participant:', selectedParticipant?.email);
+  };
+
+  const handleRemoveParticipant = () => {
+    // TODO: Implement remove functionality
+    console.log('Remove participant:', selectedParticipant?.email);
+  };
+
+  const handleCloseActionSheet = () => {
+    setIsActionSheetOpen(false);
+    setSelectedParticipant(null);
   };
 
   const getInitials = (email: string) => {
@@ -200,7 +237,10 @@ const TripMembers = () => {
                     </Text>
                   </VStack>
                 </HStack>
-                <TouchableOpacity className="w-6 h-6 justify-center items-center">
+                <TouchableOpacity
+                  className="w-6 h-6 justify-center items-center"
+                  onPress={() => handleParticipantMenuPress(participant)}
+                >
                   <Ionicons
                     name="ellipsis-vertical"
                     size={20}
@@ -220,6 +260,44 @@ const TripMembers = () => {
           size="medium"
           colors={['#14B8A6', '#0EA5E9']}
           position="bottom-right"
+        />
+
+        {/* Participant Action Sheet */}
+        <CustomActionSheet
+          isOpen={isActionSheetOpen}
+          onClose={handleCloseActionSheet}
+          title=""
+          subtitle={selectedParticipant?.email}
+          actions={[
+            {
+              id: 'remind',
+              title: 'Remind',
+              onPress: handleRemindParticipant,
+              icon: (
+                <Ionicons
+                  name="notifications-outline"
+                  size={20}
+                  color="#6B7280"
+                />
+              ),
+            },
+            {
+              id: 'remove',
+              title: 'Remove from Trip',
+              onPress: handleRemoveParticipant,
+              isDestructive: true,
+              icon: (
+                <Ionicons
+                  name="person-remove-outline"
+                  size={20}
+                  color="#EF4444"
+                />
+              ),
+            },
+          ]}
+          showCancelButton={true}
+          cancelButtonText="Cancel"
+          onCancelPress={handleCloseActionSheet}
         />
       </VStack>
     </SafeAreaView>
