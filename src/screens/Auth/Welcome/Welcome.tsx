@@ -57,7 +57,7 @@ const Welcome = () => {
   const [sendLoginCode, { isLoading: isSendingLoginCode }] =
     useSendLoginCodeMutation();
   const { showToast, ToastComponent } = useSimpleToast();
-  console.log('emailData', emailData);
+
   const handleGoogleSignIn = () => {
     // Handle Google sign in
     console.log(welcomeStrings.googleSignInPressed);
@@ -140,6 +140,13 @@ const Welcome = () => {
         navigate('EmailVerifications', {
           email: email,
         });
+      } else if (emailData.data.action === 'create_password') {
+        showToast({
+          type: 'success',
+          title: 'Success',
+          message: 'Please create your password to continue.',
+        });
+        navigate('CreatePassword');
       }
     }
   }, [isSuccess, emailData?.data?.action]);

@@ -6,6 +6,7 @@ interface AuthState {
   isLoggedIn: boolean | null;
   refreshToken: string | null;
   userId: string | null;
+  userRole: string | null;
 }
 
 const authSlice = createSlice({
@@ -16,15 +17,17 @@ const authSlice = createSlice({
     isLoggedIn: false,
     refreshToken: null,
     userId: null,
+    userRole: null,
   } as AuthState,
   reducers: {
     setCredentials: (state, action) => {
       //   console.log('payload', action?.payload);
-      const { token, refreshToken, userId } = action.payload;
+      const { token, refreshToken, userId, userRole } = action.payload;
 
       state.token = token;
       state.refreshToken = refreshToken;
       state.userId = userId;
+      state.userRole = userRole;
     },
     logOut: state => {
       state.user = null;
@@ -32,6 +35,7 @@ const authSlice = createSlice({
       state.isLoggedIn = false;
       state.refreshToken = null;
       state.userId = null;
+      state.userRole = null;
     },
     logIn: state => {
       state.isLoggedIn = true;

@@ -134,3 +134,9 @@ export { inviteUsersApi, useInviteUsersToTripMutation } from './inviteUsersApi';
 
 // Export trip members API
 export { tripMembersApi, useGetTripMembersQuery } from './tripMembersApi';
+
+// Export remove participant API
+export {
+  removeParticipantApi,
+  useRemoveParticipantMutation,
+} from './removeParticipantApi';

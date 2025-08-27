@@ -35,6 +35,7 @@ import { AuthNavigationProps } from '@/src/types/allRoutes';
 import { useNavigation } from '@react-navigation/native';
 import { useAppDispatch, useAppSelector } from '@/src/hooks';
 import { setCredentials } from '@/src/features';
+import { setItem } from '@/src/utils';
 
 // Helper function to find country by phone code
 const findCountryByPhone = (phoneCode: string) => {

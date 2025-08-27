@@ -11,10 +11,18 @@ import {
   GradientFabButton,
   Header,
 } from '@/src/components';
-import { useNavigation, useRoute } from '@react-navigation/native';
+import {
+  useFocusEffect,
+  useNavigation,
+  useRoute,
+} from '@react-navigation/native';
 import { MainNavigationProps, MainRouteProps } from '@/src/types/allRoutes';
-import { useGetTripMembersQuery } from '@/src/services';
+import {
+  useGetTripMembersQuery,
+  useRemoveParticipantMutation,
+} from '@/src/services';
 import { Loader } from '@/src/components';
+import { useSimpleToast } from '@/src/hooks/useSimpleToast';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import moment from 'moment';
 
@@ -22,6 +30,7 @@ const TripMembers = () => {
   const navigation = useNavigation<MainNavigationProps>();
   const route = useRoute<MainRouteProps<'TripMembers'>>();
   const { tripId, start, end } = route.params;
+  const { showToast, ToastComponent } = useSimpleToast();
 
   // State variables for different member types
   const [owners, setOwners] = useState<
@@ -58,7 +67,13 @@ const TripMembers = () => {
     data: tripMembersData,
     isLoading,
     error,
+    refetch,
   } = useGetTripMembersQuery(tripId);
+
+  const [
+    removeParticipant,
+    { isLoading: isRemoving, reset: resetRemoveParticipant },
+  ] = useRemoveParticipantMutation();
 
   // useEffect to separate members by role
   useEffect(() => {
@@ -95,9 +110,41 @@ const TripMembers = () => {
     console.log('Remind participant:', selectedParticipant?.email);
   };
 
-  const handleRemoveParticipant = () => {
-    // TODO: Implement remove functionality
-    console.log('Remove participant:', selectedParticipant?.email);
+  const handleRemoveParticipant = async () => {
+    if (!selectedParticipant) return;
+
+    try {
+      await removeParticipant({
+        tripId,
+        body: { userId: selectedParticipant.userId },
+      }).unwrap();
+
+      handleCloseActionSheet();
+
+      // Show success toast
+      showToast({
+        type: 'success',
+        title: 'Success',
+        message: 'Participant removed successfully',
+        duration: 2000,
+      });
+
+      // Navigate to trip details after a short delay
+      setTimeout(() => {
+        navigation.navigate('TripDetails', { tripId });
+      }, 1000);
+    } catch (error) {
+      // Show error toast
+      showToast({
+        type: 'error',
+        title: 'Error',
+        message: 'Failed to remove participant. Please try again.',
+        duration: 3000,
+      });
+      console.error('Failed to remove participant:', error);
+    } finally {
+      resetRemoveParticipant();
+    }
   };
 
   const handleCloseActionSheet = () => {
@@ -113,6 +160,14 @@ const TripMembers = () => {
     const name = email.split('@')[0];
     return name.length > 3 ? name.substring(0, 3) : name;
   };
+
+  useFocusEffect(
+    React.useCallback(() => {
+      if (tripId) {
+        refetch();
+      }
+    }, [tripId]),
+  );
 
   if (isLoading) {
     return <Loader />;
@@ -135,6 +190,7 @@ const TripMembers = () => {
 
   return (
     <SafeAreaView style={styles.container}>
+      <ToastComponent />
       <VStack space="lg" className="flex-1 bg-white">
         {/* Header */}
         <Header title={TRIP_MEMBERS_STRINGS.TITLE} />
@@ -283,9 +339,10 @@ const TripMembers = () => {
             },
             {
               id: 'remove',
-              title: 'Remove from Trip',
+              title: isRemoving ? 'Removing...' : 'Remove from Trip',
               onPress: handleRemoveParticipant,
               isDestructive: true,
+              isDisabled: isRemoving,
               icon: (
                 <Ionicons
                   name="person-remove-outline"

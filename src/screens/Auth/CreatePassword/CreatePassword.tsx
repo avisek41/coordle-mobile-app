@@ -19,7 +19,6 @@ const CreatePassword = () => {
   const [showCreatePassword, setShowCreatePassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isAgreementChecked, setIsAgreementChecked] = useState(false);
-  const [isExistingUser, setIsExistingUser] = useState(true); // Track if user is existing
 
   const handleBackPress = () => {
     goBack();
@@ -40,7 +39,7 @@ const CreatePassword = () => {
   return (
     <SafeAreaView className="flex-1 bg-white">
       {/* Header */}
-      <Header onBackPress={handleBackPress} />
+      <Header title="" onBackPress={handleBackPress} />
 
       <ScrollView
         className="flex-1"
@@ -136,7 +135,7 @@ const CreatePassword = () => {
           </VStack>
 
           {/* Forgot Password Link - Only show for existing users */}
-          {isExistingUser && (
+          {/* {isExistingUser && (
             <Box className="items-end mb-6">
               <TouchableOpacity
                 onPress={() => {
@@ -148,7 +147,7 @@ const CreatePassword = () => {
                 </Text>
               </TouchableOpacity>
             </Box>
-          )}
+          )} */}
 
           {/* Terms and Privacy Checkbox */}
           <HStack space="sm" className="items-start mb-8">

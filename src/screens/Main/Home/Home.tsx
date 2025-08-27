@@ -19,9 +19,11 @@ import { useNavigation } from '@react-navigation/native';
 import { MainNavigationProps } from '@/src/types/allRoutes';
 import { Trip } from '@/src/types/trip';
 import { globalStyles } from '@/src/styles';
+import { useAppSelector } from '@/src/hooks';
 
 const Home = () => {
   const navigation = useNavigation<MainNavigationProps>();
+  const { userRole } = useAppSelector(state => state.auth);
 
   const {
     data: userProfile,
@@ -75,7 +77,9 @@ const Home = () => {
       <Box className="flex-1 px-5 pt-6">
         {hasTrips ? (
           <VStack space="lg">
-            <AddNewTripCard onPress={handleCreateTrip} />
+            {userRole === 'owner' && (
+              <AddNewTripCard onPress={handleCreateTrip} />
+            )}
 
             <VStack space="md">
               <Text className="text-xl font-heading text-gray-800">

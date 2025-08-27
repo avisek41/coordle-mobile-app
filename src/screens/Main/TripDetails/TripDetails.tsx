@@ -9,7 +9,11 @@ import {
 import { Box } from '@/components/ui/box';
 import { Text } from '@/components/ui/text';
 import { VStack } from '@/components/ui/vstack';
-import { useNavigation, useRoute } from '@react-navigation/native';
+import {
+  useFocusEffect,
+  useNavigation,
+  useRoute,
+} from '@react-navigation/native';
 import { MainNavigationProps, MainRouteProps } from '@/src/types/allRoutes';
 import { useGetTripByIdQuery, useDeleteTripMutation } from '@/src/services';
 import { Loader, CustomAlert } from '@/src/components';
@@ -127,11 +131,13 @@ const TripDetails: React.FC = () => {
     setShowDeleteAlert(false);
   };
 
-  useEffect(() => {
-    if (tripId) {
-      refetch();
-    }
-  }, [tripId]);
+  useFocusEffect(
+    React.useCallback(() => {
+      if (tripId) {
+        refetch();
+      }
+    }, [tripId]),
+  );
 
   if (isLoading) {
     return <Loader />;
