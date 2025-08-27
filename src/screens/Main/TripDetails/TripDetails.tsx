@@ -16,7 +16,7 @@ import {
 } from '@react-navigation/native';
 import { MainNavigationProps, MainRouteProps } from '@/src/types/allRoutes';
 import { useGetTripByIdQuery, useDeleteTripMutation } from '@/src/services';
-import { Loader, CustomAlert } from '@/src/components';
+import { Loader, CustomAlert, ExpandableFab } from '@/src/components';
 import { useSimpleToast } from '@/src/hooks/useSimpleToast';
 import { useAppSelector } from '@/src/hooks';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -89,12 +89,38 @@ const TripDetails: React.FC = () => {
     }
   };
 
-  const handleAddPress = () => {
-    // TODO: Show add options
+  const handleExportItinerary = () => {
     showToast({
       type: 'info',
-      title: 'Add',
-      message: tripDetailsStrings.addComingSoon,
+      title: 'Export Itinerary',
+      message: 'Export functionality coming soon',
+      duration: 2000,
+    });
+  };
+
+  const handleTravel = () => {
+    showToast({
+      type: 'info',
+      title: 'Travel',
+      message: 'Travel options coming soon',
+      duration: 2000,
+    });
+  };
+
+  const handleLodging = () => {
+    showToast({
+      type: 'info',
+      title: 'Lodging',
+      message: 'Lodging options coming soon',
+      duration: 2000,
+    });
+  };
+
+  const handleActivity = () => {
+    showToast({
+      type: 'info',
+      title: 'Activity',
+      message: 'Activity options coming soon',
       duration: 2000,
     });
   };
@@ -198,16 +224,40 @@ const TripDetails: React.FC = () => {
         </VStack>
       </ScrollView>
 
-      {/* Floating Action Button */}
-
+      {/* Expandable Floating Action Button */}
       {!isPastTrip && (
-        <TouchableOpacity
-          onPress={handleAddPress}
-          style={styles.fab}
-          activeOpacity={0.8}
-        >
-          <Ionicons name="add" size={28} color="red" />
-        </TouchableOpacity>
+        <ExpandableFab
+          actions={[
+            {
+              id: 'export',
+              title: 'Export Itinerary',
+              icon: 'arrow-up-outline',
+              color: '#4A90E2',
+              onPress: handleExportItinerary,
+            },
+            {
+              id: 'travel',
+              title: 'Travel',
+              icon: 'airplane-outline',
+              color: '#50C878',
+              onPress: handleTravel,
+            },
+            {
+              id: 'lodging',
+              title: 'Lodging',
+              icon: 'bed-outline',
+              color: '#4A90E2',
+              onPress: handleLodging,
+            },
+            {
+              id: 'activity',
+              title: 'Activity',
+              icon: 'trending-up-outline',
+              color: 'orange',
+              onPress: handleActivity,
+            },
+          ]}
+        />
       )}
 
       {/* Delete Confirmation Alert */}
@@ -229,23 +279,6 @@ const styles = StyleSheet.create({
   scrollContent: {
     flexGrow: 1,
     paddingBottom: 100, // Add space for floating action button
-  },
-
-  fab: {
-    position: 'absolute',
-    bottom: 24,
-    right: 24,
-    backgroundColor: Colors.white,
-    borderRadius: 28,
-    width: 45,
-    height: 45,
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 8,
   },
 });
 
