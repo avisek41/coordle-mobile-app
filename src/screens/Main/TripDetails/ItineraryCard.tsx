@@ -7,6 +7,7 @@ import { GradientButton } from '@/src/components';
 import { Trip } from '@/src/types/trip';
 import { tripDetailsStrings } from './strings';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import { useAppSelector } from '@/src/hooks';
 
 interface ItineraryCardProps {
   trip: Trip;
@@ -21,6 +22,7 @@ const ItineraryCard: React.FC<ItineraryCardProps> = ({
   onImportPress,
   isPast = false,
 }) => {
+  const { userRole } = useAppSelector(state => state?.auth);
   return (
     <Box className="bg-blue-50 rounded-xl p-4 border border-blue-200">
       <HStack className="justify-between items-center mb-4">
@@ -79,7 +81,7 @@ const ItineraryCard: React.FC<ItineraryCardProps> = ({
         </HStack>
       </HStack>
 
-      {!isPast && (
+      {!isPast && userRole === 'owner' && (
         <GradientButton
           onPress={onImportPress}
           title={tripDetailsStrings.importItinerary}

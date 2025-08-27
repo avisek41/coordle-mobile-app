@@ -8,6 +8,7 @@ import { tripDetailsStrings } from './strings';
 import { Colors } from '@/src/configs/CustomTheme';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import { useAppSelector } from '@/src/hooks';
 
 interface CoverImageProps {
   trip: Trip;
@@ -26,6 +27,7 @@ const CoverImage: React.FC<CoverImageProps> = ({
 
   isPast,
 }) => {
+  const { userRole } = useAppSelector(state => state?.auth);
   return (
     <Box>
       <Box className="w-full h-64">
@@ -54,7 +56,7 @@ const CoverImage: React.FC<CoverImageProps> = ({
           <Ionicons name="chevron-back" size={24} color={Colors.white} />
         </TouchableOpacity>
 
-        {!isPast && (
+        {!isPast && userRole === 'owner' && (
           <TouchableOpacity
             onPress={onEditPress}
             style={styles.editButton}

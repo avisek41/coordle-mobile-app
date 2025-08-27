@@ -25,8 +25,10 @@ import { Loader } from '@/src/components';
 import { useSimpleToast } from '@/src/hooks/useSimpleToast';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import moment from 'moment';
+import { useAppSelector } from '@/src/hooks';
 
 const TripMembers = () => {
+  const { userRole } = useAppSelector(state => state?.auth);
   const navigation = useNavigation<MainNavigationProps>();
   const route = useRoute<MainRouteProps<'TripMembers'>>();
   const { tripId, start, end } = route.params;
@@ -150,10 +152,6 @@ const TripMembers = () => {
   const handleCloseActionSheet = () => {
     setIsActionSheetOpen(false);
     setSelectedParticipant(null);
-  };
-
-  const getInitials = (email: string) => {
-    return email.split('@')[0].charAt(0).toUpperCase();
   };
 
   const getDisplayName = (email: string) => {
@@ -293,32 +291,35 @@ const TripMembers = () => {
                     </Text>
                   </VStack>
                 </HStack>
-                <TouchableOpacity
-                  className="w-6 h-6 justify-center items-center"
-                  onPress={() => handleParticipantMenuPress(participant)}
-                >
-                  <Ionicons
-                    name="ellipsis-vertical"
-                    size={20}
-                    color="#6B7280"
-                  />
-                </TouchableOpacity>
+                {userRole === 'owner' && (
+                  <TouchableOpacity
+                    className="w-6 h-6 justify-center items-center"
+                    onPress={() => handleParticipantMenuPress(participant)}
+                  >
+                    <Ionicons
+                      name="ellipsis-vertical"
+                      size={20}
+                      color="#6B7280"
+                    />
+                  </TouchableOpacity>
+                )}
               </HStack>
             </Box>
           ))}
         </VStack>
-        {/* Floating Action Button */}
-        <GradientFabButton
-          onPress={handleAddMembers}
-          iconName="add"
-          iconSize={28}
-          iconColor="#FFFFFF"
-          size="medium"
-          colors={['#14B8A6', '#0EA5E9']}
-          position="bottom-right"
-        />
 
-        {/* Participant Action Sheet */}
+        {userRole === 'owner' && (
+          <GradientFabButton
+            onPress={handleAddMembers}
+            iconName="add"
+            iconSize={28}
+            iconColor="#FFFFFF"
+            size="medium"
+            colors={['#14B8A6', '#0EA5E9']}
+            position="bottom-right"
+          />
+        )}
+
         <CustomActionSheet
           isOpen={isActionSheetOpen}
           onClose={handleCloseActionSheet}

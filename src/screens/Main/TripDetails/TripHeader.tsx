@@ -7,6 +7,7 @@ import { Trip } from '@/src/types/trip';
 import { tripDetailsStrings } from './strings';
 import { formatDateRange } from '@/src/utils';
 import { Colors } from '@/src/configs/CustomTheme';
+import { useAppSelector } from '@/src/hooks';
 
 interface TripHeaderProps {
   trip: Trip;
@@ -19,6 +20,7 @@ const TripHeader: React.FC<TripHeaderProps> = ({
   onAddMembersPress,
   isPast = false,
 }) => {
+  const { userRole } = useAppSelector(state => state?.auth);
   return (
     <VStack space="sm">
       <HStack className="justify-between items-start">
@@ -36,7 +38,7 @@ const TripHeader: React.FC<TripHeaderProps> = ({
           </HStack>
         </VStack>
 
-        {!isPast && (
+        {!isPast && userRole === 'owner' && (
           <TouchableOpacity
             onPress={onAddMembersPress}
             style={styles.addMembersButton}

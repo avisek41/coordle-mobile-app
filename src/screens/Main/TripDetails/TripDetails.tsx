@@ -34,7 +34,7 @@ const TripDetails: React.FC = () => {
   const { tripId, isPastTrip = false } = route.params;
   const { showToast, ToastComponent } = useSimpleToast();
 
-  const { userId } = useAppSelector(state => state?.auth);
+  const { userId, userRole } = useAppSelector(state => state?.auth);
 
   const {
     data: tripData,
@@ -97,10 +97,6 @@ const TripDetails: React.FC = () => {
       message: tripDetailsStrings.addComingSoon,
       duration: 2000,
     });
-  };
-
-  const handleDeletePress = () => {
-    setShowDeleteAlert(true);
   };
 
   const handleDeleteConfirm = async () => {
