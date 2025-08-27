@@ -21,8 +21,8 @@ import { useBasicFunctions } from '@/src/hooks';
 
 const Login: React.FC = () => {
   const { goBack, navigate } = useNavigation<AuthNavigationProps>();
-  const [email, setEmail] = useState('sahooavisek60@gmail.com');
-  const [password, setPassword] = useState('Avisek123');
+  const [email, setEmail] = useState('avisek@york.ie');
+  const [password, setPassword] = useState('password123');
   const [showPassword, setShowPassword] = useState(false);
   const { handleLogin } = useBasicFunctions();
   const [login, { isLoading }] = useLoginMutation();

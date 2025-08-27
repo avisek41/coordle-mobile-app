@@ -51,6 +51,7 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
             showEditButton={true}
             onUploadSuccess={onUploadSuccess}
             onUploadError={onUploadError}
+            profilePhoto={userData?.profilePhoto?.url}
           />
 
           <VStack className="items-center mt-1" space="sm">

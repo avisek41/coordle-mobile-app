@@ -7,6 +7,7 @@ import { HStack } from '@/components/ui/hstack';
 import { TRIP_MEMBERS_STRINGS } from './strings';
 import {
   CustomActionSheet,
+  ExpandableFab,
   GradientAvatar,
   GradientFabButton,
   Header,
@@ -94,9 +95,7 @@ const TripMembers = () => {
     }
   }, [tripMembersData]);
 
-  const handleAddMembers = () => {
-    navigation.navigate('AddTripMembers', { tripId });
-  };
+  const handleAddMembers = () => {};
 
   const handleParticipantMenuPress = (participant: {
     userId: string;
@@ -309,14 +308,23 @@ const TripMembers = () => {
         </VStack>
 
         {userRole === 'owner' && (
-          <GradientFabButton
-            onPress={handleAddMembers}
-            iconName="add"
-            iconSize={28}
-            iconColor="#FFFFFF"
-            size="medium"
-            colors={['#14B8A6', '#0EA5E9']}
-            position="bottom-right"
+          <ExpandableFab
+            actions={[
+              {
+                id: 'export',
+                title: 'Export Itinerary',
+                icon: 'arrow-up-outline',
+                color: '#4A90E2',
+                onPress: () => {},
+              },
+              {
+                id: 'travel',
+                title: 'Travel',
+                icon: 'airplane-outline',
+                color: '#50C878',
+                onPress: () => {},
+              },
+            ]}
           />
         )}
 

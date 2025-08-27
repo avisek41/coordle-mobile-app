@@ -13,7 +13,7 @@ interface ProfileAvatarProps {
   showEditButton?: boolean;
   onUploadSuccess?: (profilePhotoUrl: string) => void;
   onUploadError?: (error: string) => void;
-  profilePhoto?: ProfilePhoto;
+  profilePhoto?: string;
   userInitial?: string;
   isUploading?: boolean;
 }
@@ -72,6 +72,8 @@ const ProfileAvatar: React.FC<ProfileAvatarProps> = ({
 
   const sizeStyles = getSizeStyles();
 
+  console.log('profilePhoto', profilePhoto);
+
   return (
     <>
       <Box className="relative">
@@ -82,9 +84,18 @@ const ProfileAvatar: React.FC<ProfileAvatarProps> = ({
           >
             <Loader />
           </Box>
-        ) : profilePhoto ? (
+        ) : (
+            typeof profilePhoto === 'string'
+              ? profilePhoto?.length > 0
+              : profilePhoto?.url
+          ) ? (
           <Image
-            source={{ uri: profilePhoto.thumbnailUrl || profilePhoto.url }}
+            source={{
+              uri:
+                typeof profilePhoto === 'string'
+                  ? profilePhoto
+                  : profilePhoto?.url,
+            }}
             style={[styles.avatarContainer, sizeStyles.avatar]}
             resizeMode="cover"
           />

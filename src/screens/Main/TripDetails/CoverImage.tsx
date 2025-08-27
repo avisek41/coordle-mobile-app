@@ -28,6 +28,7 @@ const CoverImage: React.FC<CoverImageProps> = ({
   isPast,
 }) => {
   const { userRole } = useAppSelector(state => state?.auth);
+  console.log('userRole', userRole);
   return (
     <Box>
       <Box className="w-full h-64">
