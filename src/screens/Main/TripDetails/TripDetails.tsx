@@ -208,6 +208,7 @@ const TripDetails: React.FC = () => {
               navigation.navigate('AddTripMembers', { tripId: trip._id })
             }
             isPast={isPastTrip}
+            isOwner={isOwner}
           />
 
           <ItineraryCard

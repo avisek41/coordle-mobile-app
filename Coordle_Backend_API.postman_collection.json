@@ -224,7 +224,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"tripId\": \"68ad47ac2047345c0cbb3184\",\n  \"users\": [\n    {\n      \"email\": \"user1@example.com\",\n      \"userRole\": \"traveller\",\n      \"isInvited\": true\n    }\n  ]\n}",
+              "raw": "{\n  \"tripId\": \"68ad47ac2047345c0cbb3184\",\n  \"users\": [\n    {\n      \"email\": \"user1@example.com\",\n      \"userRole\": \"traveller\",\n      \"isInvited\": true\n    },\n    {\n      \"phoneNumber\": \"+918637222653\",\n      \"userRole\": \"traveller\"\n    }\n  ]\n}",
               "options": {
                 "raw": {
                   "language": "json"

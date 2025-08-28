@@ -1,9 +1,10 @@
 import { apiSlice } from './apiSlice';
 
 interface InviteUser {
-  email: string;
+  email?: string;
+  phoneNumber?: string;
   userRole: string;
-  isInvited: boolean;
+  isInvited?: boolean;
 }
 
 interface InviteUsersRequest {
@@ -16,7 +17,8 @@ interface InviteUsersResponse {
   data: {
     invitedUsers: Array<{
       _id: string;
-      email: string;
+      email?: string;
+      phoneNumber?: string;
       userRole: string;
       isInvited: boolean;
       tripId: string;
@@ -26,12 +28,12 @@ interface InviteUsersResponse {
 }
 
 export const inviteUsersApi = apiSlice.injectEndpoints({
-  endpoints: (builder) => ({
+  endpoints: builder => ({
     inviteUsersToTrip: builder.mutation<
       InviteUsersResponse,
       InviteUsersRequest
     >({
-      query: (data) => ({
+      query: data => ({
         url: '/api/users/invite-to-trip',
         method: 'POST',
         body: data,
@@ -40,4 +42,4 @@ export const inviteUsersApi = apiSlice.injectEndpoints({
   }),
 });
 
-export const { useInviteUsersToTripMutation } = inviteUsersApi; 
+export const { useInviteUsersToTripMutation } = inviteUsersApi;

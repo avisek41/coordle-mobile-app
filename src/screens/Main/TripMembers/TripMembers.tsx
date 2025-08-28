@@ -39,21 +39,24 @@ const TripMembers = () => {
   const [owners, setOwners] = useState<
     Array<{
       userId: string;
-      email: string;
+      email?: string;
+      phoneNumber?: string | null;
       userRole: string;
     }>
   >([]);
   const [hosts, setHosts] = useState<
     Array<{
       userId: string;
-      email: string;
+      email?: string;
+      phoneNumber?: string | null;
       userRole: string;
     }>
   >([]);
   const [participants, setParticipants] = useState<
     Array<{
       userId: string;
-      email: string;
+      email?: string;
+      phoneNumber?: string | null;
       userRole: string;
     }>
   >([]);
@@ -62,7 +65,8 @@ const TripMembers = () => {
   const [isActionSheetOpen, setIsActionSheetOpen] = useState(false);
   const [selectedParticipant, setSelectedParticipant] = useState<{
     userId: string;
-    email: string;
+    email?: string;
+    phoneNumber?: string | null;
     userRole: string;
   } | null>(null);
 
@@ -99,7 +103,8 @@ const TripMembers = () => {
 
   const handleParticipantMenuPress = (participant: {
     userId: string;
-    email: string;
+    email?: string;
+    phoneNumber?: string | null;
     userRole: string;
   }) => {
     setSelectedParticipant(participant);
@@ -153,9 +158,15 @@ const TripMembers = () => {
     setSelectedParticipant(null);
   };
 
-  const getDisplayName = (email: string) => {
-    const name = email.split('@')[0];
-    return name.length > 3 ? name.substring(0, 3) : name;
+  const getDisplayName = (email?: string, phoneNumber?: string) => {
+    if (email) {
+      const name = email.split('@')[0];
+      return name?.length > 3 ? name.substring(0, 3) : name;
+    }
+    if (phoneNumber) {
+      return phoneNumber.length > 3 ? phoneNumber.substring(0, 3) : phoneNumber;
+    }
+    return 'User';
   };
 
   useFocusEffect(
@@ -185,6 +196,8 @@ const TripMembers = () => {
 
   const { tripName } = tripMembersData.data;
 
+  console.log('participants', participants);
+
   return (
     <SafeAreaView style={styles.container}>
       <ToastComponent />
@@ -202,20 +215,26 @@ const TripMembers = () => {
             </Text>
           </HStack>
 
-          {owners.map(host => (
+          {owners.map(owner => (
             <Box
-              key={host.userId}
+              key={owner.userId}
               className="bg-gray-100 border border-gray-200 rounded-lg p-3"
             >
               <HStack className="items-center justify-between">
                 <HStack className="items-center" space="md">
                   <GradientAvatar
-                    userName={getDisplayName(host.email)}
+                    userName={getDisplayName(
+                      owner?.email,
+                      owner?.phoneNumber || undefined,
+                    )}
                     userImage={''}
                     size="medium"
                   />
                   <Text className="text-base font-body text-gray-900">
-                    {getDisplayName(host.email)}
+                    {getDisplayName(
+                      owner?.email,
+                      owner?.phoneNumber || undefined,
+                    )}
                   </Text>
                 </HStack>
                 <Box className="bg-primary-500 rounded-lg px-3 py-1">
@@ -246,12 +265,12 @@ const TripMembers = () => {
               <HStack className="items-center justify-between">
                 <HStack className="items-center" space="md">
                   <GradientAvatar
-                    userName={getDisplayName(host.email)}
+                    userName={getDisplayName(host?.email)}
                     userImage={''}
                     size="medium"
                   />
                   <Text className="text-base font-body text-gray-900">
-                    {getDisplayName(host.email)}
+                    {getDisplayName(host?.email)}
                   </Text>
                 </HStack>
               </HStack>
@@ -276,19 +295,32 @@ const TripMembers = () => {
             >
               <HStack className="items-center justify-between">
                 <HStack className="items-center flex-1" space="md">
-                  <GradientAvatar
-                    userName={getDisplayName(participant.email)}
-                    userImage={''}
-                    size="medium"
-                  />
-                  <VStack space="xs">
-                    <Text className="text-base font-body text-gray-900">
-                      {participant.email}
-                    </Text>
-                    <Text className="text-sm font-body text-primary-500">
-                      {TRIP_MEMBERS_STRINGS.INVITED}
-                    </Text>
-                  </VStack>
+                  {participant?.email ? (
+                    <>
+                      <GradientAvatar
+                        userName={getDisplayName(participant?.email)}
+                        userImage={''}
+                        size="medium"
+                      />
+                      <VStack space="xs">
+                        <Text className="text-base font-body text-gray-900">
+                          {participant?.email}
+                        </Text>
+                        <Text className="text-sm font-body text-primary-500">
+                          {TRIP_MEMBERS_STRINGS.INVITED}
+                        </Text>
+                      </VStack>
+                    </>
+                  ) : (
+                    <VStack space="xs">
+                      <Text className="text-base font-body text-gray-900">
+                        {participant?.phoneNumber}
+                      </Text>
+                      <Text className="text-sm font-body text-primary-500">
+                        {TRIP_MEMBERS_STRINGS.INVITED}
+                      </Text>
+                    </VStack>
+                  )}
                 </HStack>
                 {userRole === 'owner' && (
                   <TouchableOpacity

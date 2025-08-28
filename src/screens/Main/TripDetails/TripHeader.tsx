@@ -13,14 +13,15 @@ interface TripHeaderProps {
   trip: Trip;
   onAddMembersPress: () => void;
   isPast?: boolean;
+  isOwner?: boolean;
 }
 
 const TripHeader: React.FC<TripHeaderProps> = ({
   trip,
   onAddMembersPress,
   isPast = false,
+  isOwner,
 }) => {
-  const { userRole } = useAppSelector(state => state?.auth);
   return (
     <VStack space="sm">
       <HStack className="justify-between items-start">
@@ -38,7 +39,7 @@ const TripHeader: React.FC<TripHeaderProps> = ({
           </HStack>
         </VStack>
 
-        {!isPast && userRole === 'owner' && (
+        {!isPast && isOwner && (
           <TouchableOpacity
             onPress={onAddMembersPress}
             style={styles.addMembersButton}

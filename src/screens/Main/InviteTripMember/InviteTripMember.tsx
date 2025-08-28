@@ -62,11 +62,6 @@ const InviteTripMember = () => {
   const [showCountryPicker, setShowCountryPicker] = useState(false);
   const [activeInputId, setActiveInputId] = useState<string>('');
 
-  // Debug: Log phone inputs whenever they change
-  useEffect(() => {
-    console.log('Phone inputs updated:', phoneInputs);
-  }, [phoneInputs]);
-
   const [inviteUsersToTrip, { isLoading: isInviting }] =
     useInviteUsersToTripMutation();
 
@@ -112,9 +107,6 @@ const InviteTripMember = () => {
   };
 
   const handleCountrySelect = (country: any) => {
-    console.log('Country selected:', country);
-    console.log('Active input ID:', activeInputId);
-
     if (activeInputId && country && country.phone) {
       // Validate country data
       if (!country.code || !country.name || !country.phone) {
@@ -124,7 +116,6 @@ const InviteTripMember = () => {
 
       // Update both country and countryCode to ensure consistency
       setPhoneInputs(prevInputs => {
-        console.log('Previous inputs:', prevInputs);
         const updatedInputs = prevInputs.map(input =>
           input.id === activeInputId
             ? {
@@ -134,7 +125,7 @@ const InviteTripMember = () => {
               }
             : input,
         );
-        console.log('Updated inputs:', updatedInputs);
+
         return updatedInputs;
       });
     } else {
@@ -267,6 +258,9 @@ const InviteTripMember = () => {
       return;
     }
 
+    // Prepare the users array based on invite type
+    let users: any[] = [];
+
     if (isEmailType) {
       // Handle email invites
       if (memberTags.length === 0) {
@@ -278,6 +272,13 @@ const InviteTripMember = () => {
         });
         return;
       }
+
+      // Email invite format
+      users = memberTags.map(member => ({
+        email: member.value,
+        userRole: 'traveller',
+        isInvited: true,
+      }));
     } else {
       // Handle phone invites
       const validPhoneInputs = phoneInputs.filter(
@@ -307,28 +308,38 @@ const InviteTripMember = () => {
         return;
       }
 
-      // Convert phone inputs to member tags
-      const phoneTags: MemberTag[] = validPhoneInputs.map(input => ({
-        id: input.id,
-        value: `${input.countryCode}${input.phoneNumber}`,
-        type: 'phone' as const,
-      }));
+      // Convert phone inputs to member tags and prepare users array
+      const phoneTags: MemberTag[] = validPhoneInputs.map(input => {
+        const fullPhoneNumber = `${input.countryCode}${input.phoneNumber}`;
+        console.log('Full phone number:', fullPhoneNumber);
+        return {
+          id: input.id,
+          value: fullPhoneNumber,
+          type: 'phone' as const,
+        };
+      });
+
+      // Update memberTags state for UI consistency
       setMemberTags(phoneTags);
+
+      // Phone invite format - using the new structure
+      users = phoneTags.map(member => ({
+        phoneNumber: member.value,
+        userRole: 'traveller',
+      }));
     }
 
     try {
-      // Prepare users array for the API
-      const users = memberTags.map(member => ({
-        email: member.value,
-        userRole: 'traveller',
-        isInvited: true,
-      }));
-
-      // Call the invite users API
-      const response = await inviteUsersToTrip({
+      // Prepare request body
+      const requestBody = {
         tripId,
         users,
-      }).unwrap();
+      };
+
+      //   console.log('Request body:', requestBody);
+
+      // Call the invite users API
+      const response = await inviteUsersToTrip(requestBody).unwrap();
 
       // Validate response
       if (!response.success) {
@@ -343,11 +354,7 @@ const InviteTripMember = () => {
       });
 
       // Navigate to TripDetails after successful invitation
-      if (tripId) {
-        navigation.navigate('TripDetails', { tripId });
-      } else {
-        navigation.goBack();
-      }
+      navigation.goBack();
     } catch (error: any) {
       console.error('Error inviting members:', error);
       showToast({
@@ -367,8 +374,6 @@ const InviteTripMember = () => {
     }
     return value.charAt(0).toUpperCase();
   };
-
-  console.log('phoneInputs', phoneInputs);
 
   return (
     <SafeAreaView style={styles.container}>
