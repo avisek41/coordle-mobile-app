@@ -63,10 +63,10 @@ const Login: React.FC = () => {
             setCredentials({
               token: accessToken,
               userId,
-              userRole: response.data.userRole,
             }),
           );
           // Store token and userId in local storage
+          setItem('userRole', response.data.userRole);
           setItem('accessToken', accessToken);
           setItem('userId', userId);
           setItem('isLoggedIn', 'true');

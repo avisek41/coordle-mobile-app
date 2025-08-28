@@ -14,9 +14,11 @@ const Routes = () => {
       const loginFlag = await getItem('isLoggedIn');
       const token = await getItem('accessToken'); // already parsed
       const userId = await getItem('userId'); // already parsed
+      const userRole = await getItem('userRole');
+      console.log('userRole>>>', userRole);
 
       if (loginFlag === 'true' && token) {
-        dispatch(setCredentials({ token, userId })); // no JSON.parse needed
+        dispatch(setCredentials({ token, userId, userRole })); // no JSON.parse needed
         dispatch(logIn());
       }
     };

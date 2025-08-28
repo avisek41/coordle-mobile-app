@@ -1,15 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   SafeAreaView,
   TouchableOpacity,
   StyleSheet,
   TextInput,
+  Image,
 } from 'react-native';
 import { Box } from '@/components/ui/box';
 import { Text } from '@/components/ui/text';
 import { VStack } from '@/components/ui/vstack';
 import { HStack } from '@/components/ui/hstack';
 import { Input, InputField } from '@/components/ui/input';
+import { Pressable } from '@/components/ui/pressable';
 import { INVITE_TRIP_MEMBER_STRINGS } from './strings';
 import { Header } from '@/src/components';
 import { GradientButton } from '@/src/components';
@@ -19,11 +21,23 @@ import { useSimpleToast } from '@/src/hooks/useSimpleToast';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { Colors } from '@/src/configs/CustomTheme';
 import { useInviteUsersToTripMutation } from '@/src/services';
+import CountryPicker from '@/src/components/CountryPicker/CountryPicker';
+import countries from '@/src/constant/countries';
 
 interface MemberTag {
   id: string;
   value: string;
   type: 'email' | 'phone';
+}
+
+interface PhoneInput {
+  id: string;
+  countryCode: string;
+  phoneNumber: string;
+  country: {
+    code: string;
+    phone: string;
+  };
 }
 
 const InviteTripMember = () => {
@@ -34,6 +48,24 @@ const InviteTripMember = () => {
 
   const [inputValue, setInputValue] = useState('');
   const [memberTags, setMemberTags] = useState<MemberTag[]>([]);
+
+  // Phone-specific state
+  const defaultCountry = countries.find(c => c.phone === '+1') || countries[0];
+  const [phoneInputs, setPhoneInputs] = useState<PhoneInput[]>([
+    {
+      id: '1',
+      countryCode: defaultCountry.phone,
+      phoneNumber: '',
+      country: defaultCountry,
+    },
+  ]);
+  const [showCountryPicker, setShowCountryPicker] = useState(false);
+  const [activeInputId, setActiveInputId] = useState<string>('');
+
+  // Debug: Log phone inputs whenever they change
+  useEffect(() => {
+    console.log('Phone inputs updated:', phoneInputs);
+  }, [phoneInputs]);
 
   const [inviteUsersToTrip, { isLoading: isInviting }] =
     useInviteUsersToTripMutation();
@@ -48,6 +80,69 @@ const InviteTripMember = () => {
   const placeholder = isEmailType
     ? INVITE_TRIP_MEMBER_STRINGS.EMAIL_PLACEHOLDER
     : INVITE_TRIP_MEMBER_STRINGS.PHONE_PLACEHOLDER;
+
+  // Phone input functions
+  const addPhoneInput = () => {
+    const newId = Date.now().toString();
+    const newInput: PhoneInput = {
+      id: newId,
+      countryCode: defaultCountry.phone,
+      phoneNumber: '',
+      country: defaultCountry,
+    };
+    setPhoneInputs([...phoneInputs, newInput]);
+  };
+
+  const removePhoneInput = (id: string) => {
+    if (phoneInputs.length > 1) {
+      setPhoneInputs(phoneInputs.filter(input => input.id !== id));
+    }
+  };
+
+  const updatePhoneInput = (
+    id: string,
+    field: 'countryCode' | 'phoneNumber' | 'country',
+    value: any,
+  ) => {
+    setPhoneInputs(
+      phoneInputs.map(input =>
+        input.id === id ? { ...input, [field]: value } : input,
+      ),
+    );
+  };
+
+  const handleCountrySelect = (country: any) => {
+    console.log('Country selected:', country);
+    console.log('Active input ID:', activeInputId);
+
+    if (activeInputId && country && country.phone) {
+      // Validate country data
+      if (!country.code || !country.name || !country.phone) {
+        console.error('Invalid country data:', country);
+        return;
+      }
+
+      // Update both country and countryCode to ensure consistency
+      setPhoneInputs(prevInputs => {
+        console.log('Previous inputs:', prevInputs);
+        const updatedInputs = prevInputs.map(input =>
+          input.id === activeInputId
+            ? {
+                ...input,
+                country: country,
+                countryCode: country.phone,
+              }
+            : input,
+        );
+        console.log('Updated inputs:', updatedInputs);
+        return updatedInputs;
+      });
+    } else {
+      console.log('No active input ID found or invalid country data');
+    }
+    setShowCountryPicker(false);
+    setActiveInputId(''); // Reset active input ID
+  };
 
   const handleInputSubmit = () => {
     if (inputValue.trim()) {
@@ -172,14 +267,53 @@ const InviteTripMember = () => {
       return;
     }
 
-    if (memberTags.length === 0) {
-      showToast({
-        type: 'error',
-        title: 'No Members',
-        message: 'Please add at least one member to invite.',
-        duration: 2000,
-      });
-      return;
+    if (isEmailType) {
+      // Handle email invites
+      if (memberTags.length === 0) {
+        showToast({
+          type: 'error',
+          title: 'No Members',
+          message: 'Please add at least one member to invite.',
+          duration: 2000,
+        });
+        return;
+      }
+    } else {
+      // Handle phone invites
+      const validPhoneInputs = phoneInputs.filter(
+        input => input.phoneNumber.trim().length > 0,
+      );
+      if (validPhoneInputs.length === 0) {
+        showToast({
+          type: 'error',
+          title: 'No Phone Numbers',
+          message: 'Please add at least one phone number to invite.',
+          duration: 2000,
+        });
+        return;
+      }
+
+      // Check for incomplete phone numbers
+      const incompleteInputs = validPhoneInputs.filter(
+        input => input.phoneNumber.trim().length < 10,
+      );
+      if (incompleteInputs.length > 0) {
+        showToast({
+          type: 'error',
+          title: 'Incomplete Phone Numbers',
+          message: 'Please ensure all phone numbers are complete.',
+          duration: 2000,
+        });
+        return;
+      }
+
+      // Convert phone inputs to member tags
+      const phoneTags: MemberTag[] = validPhoneInputs.map(input => ({
+        id: input.id,
+        value: `${input.countryCode}${input.phoneNumber}`,
+        type: 'phone' as const,
+      }));
+      setMemberTags(phoneTags);
     }
 
     try {
@@ -234,6 +368,8 @@ const InviteTripMember = () => {
     return value.charAt(0).toUpperCase();
   };
 
+  console.log('phoneInputs', phoneInputs);
+
   return (
     <SafeAreaView style={styles.container}>
       <ToastComponent />
@@ -243,50 +379,121 @@ const InviteTripMember = () => {
 
         {/* Content */}
         <VStack space="lg" className="flex-1 px-4">
-          {/* Instruction Text */}
-          <Text className="text-sm font-body text-gray-600 leading-5">
-            {instruction}
-          </Text>
-
           {/* Input Section */}
           <VStack space="sm">
-            <Text className="text-base font-body text-gray-800">{label}</Text>
+            {isEmailType && (
+              <Text className="text-base font-body text-gray-800">{label}</Text>
+            )}
 
-            <Box className="bg-white border border-primary-500 rounded-md p-3">
-              {/* Email Chips */}
-              {memberTags.length > 0 && (
-                <HStack className="items-center flex-wrap mb-2" space="sm">
-                  {memberTags.map(tag => (
-                    <HStack
-                      key={tag.id}
-                      className="items-center bg-primary-50 rounded-full px-3 py-1"
-                      style={styles.chipContainer}
-                    >
-                      <Text className="text-sm font-body text-gray-800 mr-2">
-                        {tag.value}
-                      </Text>
-                      <TouchableOpacity
-                        onPress={() => removeTag(tag.id)}
-                        className="w-4 h-4 justify-center items-center"
+            {isEmailType ? (
+              // Email Input Section
+              <Box className="bg-white border border-primary-500 rounded-md p-3">
+                {/* Email Chips */}
+                {memberTags.length > 0 && (
+                  <HStack className="items-center flex-wrap mb-2" space="sm">
+                    {memberTags.map(tag => (
+                      <HStack
+                        key={tag.id}
+                        className="items-center bg-primary-50 rounded-full px-3 py-1"
+                        style={styles.chipContainer}
                       >
-                        <Ionicons name="close" size={12} color="#6B7280" />
-                      </TouchableOpacity>
-                    </HStack>
-                  ))}
-                </HStack>
-              )}
+                        <Text className="text-sm font-body text-gray-800 mr-2">
+                          {tag.value}
+                        </Text>
+                        <TouchableOpacity
+                          onPress={() => removeTag(tag.id)}
+                          className="w-4 h-4 justify-center items-center"
+                        >
+                          <Ionicons name="close" size={12} color="#6B7280" />
+                        </TouchableOpacity>
+                      </HStack>
+                    ))}
+                  </HStack>
+                )}
 
-              {/* Input field at bottom */}
-              <TextInput
-                placeholder={placeholder}
-                value={inputValue}
-                onChangeText={handleInputChange}
-                onSubmitEditing={handleInputSubmit}
-                style={styles.textInput}
-                keyboardType={isEmailType ? 'email-address' : 'phone-pad'}
-                autoCapitalize="none"
-              />
-            </Box>
+                {/* Input field at bottom */}
+                <TextInput
+                  placeholder={placeholder}
+                  value={inputValue}
+                  onChangeText={handleInputChange}
+                  onSubmitEditing={handleInputSubmit}
+                  style={styles.textInput}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                />
+              </Box>
+            ) : (
+              // Phone Input Section
+              <VStack space="md">
+                {phoneInputs.map((input, index) => (
+                  <VStack key={input.id} space="sm">
+                    <HStack className="bg-gray-50 border border-gray-200 rounded-lg h-12 items-center px-3">
+                      {/* Country Flag and Code Picker */}
+                      <Image
+                        source={{
+                          uri: `https://flagcdn.com/w20/${input.country.code
+                            .slice(0, 2)
+                            .toLowerCase()}.png`,
+                        }}
+                        style={{
+                          width: 20,
+                          height: 20,
+                        }}
+                        resizeMode="contain"
+                      />
+                      <Pressable
+                        onPress={() => {
+                          console.log('Setting active input ID:', input.id);
+                          setActiveInputId(input.id);
+                          setShowCountryPicker(true);
+                        }}
+                        className="px-3 py-2"
+                      >
+                        <Text className="text-base font-body text-black">
+                          {input.countryCode}
+                        </Text>
+                      </Pressable>
+
+                      {/* Vertical Divider */}
+                      <Box className="w-[1px] h-9 bg-gray-400 mx-2" />
+
+                      {/* Phone Number Input */}
+                      <TextInput
+                        placeholder="Phone Number"
+                        value={input.phoneNumber}
+                        onChangeText={value =>
+                          updatePhoneInput(input.id, 'phoneNumber', value)
+                        }
+                        keyboardType="number-pad"
+                        className="flex-1 h-12 text-base font-body text-black"
+                        style={styles.phoneInput}
+                      />
+
+                      {/* Remove Button */}
+                      {phoneInputs.length > 1 && (
+                        <TouchableOpacity
+                          onPress={() => removePhoneInput(input.id)}
+                          className="w-6 h-6 justify-center items-center ml-2"
+                        >
+                          <Ionicons
+                            name="remove-circle"
+                            size={20}
+                            color={Colors.gray}
+                          />
+                        </TouchableOpacity>
+                      )}
+                    </HStack>
+                  </VStack>
+                ))}
+
+                {/* Add Another Button */}
+                <TouchableOpacity onPress={addPhoneInput} className="self-end">
+                  <Text className="text-primary-500 text-sm font-heading">
+                    + Add another
+                  </Text>
+                </TouchableOpacity>
+              </VStack>
+            )}
           </VStack>
         </VStack>
 
@@ -296,11 +503,26 @@ const InviteTripMember = () => {
             title={INVITE_TRIP_MEMBER_STRINGS.INVITE_BUTTON}
             onPress={handleInvite}
             colors={['#2E6F9E', '#51B1C0']}
-            disabled={memberTags.length === 0 || isInviting}
+            disabled={
+              isEmailType
+                ? memberTags.length === 0
+                : phoneInputs.filter(
+                    input => input.phoneNumber.trim().length > 0,
+                  ).length === 0 || isInviting
+            }
             loading={isInviting}
           />
         </Box>
       </VStack>
+
+      {/* Country Picker Modal */}
+      {!isEmailType && (
+        <CountryPicker
+          visible={showCountryPicker}
+          onClose={() => setShowCountryPicker(false)}
+          onSelect={handleCountrySelect}
+        />
+      )}
     </SafeAreaView>
   );
 };
@@ -315,6 +537,11 @@ const styles = StyleSheet.create({
     fontFamily: 'AvenirLTProRoman',
     color: '#374151',
     width: '100%',
+    paddingVertical: 8,
+    paddingHorizontal: 0,
+  },
+  phoneInput: {
+    fontFamily: 'AvenirLTProRoman',
     paddingVertical: 8,
     paddingHorizontal: 0,
   },

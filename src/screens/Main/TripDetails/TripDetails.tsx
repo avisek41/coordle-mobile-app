@@ -195,6 +195,7 @@ const TripDetails: React.FC = () => {
           onBackPress={handleBackPress}
           onEditPress={handleEditPress}
           isPast={isPastTrip}
+          isOwner={isOwner}
         />
 
         <VStack

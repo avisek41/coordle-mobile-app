@@ -17,6 +17,7 @@ interface CoverImageProps {
   onEditPress: () => void;
 
   isPast: boolean;
+  isOwner: boolean;
 }
 
 const CoverImage: React.FC<CoverImageProps> = ({
@@ -26,9 +27,8 @@ const CoverImage: React.FC<CoverImageProps> = ({
   onEditPress,
 
   isPast,
+  isOwner,
 }) => {
-  const { userRole } = useAppSelector(state => state?.auth);
-  console.log('userRole', userRole);
   return (
     <Box>
       <Box className="w-full h-64">
@@ -57,7 +57,7 @@ const CoverImage: React.FC<CoverImageProps> = ({
           <Ionicons name="chevron-back" size={24} color={Colors.white} />
         </TouchableOpacity>
 
-        {!isPast && userRole === 'owner' && (
+        {!isPast && isOwner && (
           <TouchableOpacity
             onPress={onEditPress}
             style={styles.editButton}
