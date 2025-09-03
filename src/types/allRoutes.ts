@@ -47,10 +47,12 @@ export type MainStackParams = {
   };
   AddTripMembers: {
     tripId?: string;
+    ownerId: string;
   };
   InviteTripMember: {
     tripId: string;
     inviteType: 'email' | 'phone';
+    ownerId: string;
   };
   TripMembers: {
     tripId: string;

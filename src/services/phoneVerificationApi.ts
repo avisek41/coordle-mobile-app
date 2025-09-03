@@ -16,6 +16,20 @@ export interface SendPhoneCodeResponse {
   };
 }
 
+export interface ResendPhoneCodeRequest {
+  phoneNumber: string;
+}
+
+export interface ResendPhoneCodeResponse {
+  success: boolean;
+  statusCode: number;
+  message: string;
+  timestamp: string;
+  data?: {
+    phoneNumber: string;
+  };
+}
+
 export interface VerifyPhoneCodeRequest {
   phoneNumber: string;
   code: string;
@@ -48,6 +62,16 @@ export const phoneVerificationApi = apiSlice.injectEndpoints({
         body,
       }),
     }),
+    resendPhoneCode: builder.mutation<
+      ResendPhoneCodeResponse,
+      ResendPhoneCodeRequest
+    >({
+      query: body => ({
+        url: API_ENDPOINTS.RESEND_PHONE_CODE,
+        method: 'POST',
+        body,
+      }),
+    }),
     verifyPhoneCode: builder.mutation<
       VerifyPhoneCodeResponse,
       VerifyPhoneCodeRequest
@@ -61,5 +85,8 @@ export const phoneVerificationApi = apiSlice.injectEndpoints({
   }),
 });
 
-export const { useSendPhoneCodeMutation, useVerifyPhoneCodeMutation } =
-  phoneVerificationApi;
+export const {
+  useSendPhoneCodeMutation,
+  useResendPhoneCodeMutation,
+  useVerifyPhoneCodeMutation,
+} = phoneVerificationApi;

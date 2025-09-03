@@ -26,6 +26,7 @@ export {
 export {
   phoneVerificationApi,
   useSendPhoneCodeMutation,
+  useResendPhoneCodeMutation,
   useVerifyPhoneCodeMutation,
 } from './phoneVerificationApi';
 
@@ -45,6 +46,14 @@ export {
   type ProfilePhoto,
   type UserProfileResponse,
 } from './userProfileApi';
+
+// Export user plan API
+export {
+  userPlanApi,
+  useGetUserPlanQuery,
+  type UserPlanFeatures,
+  type UserPlanResponse,
+} from './userPlanApi';
 
 // Export profile photo API
 export {
@@ -140,3 +149,9 @@ export {
   removeParticipantApi,
   useRemoveParticipantMutation,
 } from './removeParticipantApi';
+
+// Export same plan users API
+export {
+  samePlanUsersApi,
+  useGetSamePlanUsersQuery,
+} from './samePlanUsersApi';

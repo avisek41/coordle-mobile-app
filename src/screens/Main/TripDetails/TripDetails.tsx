@@ -205,7 +205,10 @@ const TripDetails: React.FC = () => {
           <TripHeader
             trip={trip}
             onAddMembersPress={() =>
-              navigation.navigate('AddTripMembers', { tripId: trip._id })
+              navigation.navigate('AddTripMembers', {
+                tripId: trip._id,
+                ownerId: trip.owner_id,
+              })
             }
             isPast={isPastTrip}
             isOwner={isOwner}

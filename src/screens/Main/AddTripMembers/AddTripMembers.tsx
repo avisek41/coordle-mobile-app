@@ -14,12 +14,8 @@ import { Header } from '@/src/components';
 const AddTripMembers = () => {
   const navigation = useNavigation<MainNavigationProps>();
   const route = useRoute<MainRouteProps<'AddTripMembers'>>();
-  const { tripId } = route.params || {};
+  const { tripId, ownerId } = route.params || {};
   const { showToast, ToastComponent } = useSimpleToast();
-
-  const handleBackPress = () => {
-    navigation.goBack();
-  };
 
   const handleEmailInvite = () => {
     if (!tripId) {
@@ -35,6 +31,7 @@ const AddTripMembers = () => {
     navigation.navigate('InviteTripMember', {
       tripId,
       inviteType: 'email',
+      ownerId,
     });
   };
 
@@ -52,6 +49,7 @@ const AddTripMembers = () => {
     navigation.navigate('InviteTripMember', {
       tripId,
       inviteType: 'phone',
+      ownerId,
     });
   };
 

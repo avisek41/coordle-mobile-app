@@ -17,4 +17,5 @@ export { default as CustomAlert } from './CustomAlert';
 export { default as NoData } from './NoData';
 export { default as BannerCarousel } from './BannerCarousel';
 export { default as DocumentsView } from './DocumentsView';
+export { default as PlanUsers } from './PlanUsers';
 export { ToastProvider, useToast } from './ToastProvider';

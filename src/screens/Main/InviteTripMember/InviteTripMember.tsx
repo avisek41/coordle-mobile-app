@@ -13,7 +13,7 @@ import { HStack } from '@/components/ui/hstack';
 import { Input, InputField } from '@/components/ui/input';
 import { Pressable } from '@/components/ui/pressable';
 import { INVITE_TRIP_MEMBER_STRINGS } from './strings';
-import { Header } from '@/src/components';
+import { Header, PlanUsers } from '@/src/components';
 import { GradientButton } from '@/src/components';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { MainNavigationProps, MainRouteProps } from '@/src/types/allRoutes';
@@ -23,6 +23,7 @@ import { Colors } from '@/src/configs/CustomTheme';
 import { useInviteUsersToTripMutation } from '@/src/services';
 import CountryPicker from '@/src/components/CountryPicker/CountryPicker';
 import countries from '@/src/constant/countries';
+import { User } from '@/src/types/user';
 
 interface MemberTag {
   id: string;
@@ -43,11 +44,12 @@ interface PhoneInput {
 const InviteTripMember = () => {
   const navigation = useNavigation<MainNavigationProps>();
   const route = useRoute<MainRouteProps<'InviteTripMember'>>();
-  const { tripId, inviteType } = route.params || {};
+  const { tripId, inviteType, ownerId } = route.params || {};
   const { showToast, ToastComponent } = useSimpleToast();
 
   const [inputValue, setInputValue] = useState('');
   const [memberTags, setMemberTags] = useState<MemberTag[]>([]);
+  const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
 
   // Phone-specific state
   const defaultCountry = countries.find(c => c.phone === '+1') || countries[0];
@@ -91,6 +93,17 @@ const InviteTripMember = () => {
   const removePhoneInput = (id: string) => {
     if (phoneInputs.length > 1) {
       setPhoneInputs(phoneInputs.filter(input => input.id !== id));
+    }
+  };
+
+  const handleUserSelect = (user: User, isSelected: boolean) => {
+    if (isSelected && isEmailType) {
+      setSelectedUsers(prev => [...prev, user.email]);
+    } else if (isSelected && !isEmailType) {
+      setSelectedUsers(prev => [...prev, user.phoneNumber]);
+    } else {
+      setSelectedUsers(prev => prev.filter(id => id !== user.email));
+      setSelectedUsers(prev => prev.filter(id => id !== user.phoneNumber));
     }
   };
 
@@ -263,7 +276,7 @@ const InviteTripMember = () => {
 
     if (isEmailType) {
       // Handle email invites
-      if (memberTags.length === 0) {
+      if (memberTags.length === 0 && selectedUsers.length === 0) {
         showToast({
           type: 'error',
           title: 'No Members',
@@ -274,13 +287,23 @@ const InviteTripMember = () => {
       }
 
       // Email invite format
-      users = memberTags.map(member => ({
+      const memberEmails = memberTags.map(member => ({
         email: member.value,
         userRole: 'traveller',
         isInvited: true,
       }));
+
+      const selectedUserEmails = selectedUsers.map(userId => ({
+        email: userId,
+        userRole: 'traveller',
+        isInvited: true,
+      }));
+
+      users = [...memberEmails, ...selectedUserEmails];
     } else {
       // Handle phone invites
+      // here do the function for selectedUsers
+
       const validPhoneInputs = phoneInputs.filter(
         input => input.phoneNumber.trim().length > 0,
       );
@@ -311,7 +334,7 @@ const InviteTripMember = () => {
       // Convert phone inputs to member tags and prepare users array
       const phoneTags: MemberTag[] = validPhoneInputs.map(input => {
         const fullPhoneNumber = `${input.countryCode}${input.phoneNumber}`;
-        console.log('Full phone number:', fullPhoneNumber);
+
         return {
           id: input.id,
           value: fullPhoneNumber,
@@ -335,8 +358,6 @@ const InviteTripMember = () => {
         tripId,
         users,
       };
-
-      //   console.log('Request body:', requestBody);
 
       // Call the invite users API
       const response = await inviteUsersToTrip(requestBody).unwrap();
@@ -368,12 +389,7 @@ const InviteTripMember = () => {
     }
   };
 
-  const getInitials = (value: string) => {
-    if (isEmailType) {
-      return value.split('@')[0].charAt(0).toUpperCase();
-    }
-    return value.charAt(0).toUpperCase();
-  };
+  console.log('selectedUsers', selectedUsers);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -381,13 +397,19 @@ const InviteTripMember = () => {
       <VStack space="lg" className="flex-1 bg-white">
         {/* Header */}
         <Header title={INVITE_TRIP_MEMBER_STRINGS.TITLE} />
-
         {/* Content */}
-        <VStack space="lg" className="flex-1 px-4">
+        <VStack space="lg" className="px-4">
           {/* Input Section */}
           <VStack space="sm">
             {isEmailType && (
-              <Text className="text-base font-body text-gray-800">{label}</Text>
+              <>
+                <Text className="text-base font-body text-gray-800">
+                  {INVITE_TRIP_MEMBER_STRINGS.EMAIL_INSTRUCTION}
+                </Text>
+                <Text className="text-base mt-2 font-body text-gray-800">
+                  {label}
+                </Text>
+              </>
             )}
 
             {isEmailType ? (
@@ -425,6 +447,8 @@ const InviteTripMember = () => {
                   style={styles.textInput}
                   keyboardType="email-address"
                   autoCapitalize="none"
+                  multiline={true}
+                  numberOfLines={4}
                 />
               </Box>
             ) : (
@@ -501,16 +525,22 @@ const InviteTripMember = () => {
             )}
           </VStack>
         </VStack>
+        {/* Conditional rendering based on invite type */}
 
+        <PlanUsers
+          ownerId={ownerId}
+          selectedUsers={selectedUsers}
+          onUserSelect={handleUserSelect}
+          isEmailType={isEmailType}
+        />
         {/* Invite Button */}
         <Box className="px-4 pb-6">
           <GradientButton
             title={INVITE_TRIP_MEMBER_STRINGS.INVITE_BUTTON}
             onPress={handleInvite}
-            colors={['#2E6F9E', '#51B1C0']}
             disabled={
               isEmailType
-                ? memberTags.length === 0
+                ? memberTags.length === 0 && selectedUsers.length === 0
                 : phoneInputs.filter(
                     input => input.phoneNumber.trim().length > 0,
                   ).length === 0 || isInviting
@@ -544,6 +574,7 @@ const styles = StyleSheet.create({
     width: '100%',
     paddingVertical: 8,
     paddingHorizontal: 0,
+    height: 100,
   },
   phoneInput: {
     fontFamily: 'AvenirLTProRoman',

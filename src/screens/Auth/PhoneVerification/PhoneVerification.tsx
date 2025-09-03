@@ -15,11 +15,15 @@ import { GradientButton } from '@/src/components';
 import { phoneVerificationStrings } from './strings';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { AuthNavigationProps, RootRouteProps } from '@/src/types/allRoutes';
-import { useVerifyPhoneCodeMutation, useLoginMutation } from '@/src/services';
+import {
+  useVerifyPhoneCodeMutation,
+  useLoginMutation,
+  useResendPhoneCodeMutation,
+} from '@/src/services';
 import { useSimpleToast } from '@/src/hooks/useSimpleToast';
 import { Loader } from '@/src/components';
 import { setItem } from '@/src/utils';
-import { setCredentials } from '@/src/features';
+import { setCredentials, logIn } from '@/src/features';
 import { useDispatch } from 'react-redux';
 
 const PhoneVerification = () => {
@@ -34,6 +38,8 @@ const PhoneVerification = () => {
   const [verifyPhoneCode, { isLoading: isVerifying }] =
     useVerifyPhoneCodeMutation();
   const [login, { isLoading: isLoggingIn }] = useLoginMutation();
+  const [resendPhoneCode, { isLoading: isSendingCode }] =
+    useResendPhoneCodeMutation();
   const { showToast, ToastComponent } = useSimpleToast();
   const dispatch = useDispatch();
 
@@ -64,6 +70,7 @@ const PhoneVerification = () => {
 
         if (loginResponse.success) {
           // Store the token and userId
+          console.log('loginResponse', loginResponse);
           const token = loginResponse.data.token;
           const userId = loginResponse.data.id;
           if (token) {
@@ -71,6 +78,8 @@ const PhoneVerification = () => {
             setItem('accessToken', token);
             setItem('userId', userId);
             setItem('isLoggedIn', 'true');
+            // Dispatch logIn action to trigger navigation to main app
+            dispatch(logIn());
           }
 
           showToast({
@@ -79,8 +88,6 @@ const PhoneVerification = () => {
             message: 'Login successful! Welcome back.',
             duration: 3000,
           });
-          // TODO: Navigate to main app/home screen
-          // navigate('MainApp');
         }
       } else {
         // For new users, verify the phone code first
@@ -93,7 +100,7 @@ const PhoneVerification = () => {
         if (verifyResponse.success) {
           // Store the token and userId
           const token = verifyResponse.data.token;
-          const userId = verifyResponse.data.id;
+          const userId = verifyResponse.data.userId;
           if (token) {
             // Store token and userId in Redux store
             dispatch(setCredentials({ token, userId }));
@@ -112,6 +119,8 @@ const PhoneVerification = () => {
               duration: 3000,
             });
             setItem('isLoggedIn', 'true');
+            // Dispatch logIn action to trigger navigation to main app
+            dispatch(logIn());
           } else {
             // Profile setup is required, navigate to ProfileSetup
             showToast({
@@ -135,8 +144,24 @@ const PhoneVerification = () => {
     }
   };
 
-  const handleResendCode = () => {
-    console.log('Resend code pressed');
+  const handleResendCode = async () => {
+    try {
+      await resendPhoneCode({ phoneNumber }).unwrap();
+      showToast({
+        type: 'success',
+        title: phoneVerificationStrings.resendSuccessTitle,
+        message: phoneVerificationStrings.resendSuccessMessage,
+        duration: 3000,
+      });
+    } catch (error) {
+      console.error('Failed to resend code:', error);
+      showToast({
+        type: 'error',
+        title: phoneVerificationStrings.resendErrorTitle,
+        message: phoneVerificationStrings.resendErrorMessage,
+        duration: 3000,
+      });
+    }
   };
 
   const handleCodeDigitChange = (index: number, value: string) => {
@@ -165,7 +190,7 @@ const PhoneVerification = () => {
   };
 
   // Show loader when API is loading
-  if (isVerifying || isLoggingIn) {
+  if (isVerifying || isLoggingIn || isSendingCode) {
     return <Loader />;
   }
 
@@ -175,7 +200,7 @@ const PhoneVerification = () => {
       <ToastComponent />
 
       {/* Header */}
-      <Header onBackPress={handleBackPress} />
+      <Header title="" onBackPress={handleBackPress} />
 
       <ScrollView
         className="flex-1"

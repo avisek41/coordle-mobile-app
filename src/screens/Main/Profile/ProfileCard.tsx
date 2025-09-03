@@ -5,7 +5,10 @@ import { Box } from '@/components/ui/box';
 import { VStack } from '@/components/ui/vstack';
 import { HStack } from '@/components/ui/hstack';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import { useGetCurrentUserProfileQuery } from '@/src/services';
+import {
+  useGetCurrentUserProfileQuery,
+  useGetUserPlanQuery,
+} from '@/src/services';
 import { Loader, ProfileAvatar } from '@/src/components';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -34,12 +37,15 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
     error,
   } = useGetCurrentUserProfileQuery();
 
-  if (isLoading) {
+  const { data: userPlan, isLoading: isPlanLoading } = useGetUserPlanQuery();
+
+  if (isLoading || isPlanLoading) {
     return <Loader />;
   }
 
   const userData = userProfile?.data;
   const userName = userData?.preferredName || userData?.firstName || 'User';
+  const planName = userPlan?.data?.currentPlan?.planName || 'Free';
 
   return (
     <Box className="bg-white rounded-3xl p-6 shadow-xl border border-gray-200 -mt-20">
@@ -59,7 +65,7 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
               {userName}
             </GluestackText>
             <GluestackText className="text-sm text-gray-500">
-              {profileStrings.accountType}
+              {profileStrings.accountType} {planName}
             </GluestackText>
           </VStack>
         </Box>

@@ -7,6 +7,7 @@ export const profileStrings = {
   logout: 'Logout',
   // ProfileCard strings
   accountType: 'Account type :',
+  planName: 'Plan :',
   preferredName: 'Preferred name',
   pronouns: 'Pronouns',
   email: 'Email',

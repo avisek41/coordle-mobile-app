@@ -174,8 +174,6 @@ const Welcome = () => {
           phoneNumber: fullPhoneNumber,
         }).unwrap();
 
-        console.log('phoneCheckResponse', phoneCheckResponse);
-
         if (phoneCheckResponse.success) {
           if (phoneCheckResponse.data.action === 'login') {
             // User exists, check if profile is set up

@@ -238,6 +238,69 @@
             }
           },
           "response": []
+        },
+        {
+          "name": "Get User Plan",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/users/plan",
+              "host": ["{{base_url}}"],
+              "path": ["api", "users", "plan"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Users with Same Plan",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/users/same-plan/{{owner_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "users", "same-plan", "{{owner_id}}"]
+            },
+            "description": "Get users who have the same plan as the specified owner"
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/users/same-plan/{{owner_id}}",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "users", "same-plan", "{{owner_id}}"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"statusCode\": 200,\n    \"message\": \"Users with same plan retrieved successfully\",\n    \"timestamp\": \"2025-09-02T09:51:30.115Z\",\n    \"data\": {\n        \"owner\": {\n            \"id\": \"689452c56a3c22c49f65bb1b\",\n            \"email\": \"avisek@york.ie\",\n            \"phoneNumber\": \"+917064802080\",\n            \"userRole\": \"owner\"\n        },\n        \"plan\": {\n            \"planId\": \"6899c600c0cdef6ca1165f91\",\n            \"planName\": \"Organizations\",\n            \"planVariant\": \"PRO\",\n            \"price\": 1200,\n            \"currency\": \"USD\",\n            \"features\": [\n                \"Unlimited trips\",\n                \"Invite unlimited members\",\n                \"3 Hosts per trip\",\n                \"15 Days free trial\"\n            ]\n        },\n        \"users\": [\n            {\n                \"_id\": \"68ad50356cbaab393a71d5d9\",\n                \"email\": \"sahooavisek60@gmail.com\",\n                \"userRole\": \"traveller\",\n                \"createdAt\": \"2025-08-26T06:12:05.790Z\",\n                \"phoneNumber\": \"+912342343434\"\n            }\n        ],\n        \"summary\": {\n            \"totalUsers\": 1,\n            \"planId\": \"6899c600c0cdef6ca1165f91\"\n        }\n    }\n}"
+            }
+          ]
         }
       ]
     },
@@ -324,6 +387,34 @@
               "raw": "{{base_url}}/api/verification/send-code",
               "host": ["{{base_url}}"],
               "path": ["api", "verification", "send-code"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Resend Phone Code",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"phoneNumber\": \"+1234567890\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/verification/resend-code",
+              "host": ["{{base_url}}"],
+              "path": ["api", "verification", "resend-code"]
             }
           },
           "response": []
