@@ -4,14 +4,13 @@ import { Box } from '@/components/ui/box';
 import { Text } from '@/components/ui/text';
 import { VStack } from '@/components/ui/vstack';
 import { HStack } from '@/components/ui/hstack';
-import { useNavigation, useRoute } from '@react-navigation/native';
-import { MainNavigationProps, MainRouteProps } from '@/src/types/allRoutes';
+import { useRoute } from '@react-navigation/native';
+import { MainRouteProps } from '@/src/types/allRoutes';
 import { useGetMemberProfileQuery } from '@/src/services/memberProfileApi';
 import { MEMBER_PROFILE_STRINGS } from './strings';
 import { GradientAvatar, Header, Loader } from '@/src/components';
 
 const MemberProfile = () => {
-  const navigation = useNavigation<MainNavigationProps>();
   const route = useRoute<MainRouteProps<'MemberProfile'>>();
   const { userId } = route.params;
 
