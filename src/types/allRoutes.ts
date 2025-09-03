@@ -58,6 +58,7 @@ export type MainStackParams = {
     tripId: string;
     start: string;
     end: string;
+    inviteType?: 'email' | 'phone';
   };
 };
 

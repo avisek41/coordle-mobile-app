@@ -9,7 +9,6 @@ import {
   CustomActionSheet,
   ExpandableFab,
   GradientAvatar,
-  GradientFabButton,
   Header,
 } from '@/src/components';
 import {
@@ -25,8 +24,16 @@ import {
 import { Loader } from '@/src/components';
 import { useSimpleToast } from '@/src/hooks/useSimpleToast';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import moment from 'moment';
 import { useAppSelector } from '@/src/hooks';
+
+interface TripMember {
+  userId: string;
+  email: string;
+  phoneNumber: string | null;
+  userRole: string;
+  inviteType: string;
+  preferredName: string;
+}
 
 const TripMembers = () => {
   const { userRole } = useAppSelector(state => state?.auth);
@@ -34,41 +41,12 @@ const TripMembers = () => {
   const route = useRoute<MainRouteProps<'TripMembers'>>();
   const { tripId, start, end } = route.params;
   const { showToast, ToastComponent } = useSimpleToast();
-
-  // State variables for different member types
-  const [owners, setOwners] = useState<
-    Array<{
-      userId: string;
-      email?: string;
-      phoneNumber?: string | null;
-      userRole: string;
-    }>
-  >([]);
-  const [hosts, setHosts] = useState<
-    Array<{
-      userId: string;
-      email?: string;
-      phoneNumber?: string | null;
-      userRole: string;
-    }>
-  >([]);
-  const [participants, setParticipants] = useState<
-    Array<{
-      userId: string;
-      email?: string;
-      phoneNumber?: string | null;
-      userRole: string;
-    }>
-  >([]);
-
-  // Action sheet state
+  const [owners, setOwners] = useState<TripMember[]>([]);
+  const [hosts, setHosts] = useState<TripMember[]>([]);
+  const [participants, setParticipants] = useState<TripMember[]>([]);
   const [isActionSheetOpen, setIsActionSheetOpen] = useState(false);
-  const [selectedParticipant, setSelectedParticipant] = useState<{
-    userId: string;
-    email?: string;
-    phoneNumber?: string | null;
-    userRole: string;
-  } | null>(null);
+  const [selectedParticipant, setSelectedParticipant] =
+    useState<TripMember | null>(null);
 
   const {
     data: tripMembersData,
@@ -82,7 +60,6 @@ const TripMembers = () => {
     { isLoading: isRemoving, reset: resetRemoveParticipant },
   ] = useRemoveParticipantMutation();
 
-  // useEffect to separate members by role
   useEffect(() => {
     if (tripMembersData?.data?.members) {
       const members = tripMembersData.data.members;
@@ -101,18 +78,12 @@ const TripMembers = () => {
 
   const handleAddMembers = () => {};
 
-  const handleParticipantMenuPress = (participant: {
-    userId: string;
-    email?: string;
-    phoneNumber?: string | null;
-    userRole: string;
-  }) => {
+  const handleParticipantMenuPress = (participant: TripMember) => {
     setSelectedParticipant(participant);
     setIsActionSheetOpen(true);
   };
 
   const handleRemindParticipant = () => {
-    // TODO: Implement remind functionality
     console.log('Remind participant:', selectedParticipant?.email);
   };
 
@@ -124,33 +95,47 @@ const TripMembers = () => {
         tripId,
         body: { userId: selectedParticipant.userId },
       }).unwrap();
-
       handleCloseActionSheet();
 
-      // Show success toast
       showToast({
         type: 'success',
-        title: 'Success',
-        message: 'Participant removed successfully',
+        title: TRIP_MEMBERS_STRINGS.SUCCESS,
+        message: TRIP_MEMBERS_STRINGS.PARTICIPANT_REMOVED_SUCCESS,
         duration: 2000,
       });
 
-      // Navigate to trip details after a short delay
       setTimeout(() => {
-        navigation.navigate('TripDetails', { tripId });
+        navigation.reset({
+          index: 1,
+          routes: [
+            { name: 'BottomTabs' },
+            { name: 'TripDetails', params: { tripId } },
+          ],
+        });
       }, 1000);
     } catch (error) {
-      // Show error toast
       showToast({
         type: 'error',
-        title: 'Error',
-        message: 'Failed to remove participant. Please try again.',
+        title: TRIP_MEMBERS_STRINGS.ERROR,
+        message: TRIP_MEMBERS_STRINGS.PARTICIPANT_REMOVE_ERROR,
         duration: 3000,
       });
       console.error('Failed to remove participant:', error);
     } finally {
       resetRemoveParticipant();
     }
+  };
+
+  const handleMakeAsHost = () => {
+    // TODO: Implement make as host functionality
+    console.log('Make as host:', selectedParticipant?.email);
+    handleCloseActionSheet();
+  };
+
+  const handleViewProfile = () => {
+    // TODO: Implement view profile functionality
+    console.log('View profile:', selectedParticipant?.email);
+    handleCloseActionSheet();
   };
 
   const handleCloseActionSheet = () => {
@@ -187,7 +172,7 @@ const TripMembers = () => {
         <Header title={TRIP_MEMBERS_STRINGS.TITLE} />
         <Box className="flex-1 justify-center items-center px-4">
           <Text className="text-base font-body text-gray-600 text-center">
-            Failed to load trip members. Please try again.
+            {TRIP_MEMBERS_STRINGS.FAILED_TO_LOAD}
           </Text>
         </Box>
       </SafeAreaView>
@@ -195,8 +180,6 @@ const TripMembers = () => {
   }
 
   const { tripName } = tripMembersData.data;
-
-  console.log('participants', participants);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -295,32 +278,57 @@ const TripMembers = () => {
             >
               <HStack className="items-center justify-between">
                 <HStack className="items-center flex-1" space="md">
-                  {participant?.email ? (
+                  {participant?.inviteType === 'phone' ? (
                     <>
                       <GradientAvatar
-                        userName={getDisplayName(participant?.email)}
+                        userName={getDisplayName(
+                          participant?.preferredName || 'N',
+                        )}
                         userImage={''}
                         size="medium"
                       />
                       <VStack space="xs">
+                        {participant?.preferredName && (
+                          <Text className="text-base font-body text-gray-900">
+                            {participant?.preferredName}
+                          </Text>
+                        )}
+                        <Text className="text-base font-body text-gray-900">
+                          {participant?.phoneNumber}
+                        </Text>
+                        {participant.preferredName?.length === 0 && (
+                          <Text className="text-sm font-body text-primary-500">
+                            {TRIP_MEMBERS_STRINGS.INVITED}
+                          </Text>
+                        )}
+                      </VStack>
+                    </>
+                  ) : participant?.inviteType === 'email' ? (
+                    <>
+                      <GradientAvatar
+                        userName={getDisplayName(
+                          participant?.preferredName || participant?.email,
+                        )}
+                        userImage={''}
+                        size="medium"
+                      />
+                      <VStack space="xs">
+                        {participant?.preferredName && (
+                          <Text className="text-base font-body text-gray-900">
+                            {participant?.preferredName}
+                          </Text>
+                        )}
                         <Text className="text-base font-body text-gray-900">
                           {participant?.email}
                         </Text>
-                        <Text className="text-sm font-body text-primary-500">
-                          {TRIP_MEMBERS_STRINGS.INVITED}
-                        </Text>
+                        {participant.preferredName?.length === 0 && (
+                          <Text className="text-sm font-body text-primary-500">
+                            {TRIP_MEMBERS_STRINGS.INVITED}
+                          </Text>
+                        )}
                       </VStack>
                     </>
-                  ) : (
-                    <VStack space="xs">
-                      <Text className="text-base font-body text-gray-900">
-                        {participant?.phoneNumber}
-                      </Text>
-                      <Text className="text-sm font-body text-primary-500">
-                        {TRIP_MEMBERS_STRINGS.INVITED}
-                      </Text>
-                    </VStack>
-                  )}
+                  ) : null}
                 </HStack>
                 {userRole === 'owner' && (
                   <TouchableOpacity
@@ -344,14 +352,14 @@ const TripMembers = () => {
             actions={[
               {
                 id: 'export',
-                title: 'Export Itinerary',
+                title: TRIP_MEMBERS_STRINGS.EXPORT_ITINERARY,
                 icon: 'arrow-up-outline',
                 color: '#4A90E2',
                 onPress: () => {},
               },
               {
                 id: 'travel',
-                title: 'Travel',
+                title: TRIP_MEMBERS_STRINGS.TRAVEL,
                 icon: 'airplane-outline',
                 color: '#50C878',
                 onPress: () => {},
@@ -364,37 +372,45 @@ const TripMembers = () => {
           isOpen={isActionSheetOpen}
           onClose={handleCloseActionSheet}
           title=""
-          subtitle={selectedParticipant?.email}
+          subtitle={
+            selectedParticipant?.preferredName
+              ? selectedParticipant?.preferredName
+              : selectedParticipant?.email
+          }
           actions={[
-            {
-              id: 'remind',
-              title: 'Remind',
-              onPress: handleRemindParticipant,
-              icon: (
-                <Ionicons
-                  name="notifications-outline"
-                  size={20}
-                  color="#6B7280"
-                />
-              ),
-            },
+            ...(selectedParticipant?.preferredName
+              ? [
+                  {
+                    id: 'viewProfile',
+                    title: TRIP_MEMBERS_STRINGS.VIEW_PROFILE,
+                    onPress: handleViewProfile,
+                  },
+                  {
+                    id: 'makeAsHost',
+                    title: TRIP_MEMBERS_STRINGS.MAKE_AS_HOST,
+                    onPress: handleMakeAsHost,
+                  },
+                ]
+              : [
+                  {
+                    id: 'remind',
+                    title: TRIP_MEMBERS_STRINGS.REMIND,
+                    onPress: handleRemindParticipant,
+                  },
+                ]),
+
             {
               id: 'remove',
-              title: isRemoving ? 'Removing...' : 'Remove from Trip',
+              title: isRemoving
+                ? TRIP_MEMBERS_STRINGS.REMOVING
+                : TRIP_MEMBERS_STRINGS.REMOVE_FROM_TRIP,
               onPress: handleRemoveParticipant,
               isDestructive: true,
               isDisabled: isRemoving,
-              icon: (
-                <Ionicons
-                  name="person-remove-outline"
-                  size={20}
-                  color="#EF4444"
-                />
-              ),
             },
           ]}
           showCancelButton={true}
-          cancelButtonText="Cancel"
+          cancelButtonText={TRIP_MEMBERS_STRINGS.CANCEL}
           onCancelPress={handleCloseActionSheet}
         />
       </VStack>

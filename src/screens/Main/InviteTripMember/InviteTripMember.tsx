@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   SafeAreaView,
   TouchableOpacity,
@@ -15,12 +15,19 @@ import { Pressable } from '@/components/ui/pressable';
 import { INVITE_TRIP_MEMBER_STRINGS } from './strings';
 import { Header, PlanUsers } from '@/src/components';
 import { GradientButton } from '@/src/components';
-import { useNavigation, useRoute } from '@react-navigation/native';
+import {
+  useFocusEffect,
+  useNavigation,
+  useRoute,
+} from '@react-navigation/native';
 import { MainNavigationProps, MainRouteProps } from '@/src/types/allRoutes';
 import { useSimpleToast } from '@/src/hooks/useSimpleToast';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { Colors } from '@/src/configs/CustomTheme';
-import { useInviteUsersToTripMutation } from '@/src/services';
+import {
+  useGetSamePlanUsersQuery,
+  useInviteUsersToTripMutation,
+} from '@/src/services';
 import CountryPicker from '@/src/components/CountryPicker/CountryPicker';
 import countries from '@/src/constant/countries';
 import { User } from '@/src/types/user';
@@ -45,6 +52,7 @@ const InviteTripMember = () => {
   const navigation = useNavigation<MainNavigationProps>();
   const route = useRoute<MainRouteProps<'InviteTripMember'>>();
   const { tripId, inviteType, ownerId } = route.params || {};
+  const { data, isLoading, error, refetch } = useGetSamePlanUsersQuery(ownerId);
   const { showToast, ToastComponent } = useSimpleToast();
 
   const [inputValue, setInputValue] = useState('');
@@ -259,7 +267,6 @@ const InviteTripMember = () => {
   };
 
   const handleInvite = async () => {
-    // Validate tripId is present
     if (!tripId) {
       showToast({
         type: 'error',
@@ -270,8 +277,6 @@ const InviteTripMember = () => {
       });
       return;
     }
-
-    // Prepare the users array based on invite type
     let users: any[] = [];
 
     if (isEmailType) {
@@ -302,20 +307,24 @@ const InviteTripMember = () => {
       users = [...memberEmails, ...selectedUserEmails];
     } else {
       // Handle phone invites
-      // here do the function for selectedUsers
-
-      const validPhoneInputs = phoneInputs.filter(
-        input => input.phoneNumber.trim().length > 0,
-      );
-      if (validPhoneInputs.length === 0) {
+      // Check for selected users from PlanUsers component
+      if (
+        selectedUsers.length === 0 &&
+        phoneInputs.filter(input => input.phoneNumber.trim().length > 0)
+          .length === 0
+      ) {
         showToast({
           type: 'error',
-          title: 'No Phone Numbers',
-          message: 'Please add at least one phone number to invite.',
+          title: 'No Members',
+          message: 'Please add at least one member to invite.',
           duration: 2000,
         });
         return;
       }
+
+      const validPhoneInputs = phoneInputs.filter(
+        input => input.phoneNumber.trim().length > 0,
+      );
 
       // Check for incomplete phone numbers
       const incompleteInputs = validPhoneInputs.filter(
@@ -345,24 +354,28 @@ const InviteTripMember = () => {
       // Update memberTags state for UI consistency
       setMemberTags(phoneTags);
 
-      // Phone invite format - using the new structure
-      users = phoneTags.map(member => ({
+      // Phone invite format - include both manually entered phone numbers and selected users
+      const phoneInputUsers = phoneTags.map(member => ({
         phoneNumber: member.value,
         userRole: 'traveller',
       }));
+
+      const selectedPhoneUsers = selectedUsers.map(userId => ({
+        phoneNumber: userId,
+        userRole: 'traveller',
+      }));
+
+      users = [...phoneInputUsers, ...selectedPhoneUsers];
     }
 
     try {
-      // Prepare request body
       const requestBody = {
         tripId,
         users,
       };
 
-      // Call the invite users API
       const response = await inviteUsersToTrip(requestBody).unwrap();
 
-      // Validate response
       if (!response.success) {
         throw new Error('Failed to invite users to trip');
       }
@@ -374,8 +387,13 @@ const InviteTripMember = () => {
         duration: 2000,
       });
 
-      // Navigate to TripDetails after successful invitation
-      navigation.goBack();
+      navigation.reset({
+        index: 1,
+        routes: [
+          { name: 'BottomTabs' },
+          { name: 'TripDetails', params: { tripId } },
+        ],
+      });
     } catch (error: any) {
       console.error('Error inviting members:', error);
       showToast({
@@ -389,7 +407,13 @@ const InviteTripMember = () => {
     }
   };
 
-  console.log('selectedUsers', selectedUsers);
+  useFocusEffect(
+    useCallback(() => {
+      if (ownerId) {
+        refetch();
+      }
+    }, [ownerId]),
+  );
 
   return (
     <SafeAreaView style={styles.container}>
@@ -498,7 +522,6 @@ const InviteTripMember = () => {
                         style={styles.phoneInput}
                       />
 
-                      {/* Remove Button */}
                       {phoneInputs.length > 1 && (
                         <TouchableOpacity
                           onPress={() => removePhoneInput(input.id)}
@@ -515,7 +538,6 @@ const InviteTripMember = () => {
                   </VStack>
                 ))}
 
-                {/* Add Another Button */}
                 <TouchableOpacity onPress={addPhoneInput} className="self-end">
                   <Text className="text-primary-500 text-sm font-heading">
                     + Add another
@@ -541,9 +563,11 @@ const InviteTripMember = () => {
             disabled={
               isEmailType
                 ? memberTags.length === 0 && selectedUsers.length === 0
-                : phoneInputs.filter(
-                    input => input.phoneNumber.trim().length > 0,
-                  ).length === 0 || isInviting
+                : (selectedUsers.length === 0 &&
+                    phoneInputs.filter(
+                      input => input.phoneNumber.trim().length > 0,
+                    ).length === 0) ||
+                  isInviting
             }
             loading={isInviting}
           />

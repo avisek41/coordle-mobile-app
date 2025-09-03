@@ -5,6 +5,8 @@ interface TripMember {
   email: string;
   phoneNumber: string | null;
   userRole: string;
+  inviteType: string;
+  preferredName: string;
 }
 
 interface TripMembersResponse {
