@@ -151,7 +151,12 @@ export {
 } from './removeParticipantApi';
 
 // Export same plan users API
+export { samePlanUsersApi, useGetSamePlanUsersQuery } from './samePlanUsersApi';
+
+// Export member profile API
 export {
-  samePlanUsersApi,
-  useGetSamePlanUsersQuery,
-} from './samePlanUsersApi';
+  memberProfileApi,
+  useGetMemberProfileQuery,
+  type MemberProfileResponse,
+  type MemberProfileData,
+} from './memberProfileApi';

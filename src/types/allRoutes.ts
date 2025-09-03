@@ -60,6 +60,9 @@ export type MainStackParams = {
     end: string;
     inviteType?: 'email' | 'phone';
   };
+  MemberProfile: {
+    userId: string;
+  };
 };
 
 export type MainNavigationProps = NativeStackNavigationProp<MainStackParams>;

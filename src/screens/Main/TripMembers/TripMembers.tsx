@@ -133,8 +133,11 @@ const TripMembers = () => {
   };
 
   const handleViewProfile = () => {
-    // TODO: Implement view profile functionality
-    console.log('View profile:', selectedParticipant?.email);
+    if (selectedParticipant?.userId) {
+      navigation.navigate('MemberProfile', {
+        userId: selectedParticipant.userId,
+      });
+    }
     handleCloseActionSheet();
   };
 

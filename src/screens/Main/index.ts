@@ -10,3 +10,4 @@ export { default as TripDetails } from './TripDetails';
 export { AddTripMembers } from './AddTripMembers';
 export { InviteTripMember } from './InviteTripMember';
 export { TripMembers } from './TripMembers';
+export { MemberProfile } from './MemberProfile';

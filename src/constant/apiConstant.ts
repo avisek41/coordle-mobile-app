@@ -12,6 +12,7 @@ export const API_ENDPOINTS = {
   VERIFY_PHONE_CODE: '/api/verification/verify',
   REGISTER: '/api/verification/register',
   GET_CURRENT_USER_PROFILE: '/api/users/me',
+  GET_MEMBER_PROFILE: '/api/users/profile',
   GET_USER_PLAN: '/api/users/plan',
   PROFILE_PHOTO_UPLOAD: '/api/profile-photo/upload',
   CHANGE_PASSWORD: '/api/change-password',
