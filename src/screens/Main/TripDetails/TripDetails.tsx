@@ -1,11 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import {
-  SafeAreaView,
-  ScrollView,
-  TouchableOpacity,
-  StyleSheet,
-  Alert,
-} from 'react-native';
+import React, { useState } from 'react';
+import { SafeAreaView, ScrollView, StyleSheet } from 'react-native';
 import { Box } from '@/components/ui/box';
 import { Text } from '@/components/ui/text';
 import { VStack } from '@/components/ui/vstack';
@@ -15,17 +9,24 @@ import {
   useRoute,
 } from '@react-navigation/native';
 import { MainNavigationProps, MainRouteProps } from '@/src/types/allRoutes';
-import { useGetTripByIdQuery, useDeleteTripMutation } from '@/src/services';
-import { Loader, CustomAlert, ExpandableFab } from '@/src/components';
+import {
+  useGetTripByIdQuery,
+  useDeleteTripMutation,
+  useRemoveParticipantMutation,
+} from '@/src/services';
+import {
+  Loader,
+  CustomAlert,
+  ExpandableFab,
+  GradientButton,
+} from '@/src/components';
 import { useSimpleToast } from '@/src/hooks/useSimpleToast';
 import { useAppSelector } from '@/src/hooks';
-import Ionicons from 'react-native-vector-icons/Ionicons';
 import { tripDetailsStrings } from './strings';
 import TripHeader from './TripHeader';
 import ItineraryCard from './ItineraryCard';
 import FeatureGrid from './FeatureGrid';
 import CoverImage from './CoverImage';
-import { Colors } from '@/src/configs/CustomTheme';
 import { globalStyles } from '@/src/styles';
 
 const TripDetails: React.FC = () => {
@@ -43,6 +44,8 @@ const TripDetails: React.FC = () => {
     refetch,
   } = useGetTripByIdQuery(tripId);
   const [deleteTrip, { isLoading: isDeleting }] = useDeleteTripMutation();
+  const [removeParticipant, { isLoading: isRemoving }] =
+    useRemoveParticipantMutation();
   const [showDeleteAlert, setShowDeleteAlert] = useState(false);
 
   const handleBackPress = () => {
@@ -123,6 +126,41 @@ const TripDetails: React.FC = () => {
       message: 'Activity options coming soon',
       duration: 2000,
     });
+  };
+
+  const handleExitTrip = async () => {
+    if (!userId) {
+      showToast({
+        type: 'error',
+        title: tripDetailsStrings.error,
+        message: tripDetailsStrings.userIdNotFound,
+        duration: 3000,
+      });
+      return;
+    }
+
+    try {
+      await removeParticipant({
+        tripId,
+        body: { userId },
+      }).unwrap();
+
+      showToast({
+        type: 'success',
+        title: tripDetailsStrings.success,
+        message: tripDetailsStrings.exitTripSuccess,
+        duration: 2000,
+      });
+
+      navigation.navigate('BottomTabs');
+    } catch (error: any) {
+      showToast({
+        type: 'error',
+        title: tripDetailsStrings.error,
+        message: error?.data?.message || tripDetailsStrings.exitTripError,
+        duration: 3000,
+      });
+    }
   };
 
   const handleDeleteConfirm = async () => {
@@ -226,6 +264,13 @@ const TripDetails: React.FC = () => {
             onFeaturePress={handleFeaturePress}
             isPast={isPastTrip}
           />
+          {userRole !== 'owner' && (
+            <GradientButton
+              title="Exit Trip"
+              loading={isRemoving}
+              onPress={handleExitTrip}
+            />
+          )}
         </VStack>
       </ScrollView>
 

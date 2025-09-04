@@ -45,7 +45,7 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
 
   const userData = userProfile?.data;
   const userName = userData?.preferredName || userData?.firstName || 'User';
-  const planName = userPlan?.data?.currentPlan?.planName || 'Free';
+  const planName = userPlan?.data?.currentPlan?.planName || null;
 
   return (
     <Box className="bg-white rounded-3xl p-6 shadow-xl border border-gray-200 -mt-20">

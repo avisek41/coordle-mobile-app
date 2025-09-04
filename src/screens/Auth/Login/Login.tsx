@@ -14,15 +14,15 @@ import { useLoginMutation } from '@/src/services';
 import { useSimpleToast } from '@/src/hooks/useSimpleToast';
 import { Loader } from '@/src/components';
 import { setItem } from '@/src/utils';
-import { setCredentials } from '@/src/features';
+import { logIn, setCredentials } from '@/src/features';
 import { useDispatch } from 'react-redux';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useBasicFunctions } from '@/src/hooks';
 
 const Login: React.FC = () => {
   const { goBack, navigate } = useNavigation<AuthNavigationProps>();
-  const [email, setEmail] = useState('avisek@york.ie');
-  const [password, setPassword] = useState('password123');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const { handleLogin } = useBasicFunctions();
   const [login, { isLoading }] = useLoginMutation();
@@ -53,30 +53,26 @@ const Login: React.FC = () => {
       }).unwrap();
 
       if (response.success) {
-        console.log('response', response);
-        // Store the access token and userId
         const accessToken = response.data.token;
         const userId = response.data.id;
         if (accessToken) {
-          // Store token and userId in Redux store
+          await Promise.all([
+            setItem('accessToken', accessToken),
+            setItem('userId', userId),
+            setItem('userRole', response.data.userRole),
+            setItem('isLoggedIn', 'true'),
+          ]);
+
           dispatch(
             setCredentials({
               token: accessToken,
               userId,
             }),
           );
-          // Store token and userId in local storage
-          setItem('userRole', response.data.userRole);
-          setItem('accessToken', accessToken);
-          setItem('userId', userId);
-          setItem('isLoggedIn', 'true');
         }
 
-        // Check if profile setup is required
         if (response?.data?.isProfileSetup) {
-          // Profile is already set up, show success message
           handleLogin();
-          // TODO: Navigate to main app or handle authenticated state
         } else {
           // Profile setup is required, navigate to ProfileSetup
           showToast({

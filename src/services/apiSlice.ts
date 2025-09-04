@@ -13,10 +13,8 @@ const baseQuery = fetchBaseQuery({
     { getState }: { getState: () => unknown },
   ) => {
     const state = getState() as RootState;
-    const auth = state.auth as { token: string | null };
-    const { token } = auth;
+    const token = getItem('accessToken');
     console.log('token', token);
-
     if (token) {
       headers.set('authorization', `Bearer ${token}`);
     }
@@ -34,16 +32,6 @@ const baseQueryWithReauth = async (
   console.log('api>>', api);
   // Make the initial query
   let result = await baseQuery(args, api, extraOptions);
-
-  // Check if the result contains an error with status code 401 (Unauthorized)
-  if (result?.error?.status === 401) {
-    console.log('Access token expired or invalid, logging out user');
-    // Since there's no refresh token, simply log out the user when access token is invalid
-    api.dispatch(logOut());
-    setItem('isLoggedIn', 'false');
-    setItem('accessToken', '');
-    removeItem('userId');
-  }
 
   return result; // Return the result of the query
 };

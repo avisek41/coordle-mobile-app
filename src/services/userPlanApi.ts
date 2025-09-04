@@ -30,7 +30,6 @@ export const userPlanApi = apiSlice.injectEndpoints({
         url: API_ENDPOINTS.GET_USER_PLAN,
         method: 'GET',
       }),
-      providesTags: ['UserPlan'],
     }),
   }),
 });

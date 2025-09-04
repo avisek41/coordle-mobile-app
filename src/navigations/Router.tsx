@@ -15,6 +15,10 @@ const Routes = () => {
       const token = await getItem('accessToken'); // already parsed
       const userId = await getItem('userId'); // already parsed
       const userRole = await getItem('userRole');
+
+      console.log('loginFlag>>>', loginFlag);
+      console.log('token>>>', token);
+      console.log('userId>>>', userId);
       console.log('userRole>>>', userRole);
 
       if (loginFlag === 'true' && token) {

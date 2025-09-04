@@ -258,10 +258,8 @@ const Welcome = () => {
           </Text>
         </VStack>
 
-        <VStack className="items-center mt-10 px-4">
-          {/* Sign-in Buttons */}
+        {/* <VStack className="items-center mt-10 px-4">
           <VStack className="w-full ">
-            {/* Google Sign-in Button */}
             <TouchableOpacity
               style={styles.signInButton}
               onPress={handleGoogleSignIn}
@@ -279,7 +277,6 @@ const Welcome = () => {
               </HStack>
             </TouchableOpacity>
 
-            {/* Apple Sign-in Button */}
             <TouchableOpacity
               style={styles.signInButton}
               onPress={handleAppleSignIn}
@@ -298,10 +295,10 @@ const Welcome = () => {
             style={{ width: '70%', height: 50, alignSelf: 'center' }}
             resizeMode="contain"
           />
-        </VStack>
+        </VStack> */}
 
         {/* Email Input Section */}
-        <VStack className="px-4 space-y-2 mt-2">
+        <VStack className="px-4 space-y-2 mt-10">
           <Text className="text-sm font-body text-black">
             {welcomeStrings.emailPhoneLabel}
           </Text>

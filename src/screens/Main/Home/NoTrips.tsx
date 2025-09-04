@@ -22,16 +22,15 @@ const NoTrips: React.FC = () => {
   });
 
   // Check if user has any successful payments
-  const hasPaid = paymentHistory?.data?.payments?.length ?? 0 > 0;
+  const hasPaid = (paymentHistory?.data?.payments?.length ?? 0) > 0;
 
   const handleCreateTrip = () => {
-    navigate('CreateTrip');
+    navigate({ name: 'CreateTrip', params: { isEditMode: false } });
   };
 
   return (
     <Box className="bg-white rounded-xl p-6 mb-8 shadow-sm border border-gray-200">
       <VStack className="items-center" space="lg">
-        {/* Suitcase Icon */}
         <Box className="relative mb-2">
           <Image
             source={images.trip}
@@ -43,7 +42,6 @@ const NoTrips: React.FC = () => {
           />
         </Box>
 
-        {/* Card Text */}
         <VStack className="items-center" space="sm">
           <GluestackText className="text-xl font-heading text-black-800 text-center">
             {homeStrings.noTripsTitle}
@@ -53,7 +51,6 @@ const NoTrips: React.FC = () => {
           </GluestackText>
         </VStack>
 
-        {/* Create Trip Button - Only show if user has paid */}
         {hasPaid && (
           <Box className="w-full ">
             <GradientButton

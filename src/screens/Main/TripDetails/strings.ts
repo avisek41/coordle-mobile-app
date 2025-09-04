@@ -19,11 +19,18 @@ export const tripDetailsStrings = {
   editTrip: 'Edit Trip',
   deleteTrip: 'Delete Trip',
   deleteTripTitle: 'Delete Trip',
-  deleteTripMessage: 'Are you sure you want to delete this trip? This action cannot be undone.',
+  deleteTripMessage:
+    'Are you sure you want to delete this trip? This action cannot be undone.',
   deleteTripSuccess: 'Trip deleted successfully',
   deleteTripError: 'Failed to delete trip. Please try again.',
   editComingSoon: 'Edit functionality coming soon',
   importComingSoon: 'Import functionality coming soon',
   featureComingSoon: 'functionality coming soon',
   addComingSoon: 'Add functionality coming soon',
-}; 
+  exitTrip: 'Exit Trip',
+  exitTripSuccess: 'You have successfully exited the trip',
+  exitTripError: 'Failed to exit trip. Please try again.',
+  userIdNotFound: 'User ID not found. Please try again.',
+  success: 'Success',
+  error: 'Error',
+};

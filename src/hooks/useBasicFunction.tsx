@@ -1,4 +1,5 @@
 import { logIn, logOut } from '../features';
+import { apiSlice } from '../services';
 import { setItem, removeItem } from '../utils';
 import { useAppDispatch } from './index';
 
@@ -11,6 +12,7 @@ const useBasicFunctions = () => {
   };
 
   const handleLogout = () => {
+    dispatch(apiSlice.util.resetApiState());
     setItem('Login', false);
     removeItem('userId');
     dispatch(logOut());

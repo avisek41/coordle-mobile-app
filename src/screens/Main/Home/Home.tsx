@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { SafeAreaView, Linking } from 'react-native';
 import {
   useGetCurrentUserProfileQuery,
@@ -8,7 +8,6 @@ import {
 import { Text } from '@/components/ui/text';
 import { Box } from '@/components/ui/box';
 import { VStack } from '@/components/ui/vstack';
-import { HStack } from '@/components/ui/hstack';
 import { Loader, BannerCarousel } from '@/src/components';
 import { homeStrings } from './strings';
 import Header from './Header';
@@ -28,23 +27,20 @@ const Home = () => {
   const {
     data: userProfile,
     isLoading: isProfileLoading,
-    error: profileError,
+    refetch: refetchProfile,
   } = useGetCurrentUserProfileQuery();
 
-  const {
-    data: bannersData,
-    isLoading: isBannersLoading,
-    error: bannersError,
-  } = useGetBannersQuery();
+  const { data: bannersData, isLoading: isBannersLoading } =
+    useGetBannersQuery();
 
   const {
     data: tripsData,
     isLoading: isTripsLoading,
-    error: tripsError,
     refetch,
   } = useGetTripsQuery({ status: 'upcoming' });
 
-  if (isTripsLoading) {
+  // show loader until critical data is ready
+  if (isTripsLoading || isProfileLoading) {
     return <Loader />;
   }
 
@@ -66,7 +62,6 @@ const Home = () => {
   };
 
   const handleTripPress = (trip: Trip) => {
-    // Navigate to trip details
     navigation.navigate('TripDetails', { tripId: trip._id });
   };
 
