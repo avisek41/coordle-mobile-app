@@ -1234,6 +1234,105 @@
             }
           },
           "response": []
+        },
+        {
+          "name": "Make Host",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"68ad50356cbaab393a71d5d9\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/trips/{{trip_id}}/hosts",
+              "host": ["{{base_url}}"],
+              "path": ["api", "trips", "{{trip_id}}", "hosts"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Change User Role",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"68ad50356cbaab393a71d5d9\",\n  \"userRole\": \"traveller\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/trips/{{trip_id}}/change-role",
+              "host": ["{{base_url}}"],
+              "path": ["api", "trips", "{{trip_id}}", "change-role"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Remove Host",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"68ad50356cbaab393a71d5d9\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/trips/{{trip_id}}/hosts",
+              "host": ["{{base_url}}"],
+              "path": ["api", "trips", "{{trip_id}}", "hosts"]
+            }
+          },
+          "response": []
         }
       ]
     },

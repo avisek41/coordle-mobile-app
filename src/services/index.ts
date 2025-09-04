@@ -160,3 +160,28 @@ export {
   type MemberProfileResponse,
   type MemberProfileData,
 } from './memberProfileApi';
+
+// Export make host API
+export {
+  makeHostApi,
+  useMakeHostMutation,
+  type MakeHostRequest,
+  type MakeHostResponse,
+  type TripMember,
+} from './makeHostApi';
+
+// Export change user role API
+export {
+  changeUserRoleApi,
+  useChangeUserRoleMutation,
+  type ChangeUserRoleRequest,
+  type ChangeUserRoleResponse,
+} from './changeUserRoleApi';
+
+// Export remove host API
+export {
+  removeHostApi,
+  useRemoveHostMutation,
+  type RemoveHostRequest,
+  type RemoveHostResponse,
+} from './removeHostApi';

@@ -20,11 +20,13 @@ import { MainNavigationProps, MainRouteProps } from '@/src/types/allRoutes';
 import {
   useGetTripMembersQuery,
   useRemoveParticipantMutation,
+  useMakeHostMutation,
+  useChangeUserRoleMutation,
+  useRemoveHostMutation,
 } from '@/src/services';
 import { Loader } from '@/src/components';
 import { useSimpleToast } from '@/src/hooks/useSimpleToast';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import { useAppSelector } from '@/src/hooks';
 
 interface TripMember {
   userId: string;
@@ -59,12 +61,18 @@ const TripMembers = () => {
     { isLoading: isRemoving, reset: resetRemoveParticipant },
   ] = useRemoveParticipantMutation();
 
+  const [makeHost, { isLoading: isMakingHost, reset: resetMakeHost }] =
+    useMakeHostMutation();
+
+  const [removeHost, { isLoading: isRemovingHost, reset: resetRemoveHost }] =
+    useRemoveHostMutation();
+
   useEffect(() => {
     if (tripMembersData?.data?.members) {
       const members = tripMembersData.data.members;
 
       const ownersList = members.filter(member => member.userRole === 'owner');
-      const hostsList = members.filter(member => member.userRole === 'hosts');
+      const hostsList = members.filter(member => member.userRole === 'host');
       const participantsList = members.filter(
         member => member.userRole === 'traveller',
       );
@@ -125,10 +133,47 @@ const TripMembers = () => {
     }
   };
 
-  const handleMakeAsHost = () => {
-    // TODO: Implement make as host functionality
-    console.log('Make as host:', selectedParticipant?.email);
-    handleCloseActionSheet();
+  const handleMakeAsHost = async () => {
+    if (!selectedParticipant) return;
+
+    try {
+      await makeHost({
+        tripId,
+        body: { userId: selectedParticipant.userId },
+      }).unwrap();
+
+      handleCloseActionSheet();
+
+      refetch();
+    } catch (error: any) {
+      console.error('Failed to make user host:', error);
+
+      showToast({
+        type: 'error',
+        message: error?.data?.message || 'Failed to promote user to host',
+      });
+    } finally {
+      resetMakeHost();
+    }
+  };
+
+  const handleDemoteToTraveller = async () => {
+    if (!selectedParticipant) return;
+
+    try {
+      await removeHost({
+        tripId,
+        body: { userId: selectedParticipant.userId },
+      }).unwrap();
+
+      handleCloseActionSheet();
+
+      refetch();
+    } catch (error: any) {
+      console.error('Failed to remove host:', error);
+    } finally {
+      resetRemoveHost();
+    }
   };
 
   const handleViewProfile = () => {
@@ -164,7 +209,7 @@ const TripMembers = () => {
     }, [tripId]),
   );
 
-  if (isLoading) {
+  if (isLoading || isRemovingHost || isMakingHost) {
     return <Loader />;
   }
 
@@ -187,9 +232,7 @@ const TripMembers = () => {
     <SafeAreaView style={styles.container}>
       <ToastComponent />
       <VStack space="lg" className="flex-1 bg-white">
-        {/* Header */}
         <Header title={TRIP_MEMBERS_STRINGS.TITLE} />
-
         <VStack space="md" className="px-4">
           <HStack className="justify-between items-center">
             <Text className="text-lg font-heading text-gray-900">
@@ -248,16 +291,69 @@ const TripMembers = () => {
               className="bg-gray-100 border border-gray-200 rounded-lg p-3"
             >
               <HStack className="items-center justify-between">
-                <HStack className="items-center" space="md">
-                  <GradientAvatar
-                    userName={getDisplayName(host?.email)}
-                    userImage={''}
-                    size="medium"
-                  />
-                  <Text className="text-base font-body text-gray-900">
-                    {getDisplayName(host?.email)}
-                  </Text>
+                <HStack className="items-center flex-1" space="md">
+                  {host?.inviteType === 'phone' ? (
+                    <>
+                      <GradientAvatar
+                        userName={getDisplayName(host?.preferredName || 'N')}
+                        userImage={''}
+                        size="medium"
+                      />
+                      <VStack space="xs">
+                        {host?.preferredName && (
+                          <Text className="text-base font-body text-gray-900">
+                            {host?.preferredName}
+                          </Text>
+                        )}
+                        <Text className="text-base font-body text-gray-900">
+                          {host?.phoneNumber}
+                        </Text>
+                        {host.preferredName?.length === 0 && (
+                          <Text className="text-sm font-body text-primary-500">
+                            {TRIP_MEMBERS_STRINGS.INVITED}
+                          </Text>
+                        )}
+                      </VStack>
+                    </>
+                  ) : host?.inviteType === 'email' ? (
+                    <>
+                      <GradientAvatar
+                        userName={getDisplayName(
+                          host?.preferredName || host?.email,
+                        )}
+                        userImage={''}
+                        size="medium"
+                      />
+                      <VStack space="xs">
+                        {host?.preferredName && (
+                          <Text className="text-base font-body text-gray-900">
+                            {host?.preferredName}
+                          </Text>
+                        )}
+                        <Text className="text-base font-body text-gray-900">
+                          {host?.email}
+                        </Text>
+                        {host.preferredName?.length === 0 && (
+                          <Text className="text-sm font-body text-primary-500">
+                            {TRIP_MEMBERS_STRINGS.INVITED}
+                          </Text>
+                        )}
+                      </VStack>
+                    </>
+                  ) : null}
                 </HStack>
+                {isOwner && (
+                  <TouchableOpacity
+                    className="w-6 h-6 justify-center items-center"
+                    onPress={() => handleParticipantMenuPress(host)}
+                  >
+                    <Ionicons
+                      name="ellipsis-vertical"
+                      size={20}
+                      color="#6B7280"
+                    />
+                  </TouchableOpacity>
+                )}
               </HStack>
             </Box>
           ))}
@@ -387,11 +483,29 @@ const TripMembers = () => {
                     title: TRIP_MEMBERS_STRINGS.VIEW_PROFILE,
                     onPress: handleViewProfile,
                   },
-                  {
-                    id: 'makeAsHost',
-                    title: TRIP_MEMBERS_STRINGS.MAKE_AS_HOST,
-                    onPress: handleMakeAsHost,
-                  },
+                  ...(selectedParticipant?.userRole === 'traveller'
+                    ? [
+                        {
+                          id: 'makeAsHost',
+                          title: isMakingHost
+                            ? 'Promoting...'
+                            : TRIP_MEMBERS_STRINGS.MAKE_AS_HOST,
+                          onPress: handleMakeAsHost,
+                          isDisabled: isMakingHost,
+                        },
+                      ]
+                    : selectedParticipant?.userRole === 'host'
+                    ? [
+                        {
+                          id: 'demoteToTraveller',
+                          title: isRemovingHost
+                            ? 'Removing...'
+                            : 'Remove from Hosts',
+                          onPress: handleDemoteToTraveller,
+                          isDisabled: isRemovingHost,
+                        },
+                      ]
+                    : []),
                 ]
               : [
                   {

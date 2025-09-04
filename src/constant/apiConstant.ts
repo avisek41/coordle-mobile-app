@@ -21,4 +21,7 @@ export const API_ENDPOINTS = {
   UPDATE_DOCUMENT: '/api/documents',
   DELETE_DOCUMENT: '/api/documents',
   GET_BANNERS: '/api/banners',
+  MAKE_HOST: '/api/trips',
+  CHANGE_USER_ROLE: '/api/trips',
+  REMOVE_HOST: '/api/trips',
 } as const;
