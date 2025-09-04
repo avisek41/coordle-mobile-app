@@ -39,7 +39,6 @@ const Home = () => {
     refetch,
   } = useGetTripsQuery({ status: 'upcoming' });
 
-  // show loader until critical data is ready
   if (isTripsLoading || isProfileLoading) {
     return <Loader />;
   }
