@@ -80,6 +80,7 @@ const TripDetails: React.FC = () => {
         tripId: trip._id,
         start: trip.display_start,
         end: trip.display_end,
+        isOwner: trip.owner_id === userId,
       });
     } else {
       // TODO: Navigate to respective feature screens
@@ -263,6 +264,7 @@ const TripDetails: React.FC = () => {
             userCount={userCount}
             onFeaturePress={handleFeaturePress}
             isPast={isPastTrip}
+            isOwner={isOwner}
           />
           {userRole !== 'owner' && (
             <GradientButton

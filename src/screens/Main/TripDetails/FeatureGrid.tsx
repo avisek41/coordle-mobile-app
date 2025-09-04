@@ -13,18 +13,21 @@ interface FeatureButton {
   title: string;
   icon: string;
   badge: number | null;
+  isOwner: boolean;
 }
 
 interface FeatureGridProps {
   userCount: number;
   onFeaturePress: (feature: string) => void;
   isPast?: boolean;
+  isOwner: boolean;
 }
 
 const FeatureGrid: React.FC<FeatureGridProps> = ({
   userCount,
   onFeaturePress,
   isPast = false,
+  isOwner,
 }) => {
   const featureButtons: FeatureButton[] = [
     {
@@ -32,42 +35,49 @@ const FeatureGrid: React.FC<FeatureGridProps> = ({
       title: tripDetailsStrings.announcement,
       icon: 'megaphone-outline',
       badge: null,
+      isOwner,
     },
     {
       id: 'chat',
       title: tripDetailsStrings.chat,
       icon: 'chatbubble-outline',
       badge: null,
+      isOwner,
     },
     {
       id: 'food-order',
       title: tripDetailsStrings.manageFoodOrder,
       icon: 'restaurant-outline',
       badge: null,
+      isOwner,
     },
     {
       id: 'members',
       title: tripDetailsStrings.tripMembers,
       icon: 'people-outline',
       badge: userCount,
+      isOwner,
     },
     {
       id: 'poll',
       title: tripDetailsStrings.poll,
       icon: 'bar-chart-outline',
       badge: null,
+      isOwner,
     },
     {
       id: 'map',
       title: tripDetailsStrings.map,
       icon: 'location-outline',
       badge: null,
+      isOwner,
     },
     {
       id: 'documents',
       title: 'Documents',
       icon: 'document-text-outline',
       badge: null,
+      isOwner,
     },
   ];
 

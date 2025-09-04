@@ -36,10 +36,9 @@ interface TripMember {
 }
 
 const TripMembers = () => {
-  const { userRole } = useAppSelector(state => state?.auth);
   const navigation = useNavigation<MainNavigationProps>();
   const route = useRoute<MainRouteProps<'TripMembers'>>();
-  const { tripId, start, end } = route.params;
+  const { tripId, start, end, isOwner } = route.params;
   const { showToast, ToastComponent } = useSimpleToast();
   const [owners, setOwners] = useState<TripMember[]>([]);
   const [hosts, setHosts] = useState<TripMember[]>([]);
@@ -333,7 +332,7 @@ const TripMembers = () => {
                     </>
                   ) : null}
                 </HStack>
-                {userRole === 'owner' && (
+                {isOwner && (
                   <TouchableOpacity
                     className="w-6 h-6 justify-center items-center"
                     onPress={() => handleParticipantMenuPress(participant)}
@@ -350,7 +349,7 @@ const TripMembers = () => {
           ))}
         </VStack>
 
-        {userRole === 'owner' && (
+        {isOwner && (
           <ExpandableFab
             actions={[
               {

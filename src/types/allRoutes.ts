@@ -59,6 +59,7 @@ export type MainStackParams = {
     start: string;
     end: string;
     inviteType?: 'email' | 'phone';
+    isOwner?: boolean;
   };
   MemberProfile: {
     userId: string;
