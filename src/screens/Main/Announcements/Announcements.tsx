@@ -78,6 +78,9 @@ const Announcements = () => {
         {(announcementsData?.data?.announcements?.length ?? 0) > 0 ? (
           <AnnouncementList
             announcements={announcementsData?.data?.announcements || []}
+            navigation={navigation}
+            startDate={startDate}
+            endDate={endDate}
           />
         ) : (
           <NoData

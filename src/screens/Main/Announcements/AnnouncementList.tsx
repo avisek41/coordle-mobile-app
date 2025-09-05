@@ -15,13 +15,20 @@ import {
 } from '@/src/components';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { Colors } from '@/src/configs/CustomTheme';
+import { MainNavigationProps } from '@/src/types/allRoutes';
 
 interface AnnouncementListProps {
   announcements: Announcement[];
+  navigation: MainNavigationProps;
+  startDate: string;
+  endDate: string;
 }
 
 const AnnouncementList: React.FC<AnnouncementListProps> = ({
   announcements,
+  navigation,
+  startDate,
+  endDate,
 }) => {
   const [selectedAnnouncement, setSelectedAnnouncement] =
     useState<Announcement | null>(null);
@@ -39,11 +46,14 @@ const AnnouncementList: React.FC<AnnouncementListProps> = ({
   };
 
   const handleEdit = () => {
-    // TODO: Implement edit functionality
-    Alert.alert(
-      ANNOUNCEMENTS_STRINGS.EDIT,
-      ANNOUNCEMENTS_STRINGS.EDIT_PLACEHOLDER,
-    );
+    if (selectedAnnouncement) {
+      navigation.navigate('EditAnnouncement', {
+        announcementId: selectedAnnouncement._id,
+        message: selectedAnnouncement.message,
+        startDate,
+        endDate,
+      });
+    }
   };
 
   const handleRetract = () => {

@@ -16,4 +16,10 @@ export const ANNOUNCEMENTS_STRINGS = {
   RETRACT_SUCCESS: 'Announcement retracted successfully',
   EDIT_PLACEHOLDER: 'Edit functionality will be implemented',
   COPY_PLACEHOLDER: 'Announcement copied to clipboard',
+  // Edit Announcement
+  EDIT_ANNOUNCEMENT_TITLE: 'Edit Announcement Message',
+  ANNOUNCEMENT_MESSAGE_LABEL: 'Announcement message',
+  SAVE: 'Save',
+  UPDATE_SUCCESS: 'Announcement updated successfully',
+  UPDATE_ERROR: 'Failed to update announcement',
 } as const;

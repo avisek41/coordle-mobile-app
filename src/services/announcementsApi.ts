@@ -45,6 +45,16 @@ export interface CreateAnnouncementResponse {
   data: Announcement;
 }
 
+export interface UpdateAnnouncementRequest {
+  message: string;
+}
+
+export interface UpdateAnnouncementResponse {
+  success: boolean;
+  message: string;
+  data: Announcement;
+}
+
 export const announcementsApi = apiSlice.injectEndpoints({
   endpoints: builder => ({
     createAnnouncement: builder.mutation<
@@ -68,8 +78,22 @@ export const announcementsApi = apiSlice.injectEndpoints({
       }),
       providesTags: ['Announcements'],
     }),
+    updateAnnouncement: builder.mutation<
+      UpdateAnnouncementResponse,
+      { announcementId: string; message: string }
+    >({
+      query: ({ announcementId, message }) => ({
+        url: `/api/announcements/${announcementId}`,
+        method: 'PUT',
+        body: { message },
+      }),
+      invalidatesTags: ['Announcements'],
+    }),
   }),
 });
 
-export const { useCreateAnnouncementMutation, useGetAnnouncementsQuery } =
-  announcementsApi;
+export const {
+  useCreateAnnouncementMutation,
+  useGetAnnouncementsQuery,
+  useUpdateAnnouncementMutation,
+} = announcementsApi;

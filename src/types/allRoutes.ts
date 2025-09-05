@@ -70,6 +70,12 @@ export type MainStackParams = {
     startDate: string;
     endDate: string;
   };
+  EditAnnouncement: {
+    announcementId: string;
+    message: string;
+    startDate: string;
+    endDate: string;
+  };
 };
 
 export type MainNavigationProps = NativeStackNavigationProp<MainStackParams>;
