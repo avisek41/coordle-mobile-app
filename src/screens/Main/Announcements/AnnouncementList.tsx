@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ScrollView, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import { ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
 import { Text } from '@/components/ui/text';
 import { VStack } from '@/components/ui/vstack';
 import { HStack } from '@/components/ui/hstack';
@@ -12,16 +12,23 @@ import {
   CustomActionSheet,
   ActionItem,
   CustomAlert,
+  Loader,
 } from '@/src/components';
+import { useDeleteAnnouncementMutation } from '@/src/services';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { Colors } from '@/src/configs/CustomTheme';
 import { MainNavigationProps } from '@/src/types/allRoutes';
+import Clipboard from '@react-native-clipboard/clipboard';
+import { useSimpleToast } from '@/src/hooks/useSimpleToast';
 
 interface AnnouncementListProps {
   announcements: Announcement[];
   navigation: MainNavigationProps;
   startDate: string;
   endDate: string;
+  deleteAnnouncement: (args: { announcementId: string }) => any;
+  isDeleting: boolean;
+  onRetract: (announcementId: string) => void;
 }
 
 const AnnouncementList: React.FC<AnnouncementListProps> = ({
@@ -29,11 +36,14 @@ const AnnouncementList: React.FC<AnnouncementListProps> = ({
   navigation,
   startDate,
   endDate,
+  deleteAnnouncement,
+  isDeleting,
+  onRetract,
 }) => {
   const [selectedAnnouncement, setSelectedAnnouncement] =
     useState<Announcement | null>(null);
   const [isActionSheetOpen, setIsActionSheetOpen] = useState(false);
-  const [isRetractAlertOpen, setIsRetractAlertOpen] = useState(false);
+  const { showToast, ToastComponent } = useSimpleToast();
 
   const handleMenuPress = (announcement: Announcement) => {
     setSelectedAnnouncement(announcement);
@@ -57,28 +67,25 @@ const AnnouncementList: React.FC<AnnouncementListProps> = ({
   };
 
   const handleRetract = () => {
-    setIsRetractAlertOpen(true);
-  };
-
-  const handleRetractConfirm = () => {
-    // TODO: Implement retract functionality
-    setIsRetractAlertOpen(false);
-    setIsActionSheetOpen(false);
-    setSelectedAnnouncement(null);
-    // Show success message
-    Alert.alert('Success', ANNOUNCEMENTS_STRINGS.RETRACT_SUCCESS);
-  };
-
-  const handleRetractCancel = () => {
-    setIsRetractAlertOpen(false);
+    if (selectedAnnouncement) {
+      onRetract(selectedAnnouncement._id);
+      setIsActionSheetOpen(false);
+      setSelectedAnnouncement(null);
+    }
   };
 
   const handleCopy = () => {
-    // TODO: Implement copy functionality
-    Alert.alert(
-      ANNOUNCEMENTS_STRINGS.COPY,
-      ANNOUNCEMENTS_STRINGS.COPY_PLACEHOLDER,
-    );
+    if (selectedAnnouncement) {
+      Clipboard.setString(selectedAnnouncement.message);
+      showToast({
+        type: 'success',
+        title: ANNOUNCEMENTS_STRINGS.COPY,
+        message: ANNOUNCEMENTS_STRINGS.COPY_PLACEHOLDER,
+        duration: 2000,
+      });
+      setIsActionSheetOpen(false);
+      setSelectedAnnouncement(null);
+    }
   };
 
   const getActionItems = (): ActionItem[] => [
@@ -87,6 +94,7 @@ const AnnouncementList: React.FC<AnnouncementListProps> = ({
       title: ANNOUNCEMENTS_STRINGS.EDIT,
       onPress: handleEdit,
     },
+
     {
       id: 'retract',
       title: ANNOUNCEMENTS_STRINGS.RETRACT,
@@ -166,18 +174,8 @@ const AnnouncementList: React.FC<AnnouncementListProps> = ({
         actions={getActionItems()}
       />
 
-      {isRetractAlertOpen && (
-        <CustomAlert
-          isOpen={isRetractAlertOpen}
-          title={ANNOUNCEMENTS_STRINGS.RETRACT_CONFIRMATION_TITLE}
-          message={ANNOUNCEMENTS_STRINGS.RETRACT_CONFIRMATION_MESSAGE}
-          cancelText={ANNOUNCEMENTS_STRINGS.CANCEL}
-          confirmText={ANNOUNCEMENTS_STRINGS.RETRACT}
-          onCancel={handleRetractCancel}
-          onConfirm={handleRetractConfirm}
-          isDestructive={true}
-        />
-      )}
+      {/* Toast Component */}
+      <ToastComponent />
     </>
   );
 };

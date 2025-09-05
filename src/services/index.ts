@@ -191,7 +191,12 @@ export {
   announcementsApi,
   useCreateAnnouncementMutation,
   useGetAnnouncementsQuery,
+  useUpdateAnnouncementMutation,
+  useDeleteAnnouncementMutation,
   type CreateAnnouncementRequest,
   type Announcement,
   type CreateAnnouncementResponse,
+  type UpdateAnnouncementRequest,
+  type UpdateAnnouncementResponse,
+  type DeleteAnnouncementResponse,
 } from './announcementsApi';

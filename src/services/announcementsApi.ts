@@ -55,6 +55,11 @@ export interface UpdateAnnouncementResponse {
   data: Announcement;
 }
 
+export interface DeleteAnnouncementResponse {
+  success: boolean;
+  message: string;
+}
+
 export const announcementsApi = apiSlice.injectEndpoints({
   endpoints: builder => ({
     createAnnouncement: builder.mutation<
@@ -89,6 +94,16 @@ export const announcementsApi = apiSlice.injectEndpoints({
       }),
       invalidatesTags: ['Announcements'],
     }),
+    deleteAnnouncement: builder.mutation<
+      DeleteAnnouncementResponse,
+      { announcementId: string }
+    >({
+      query: ({ announcementId }) => ({
+        url: `/api/announcements/${announcementId}`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: ['Announcements'],
+    }),
   }),
 });
 
@@ -96,4 +111,5 @@ export const {
   useCreateAnnouncementMutation,
   useGetAnnouncementsQuery,
   useUpdateAnnouncementMutation,
+  useDeleteAnnouncementMutation,
 } = announcementsApi;

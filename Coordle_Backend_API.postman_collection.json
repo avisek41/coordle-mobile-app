@@ -1397,6 +1397,25 @@
             }
           },
           "response": []
+        },
+        {
+          "name": "Delete Announcement",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/announcements/{{announcement_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "announcements", "{{announcement_id}}"]
+            }
+          },
+          "response": []
         }
       ]
     },

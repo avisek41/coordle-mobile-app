@@ -6,20 +6,29 @@ import { HStack } from '@/components/ui/hstack';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { MainNavigationProps, MainRouteProps } from '@/src/types/allRoutes';
 import { ANNOUNCEMENTS_STRINGS } from './strings';
-import { Header, Loader, NoData } from '@/src/components';
+import { Header, Loader, NoData, CustomAlert } from '@/src/components';
 import {
   useCreateAnnouncementMutation,
+  useDeleteAnnouncementMutation,
   useGetAnnouncementsQuery,
 } from '@/src/services';
 import { useSimpleToast } from '@/src/hooks/useSimpleToast';
 import InputBox from './InputBox';
 import AnnouncementList from './AnnouncementList';
+import { useAppSelector } from '@/src/hooks';
 
 const Announcements = () => {
+  const { userRole } = useAppSelector(state => state?.auth);
   const navigation = useNavigation<MainNavigationProps>();
+  const [deleteAnnouncement, { isLoading: isDeleting }] =
+    useDeleteAnnouncementMutation();
   const route = useRoute<MainRouteProps<'Announcements'>>();
   const { tripId, tripName, startDate, endDate } = route.params;
   const [message, setMessage] = useState('');
+  const [isRetractAlertOpen, setIsRetractAlertOpen] = useState(false);
+  const [selectedAnnouncementId, setSelectedAnnouncementId] = useState<
+    string | null
+  >(null);
   const { showToast, ToastComponent } = useSimpleToast();
 
   const [createAnnouncement, { isLoading }] = useCreateAnnouncementMutation();
@@ -54,7 +63,40 @@ const Announcements = () => {
     }
   };
 
-  if (isLoadingAnnouncements) {
+  const handleRetract = (announcementId: string) => {
+    setSelectedAnnouncementId(announcementId);
+    setIsRetractAlertOpen(true);
+  };
+
+  const handleRetractConfirm = async () => {
+    if (!selectedAnnouncementId) return;
+
+    try {
+      await deleteAnnouncement({
+        announcementId: selectedAnnouncementId,
+      }).unwrap();
+
+      showToast({
+        type: 'success',
+        message: ANNOUNCEMENTS_STRINGS.DELETE_SUCCESS,
+      });
+    } catch (error: any) {
+      showToast({
+        type: 'error',
+        message: error?.data?.message || 'Failed to delete announcement',
+      });
+    } finally {
+      setIsRetractAlertOpen(false);
+      setSelectedAnnouncementId(null);
+    }
+  };
+
+  const handleRetractCancel = () => {
+    setIsRetractAlertOpen(false);
+    setSelectedAnnouncementId(null);
+  };
+
+  if (isLoadingAnnouncements || isDeleting) {
     return <Loader />;
   }
 
@@ -81,6 +123,9 @@ const Announcements = () => {
             navigation={navigation}
             startDate={startDate}
             endDate={endDate}
+            isDeleting={isDeleting}
+            deleteAnnouncement={deleteAnnouncement}
+            onRetract={handleRetract}
           />
         ) : (
           <NoData
@@ -91,15 +136,29 @@ const Announcements = () => {
           />
         )}
 
-        {/* Message Input */}
-        <InputBox
-          value={message}
-          onChangeText={setMessage}
-          onSend={handleSendMessage}
-          placeholder={ANNOUNCEMENTS_STRINGS.MESSAGE_PLACEHOLDER}
-          isLoading={isLoading}
-        />
+        {userRole !== 'traveller' && (
+          <InputBox
+            value={message}
+            onChangeText={setMessage}
+            onSend={handleSendMessage}
+            placeholder={ANNOUNCEMENTS_STRINGS.MESSAGE_PLACEHOLDER}
+            isLoading={isLoading}
+          />
+        )}
       </VStack>
+
+      {isRetractAlertOpen && (
+        <CustomAlert
+          isOpen={isRetractAlertOpen}
+          title={ANNOUNCEMENTS_STRINGS.RETRACT_CONFIRMATION_TITLE}
+          message={ANNOUNCEMENTS_STRINGS.RETRACT_CONFIRMATION_MESSAGE}
+          cancelText={ANNOUNCEMENTS_STRINGS.CANCEL}
+          confirmText={ANNOUNCEMENTS_STRINGS.RETRACT}
+          onCancel={handleRetractCancel}
+          onConfirm={handleRetractConfirm}
+          isDestructive={true}
+        />
+      )}
     </SafeAreaView>
   );
 };
