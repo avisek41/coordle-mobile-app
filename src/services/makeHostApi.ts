@@ -40,6 +40,7 @@ export const makeHostApi = apiSlice.injectEndpoints({
         method: 'POST',
         body,
       }),
+      invalidatesTags: ['TripMembers'],
     }),
   }),
 });

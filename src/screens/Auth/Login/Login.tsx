@@ -55,6 +55,7 @@ const Login: React.FC = () => {
       if (response.success) {
         const accessToken = response.data.token;
         const userId = response.data.id;
+
         if (accessToken) {
           await Promise.all([
             setItem('accessToken', accessToken),
@@ -67,6 +68,7 @@ const Login: React.FC = () => {
             setCredentials({
               token: accessToken,
               userId,
+              userRole: response.data.userRole,
             }),
           );
         }

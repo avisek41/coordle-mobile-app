@@ -38,6 +38,7 @@ export const removeHostApi = apiSlice.injectEndpoints({
         method: 'DELETE',
         body,
       }),
+      invalidatesTags: ['TripMembers'],
     }),
   }),
 });

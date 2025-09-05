@@ -32,7 +32,6 @@ const PlanUsers: React.FC<PlanUsersProps> = ({
   const { data, isLoading, error } = useGetSamePlanUsersQuery(ownerId);
   const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
 
-  console.log('data', data);
   // Filter users based on inviteType when data or isEmailType changes
   useEffect(() => {
     if (data?.success && data?.data?.users) {
@@ -79,7 +78,7 @@ const PlanUsers: React.FC<PlanUsersProps> = ({
     return (
       <React.Fragment key={user._id}>
         {isEmailType ? (
-          <Box className="flex-row items-center">
+          <Box className="flex-row items-center mb-2">
             <HStack className="flex-1 items-center" space="md">
               <GradientAvatar userName={user?.email} size="medium" />
 
@@ -104,7 +103,7 @@ const PlanUsers: React.FC<PlanUsersProps> = ({
             )}
           </Box>
         ) : (
-          <Box className="flex-row items-center">
+          <Box className="flex-row items-center mb-2">
             <HStack className="flex-1 items-center" space="md">
               <VStack className="flex-1">
                 <Text className="font-body text-gray-800 text-base">

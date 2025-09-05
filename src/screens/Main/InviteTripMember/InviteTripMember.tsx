@@ -374,6 +374,8 @@ const InviteTripMember = () => {
         users,
       };
 
+      console.log('requestBody', requestBody);
+
       const response = await inviteUsersToTrip(requestBody).unwrap();
 
       if (!response.success) {

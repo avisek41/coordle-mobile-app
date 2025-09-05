@@ -250,7 +250,7 @@ const TripDetails: React.FC = () => {
               })
             }
             isPast={isPastTrip}
-            isOwner={isOwner}
+            isOwner={userRole !== 'traveller'}
           />
 
           <ItineraryCard

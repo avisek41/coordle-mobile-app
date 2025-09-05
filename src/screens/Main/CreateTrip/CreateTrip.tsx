@@ -37,8 +37,10 @@ import { MainNavigationProps, MainRouteProps } from '@/src/types/allRoutes';
 import moment from 'moment';
 import { useSimpleToast } from '@/src/hooks/useSimpleToast';
 import ShareTripSection from './ShareTripSection';
+import { useAppSelector } from '@/src/hooks';
 
 const CreateTrip = () => {
+  const { userRole } = useAppSelector(state => state.auth);
   const navigation = useNavigation<MainNavigationProps>();
   const route = useRoute<MainRouteProps<'CreateTrip'>>();
 
@@ -395,7 +397,7 @@ const CreateTrip = () => {
               disabled={isCreating || isUpdating}
             />
 
-            {isEditMode && (
+            {isEditMode && userRole === 'owner' && (
               <TouchableOpacity
                 onPress={handleDeleteTrip}
                 disabled={isDeleting}
