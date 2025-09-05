@@ -4,14 +4,39 @@ export interface CreateAnnouncementRequest {
   message: string;
 }
 
+export interface CreatedBy {
+  _id: string;
+  email: string;
+  preferredName: string;
+}
+
 export interface Announcement {
   _id: string;
-  message: string;
   tripId: string;
-  authorId: string;
-  authorName: string;
+  createdBy: CreatedBy;
+  message: string;
   createdAt: string;
   updatedAt: string;
+  __v: number;
+}
+
+export interface Pagination {
+  currentPage: number;
+  totalPages: number;
+  totalCount: number;
+  hasNextPage: boolean;
+  hasPrevPage: boolean;
+}
+
+export interface GetAnnouncementsResponse {
+  success: boolean;
+  statusCode: number;
+  message: string;
+  timestamp: string;
+  data: {
+    announcements: Announcement[];
+    pagination: Pagination;
+  };
 }
 
 export interface CreateAnnouncementResponse {
@@ -33,8 +58,14 @@ export const announcementsApi = apiSlice.injectEndpoints({
       }),
       invalidatesTags: ['Announcements'],
     }),
-    getAnnouncements: builder.query<Announcement[], string>({
-      query: tripId => `/api/trips/${tripId}/announcements`,
+    getAnnouncements: builder.query<
+      GetAnnouncementsResponse,
+      { tripId: string; page?: number; limit?: number }
+    >({
+      query: ({ tripId, page = 1, limit = 10 }) => ({
+        url: `/api/trips/${tripId}/announcements`,
+        params: { page, limit },
+      }),
       providesTags: ['Announcements'],
     }),
   }),

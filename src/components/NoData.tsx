@@ -4,6 +4,7 @@ import { Box } from '@/components/ui/box';
 import { Text } from '@/components/ui/text';
 import { VStack } from '@/components/ui/vstack';
 import { images } from '@/src/assets';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
 interface NoDataProps {
   title?: string;
@@ -14,6 +15,9 @@ interface NoDataProps {
   showButton?: boolean;
   imageSize?: number;
   className?: string;
+  isIcon?: boolean;
+  iconName?: string;
+  iconSize?: number;
 }
 
 const NoData: React.FC<NoDataProps> = ({
@@ -25,18 +29,25 @@ const NoData: React.FC<NoDataProps> = ({
   showButton = false,
   imageSize = 64,
   className = '',
+  isIcon = false,
+  iconName = 'alert-circle',
+  iconSize = 28,
 }) => {
   return (
     <Box className={`flex-1 justify-center items-center px-6 ${className}`}>
       <VStack className="items-center justify-center">
         {/* Icon/Image */}
         <Box className="mb-4">
-          <Image
-            source={image}
-            className={`w-${imageSize / 4} h-${imageSize / 4}`}
-            style={{ width: imageSize, height: imageSize }}
-            resizeMode="contain"
-          />
+          {isIcon ? (
+            <Ionicons name={iconName} size={iconSize} color="#51B1C0" />
+          ) : (
+            <Image
+              source={image}
+              className={`w-${imageSize / 4} h-${imageSize / 4}`}
+              style={{ width: imageSize, height: imageSize }}
+              resizeMode="contain"
+            />
+          )}
         </Box>
 
         {/* Title */}
