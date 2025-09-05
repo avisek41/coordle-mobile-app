@@ -52,7 +52,7 @@ const CustomAlert: React.FC<CustomAlertProps> = ({
             <Text className="text-xl font-heading text-gray-900  mb-2">
               {title}
             </Text>
-            <Text className="text-sm font-body text-gray-600 text-center leading-5">
+            <Text className="text-sm font-body text-gray-600  leading-5">
               {message}
             </Text>
           </VStack>
