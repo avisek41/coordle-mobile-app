@@ -64,6 +64,12 @@ export type MainStackParams = {
   MemberProfile: {
     userId: string;
   };
+  Announcements: {
+    tripId: string;
+    tripName: string;
+    startDate: string;
+    endDate: string;
+  };
 };
 
 export type MainNavigationProps = NativeStackNavigationProp<MainStackParams>;

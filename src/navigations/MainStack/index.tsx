@@ -17,6 +17,7 @@ import { AddTripMembers } from '../../screens/Main/AddTripMembers';
 import { InviteTripMember } from '../../screens/Main/InviteTripMember';
 import { TripMembers } from '../../screens/Main/TripMembers';
 import { MemberProfile } from '../../screens/Main/MemberProfile';
+import { Announcements } from '../../screens/Main/Announcements';
 
 import { Routes } from '../NavigationUtilis';
 import { MainStackParams } from '@/src/types/allRoutes';
@@ -99,6 +100,11 @@ const MainStack = () => {
       <Stack.Screen
         name="MemberProfile"
         component={MemberProfile}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="Announcements"
+        component={Announcements}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>

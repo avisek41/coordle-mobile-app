@@ -11,3 +11,4 @@ export { AddTripMembers } from './AddTripMembers';
 export { InviteTripMember } from './InviteTripMember';
 export { TripMembers } from './TripMembers';
 export { MemberProfile } from './MemberProfile';
+export { Announcements } from './Announcements';

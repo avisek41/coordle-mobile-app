@@ -82,6 +82,13 @@ const TripDetails: React.FC = () => {
         end: trip.display_end,
         isOwner: trip.owner_id === userId,
       });
+    } else if (feature === tripDetailsStrings.announcement) {
+      navigation.navigate('Announcements', {
+        tripId: trip._id,
+        tripName: trip.name,
+        startDate: trip.display_start,
+        endDate: trip.display_end,
+      });
     } else {
       // TODO: Navigate to respective feature screens
       showToast({
