@@ -4,6 +4,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   TextInput,
+  ActivityIndicator,
 } from 'react-native';
 import { Text } from '@/components/ui/text';
 import { VStack } from '@/components/ui/vstack';
@@ -14,21 +15,45 @@ import { MainNavigationProps, MainRouteProps } from '@/src/types/allRoutes';
 import { ANNOUNCEMENTS_STRINGS } from './strings';
 import { Header } from '@/src/components';
 import { Colors } from '@/src/configs/CustomTheme';
+import { useCreateAnnouncementMutation } from '@/src/services';
+import { useSimpleToast } from '@/src/hooks/useSimpleToast';
 
 const Announcements = () => {
   const navigation = useNavigation<MainNavigationProps>();
   const route = useRoute<MainRouteProps<'Announcements'>>();
   const { tripId, tripName, startDate, endDate } = route.params;
   const [message, setMessage] = useState('');
+  const { showToast, ToastComponent } = useSimpleToast();
 
-  const handleSendMessage = () => {
-    if (message.trim()) {
+  const [createAnnouncement, { isLoading }] = useCreateAnnouncementMutation();
+
+  const handleSendMessage = async () => {
+    if (!message.trim()) return;
+
+    try {
+      await createAnnouncement({
+        tripId,
+        announcement: {
+          message: message.trim(),
+        },
+      }).unwrap();
+
       setMessage('');
+      showToast({
+        type: 'success',
+        message: 'Announcement posted successfully',
+      });
+    } catch (error: any) {
+      showToast({
+        type: 'error',
+        message: error?.data?.message || 'Failed to post announcement',
+      });
     }
   };
 
   return (
     <SafeAreaView style={styles.container}>
+      <ToastComponent />
       <VStack className="flex-1 bg-white">
         {/* Header */}
         <Header
@@ -69,15 +94,19 @@ const Announcements = () => {
             onPress={handleSendMessage}
             style={[
               styles.sendButton,
-              !message.trim() && styles.sendButtonDisabled,
+              (!message.trim() || isLoading) && styles.sendButtonDisabled,
             ]}
-            disabled={!message.trim()}
+            disabled={!message.trim() || isLoading}
           >
-            <Ionicons
-              name="send"
-              size={20}
-              color={message.trim() ? Colors.white : '#9CA3AF'}
-            />
+            {isLoading ? (
+              <ActivityIndicator size={20} color={Colors.white} />
+            ) : (
+              <Ionicons
+                name={'send'}
+                size={20}
+                color={message.trim() && !isLoading ? Colors.white : '#9CA3AF'}
+              />
+            )}
           </TouchableOpacity>
         </HStack>
       </VStack>

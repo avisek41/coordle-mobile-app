@@ -185,3 +185,13 @@ export {
   type RemoveHostRequest,
   type RemoveHostResponse,
 } from './removeHostApi';
+
+// Export announcements API
+export {
+  announcementsApi,
+  useCreateAnnouncementMutation,
+  useGetAnnouncementsQuery,
+  type CreateAnnouncementRequest,
+  type Announcement,
+  type CreateAnnouncementResponse,
+} from './announcementsApi';

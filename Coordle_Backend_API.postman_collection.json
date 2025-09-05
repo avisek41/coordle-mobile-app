@@ -1333,6 +1333,58 @@
             }
           },
           "response": []
+        },
+        {
+          "name": "Create Announcement",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"message\": \"Welcome to our trip! Please arrive at the airport 2 hours before departure.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/trips/{{trip_id}}/announcements",
+              "host": ["{{base_url}}"],
+              "path": ["api", "trips", "{{trip_id}}", "announcements"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Announcements",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/trips/{{trip_id}}/announcements",
+              "host": ["{{base_url}}"],
+              "path": ["api", "trips", "{{trip_id}}", "announcements"]
+            }
+          },
+          "response": []
         }
       ]
     },
