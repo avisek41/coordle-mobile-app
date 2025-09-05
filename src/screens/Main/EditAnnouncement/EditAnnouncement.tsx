@@ -17,10 +17,8 @@ const EditAnnouncement = () => {
   const navigation = useNavigation<MainNavigationProps>();
   const route = useRoute<MainRouteProps<'EditAnnouncement'>>();
   const { announcementId, message, startDate, endDate } = route.params;
-
   const [editedMessage, setEditedMessage] = useState(message);
   const { showToast, ToastComponent } = useSimpleToast();
-
   const [updateAnnouncement, { isLoading }] = useUpdateAnnouncementMutation();
 
   const handleSave = async () => {
