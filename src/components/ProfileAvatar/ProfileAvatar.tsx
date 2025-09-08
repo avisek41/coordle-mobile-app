@@ -72,8 +72,6 @@ const ProfileAvatar: React.FC<ProfileAvatarProps> = ({
 
   const sizeStyles = getSizeStyles();
 
-  console.log('profilePhoto', profilePhoto);
-
   return (
     <>
       <Box className="relative">

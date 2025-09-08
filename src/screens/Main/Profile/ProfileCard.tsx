@@ -50,8 +50,6 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
   const planName =
     userPlan?.data?.currentPlan?.planName || profilePlanName || null;
 
-  console.log('profilePlanName', profilePlanName);
-
   return (
     <Box className="bg-white rounded-3xl p-6 shadow-xl border border-gray-200 -mt-20">
       <VStack space="lg">

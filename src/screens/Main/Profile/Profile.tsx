@@ -22,8 +22,6 @@ const Profile = () => {
     refetch,
   } = useGetCurrentUserProfileQuery();
 
-  const { data: userPlan } = useGetUserPlanQuery();
-
   // Refetch user data when the screen comes into focus
   useFocusEffect(
     React.useCallback(() => {
