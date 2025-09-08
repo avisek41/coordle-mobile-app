@@ -23,11 +23,13 @@ type ProfileNavigationProp = NativeStackNavigationProp<
 interface ProfileCardProps {
   onUploadSuccess?: (profilePhotoUrl: string) => void;
   onUploadError?: (error: string) => void;
+  profilePlanName?: string;
 }
 
 const ProfileCard: React.FC<ProfileCardProps> = ({
   onUploadSuccess,
   onUploadError,
+  profilePlanName,
 }) => {
   const navigation = useNavigation<ProfileNavigationProp>();
 
@@ -45,7 +47,10 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
 
   const userData = userProfile?.data;
   const userName = userData?.preferredName || userData?.firstName || 'User';
-  const planName = userPlan?.data?.currentPlan?.planName || null;
+  const planName =
+    userPlan?.data?.currentPlan?.planName || profilePlanName || null;
+
+  console.log('profilePlanName', profilePlanName);
 
   return (
     <Box className="bg-white rounded-3xl p-6 shadow-xl border border-gray-200 -mt-20">

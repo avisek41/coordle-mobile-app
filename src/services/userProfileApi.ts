@@ -44,6 +44,13 @@ export interface UserProfileResponse {
     genderIdentity?: string;
     sexualOrientation?: string;
     disabilityStatus?: string;
+    currentPlan?: {
+      planName: string;
+      planVariant: string;
+      price: number;
+      currency: string;
+      features: string[];
+    };
     profilePhoto?: ProfilePhoto;
   };
 }

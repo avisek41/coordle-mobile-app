@@ -6,7 +6,10 @@ import { images } from '@/src/assets';
 import Header from '@/src/screens/Main/Profile/Header';
 import ProfileCard from '@/src/screens/Main/Profile/ProfileCard';
 import ProfileSettings from '@/src/screens/Main/Profile/ProfileSettings';
-import { useGetCurrentUserProfileQuery } from '@/src/services';
+import {
+  useGetCurrentUserProfileQuery,
+  useGetUserPlanQuery,
+} from '@/src/services';
 import { useFocusEffect } from '@react-navigation/native';
 import { useSimpleToast } from '@/src/hooks/useSimpleToast';
 
@@ -18,6 +21,8 @@ const Profile = () => {
     isLoading,
     refetch,
   } = useGetCurrentUserProfileQuery();
+
+  const { data: userPlan } = useGetUserPlanQuery();
 
   // Refetch user data when the screen comes into focus
   useFocusEffect(
@@ -65,6 +70,7 @@ const Profile = () => {
             <ProfileCard
               onUploadSuccess={handleUploadSuccess}
               onUploadError={handleUploadError}
+              profilePlanName={userProfile?.data?.currentPlan?.planName}
             />
           </Box>
         </Box>

@@ -37,7 +37,7 @@ const Home = () => {
     data: tripsData,
     isLoading: isTripsLoading,
     refetch,
-  } = useGetTripsQuery();
+  } = useGetTripsQuery({ status: 'upcoming' });
 
   console.log('tripsData', tripsData);
 
