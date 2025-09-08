@@ -1,5 +1,5 @@
 import React from 'react';
-import { SafeAreaView, Image, ScrollView } from 'react-native';
+import { SafeAreaView, Image, ScrollView, StyleSheet } from 'react-native';
 import { Box } from '@/components/ui/box';
 import { globalStyles } from '@/src/styles';
 import { images } from '@/src/assets';
@@ -9,6 +9,7 @@ import ProfileSettings from '@/src/screens/Main/Profile/ProfileSettings';
 import { useGetCurrentUserProfileQuery } from '@/src/services';
 import { useFocusEffect } from '@react-navigation/native';
 import { useSimpleToast } from '@/src/hooks/useSimpleToast';
+import { Loader } from '@/src/components';
 
 const Profile = () => {
   const { showToast, ToastComponent } = useSimpleToast();
@@ -40,21 +41,16 @@ const Profile = () => {
     });
   };
 
+  if (isLoading) {
+    return <Loader />;
+  }
+
   return (
     <SafeAreaView style={globalStyles.container}>
       <ScrollView showsVerticalScrollIndicator={false}>
         {/* Cover Image with Curve */}
         <Box className="relative">
-          <Image
-            source={images.cover}
-            style={{
-              width: '100%',
-              height: 170,
-              resizeMode: 'cover',
-              borderBottomLeftRadius: 40,
-              borderBottomRightRadius: 40,
-            }}
-          />
+          <Image source={images.cover} style={styles.img} />
           <Box />
 
           {/* Header Overlay */}
@@ -82,3 +78,13 @@ const Profile = () => {
 };
 
 export default Profile;
+
+const styles = StyleSheet.create({
+  img: {
+    width: '100%',
+    height: 170,
+    resizeMode: 'cover',
+    borderBottomLeftRadius: 40,
+    borderBottomRightRadius: 40,
+  },
+});
