@@ -6,10 +6,7 @@ import { images } from '@/src/assets';
 import Header from '@/src/screens/Main/Profile/Header';
 import ProfileCard from '@/src/screens/Main/Profile/ProfileCard';
 import ProfileSettings from '@/src/screens/Main/Profile/ProfileSettings';
-import {
-  useGetCurrentUserProfileQuery,
-  useGetUserPlanQuery,
-} from '@/src/services';
+import { useGetCurrentUserProfileQuery } from '@/src/services';
 import { useFocusEffect } from '@react-navigation/native';
 import { useSimpleToast } from '@/src/hooks/useSimpleToast';
 
