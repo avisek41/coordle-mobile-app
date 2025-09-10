@@ -7,9 +7,7 @@ import {
   StyleSheet,
 } from 'react-native';
 import { Box } from '@/components/ui/box';
-import { Text } from '@/components/ui/text';
 import { HStack } from '@/components/ui/hstack';
-import { VStack } from '@/components/ui/vstack';
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
