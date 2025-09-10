@@ -3,18 +3,15 @@ import {
   TouchableOpacity,
   StyleSheet,
   Animated,
-  Dimensions,
   View,
   Modal,
   Pressable,
 } from 'react-native';
-import { Box } from '@/components/ui/box';
+
 import { Text } from '@/components/ui/text';
 import { HStack } from '@/components/ui/hstack';
 
 import Ionicons from 'react-native-vector-icons/Ionicons';
-
-const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
 interface FabAction {
   id: string;
