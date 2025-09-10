@@ -118,6 +118,19 @@ const ExpandableFab: React.FC<ExpandableFabProps> = ({
               ))}
             </View>
           </View>
+          {isExpanded && (
+            <TouchableOpacity
+              onPress={toggleExpanded}
+              style={[styles.fab]}
+              activeOpacity={0.8}
+            >
+              <Ionicons
+                name={isExpanded ? 'close' : 'add'}
+                size={28}
+                color="#FF6B6B"
+              />
+            </TouchableOpacity>
+          )}
         </Pressable>
       </Modal>
 
