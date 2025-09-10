@@ -76,6 +76,7 @@ export type MainStackParams = {
     startDate: string;
     endDate: string;
   };
+  AppNotifications: undefined;
 };
 
 export type MainNavigationProps = NativeStackNavigationProp<MainStackParams>;

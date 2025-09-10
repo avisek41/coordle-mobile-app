@@ -7,6 +7,8 @@ import { HStack } from '@/components/ui/hstack';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { GradientAvatar } from '@/src/components';
 import { homeStrings } from './strings';
+import { MainNavigationProps } from '@/src/types';
+import { useNavigation } from '@react-navigation/native';
 
 interface HeaderProps {
   userName: string;
@@ -14,6 +16,8 @@ interface HeaderProps {
 }
 
 const Header: React.FC<HeaderProps> = ({ userName, userImage }) => {
+  const navigation = useNavigation<MainNavigationProps>();
+
   return (
     <Box className="px-5 py-4">
       <HStack className="justify-between items-center" space="md">
@@ -35,7 +39,10 @@ const Header: React.FC<HeaderProps> = ({ userName, userImage }) => {
         </VStack>
 
         {/* Notifications Icon */}
-        <TouchableOpacity style={styles.notificationButton}>
+        <TouchableOpacity
+          style={styles.notificationButton}
+          onPress={() => navigation.navigate('AppNotifications')}
+        >
           <Ionicons name="notifications-outline" size={21} color="#333" />
         </TouchableOpacity>
       </HStack>

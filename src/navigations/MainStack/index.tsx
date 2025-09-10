@@ -18,11 +18,10 @@ import { InviteTripMember } from '../../screens/Main/InviteTripMember';
 import { TripMembers } from '../../screens/Main/TripMembers';
 import { MemberProfile } from '../../screens/Main/MemberProfile';
 import { Announcements } from '../../screens/Main/Announcements';
-
-import { Routes } from '../NavigationUtilis';
 import { MainStackParams } from '@/src/types/allRoutes';
 import BottomTabs from '@/src/layouts/BottomTabs';
 import EditAnnouncement from '@/src/screens/Main/EditAnnouncement';
+import { AppNotifications } from '@/src/screens/Main/AppNotifications';
 
 const Stack = createNativeStackNavigator<MainStackParams>();
 const MainStack = () => {
@@ -111,6 +110,11 @@ const MainStack = () => {
       <Stack.Screen
         name="EditAnnouncement"
         component={EditAnnouncement}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="AppNotifications"
+        component={AppNotifications}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>
