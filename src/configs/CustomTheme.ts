@@ -7,4 +7,8 @@ export const Colors = {
   darkGray: '#909090',
   //#F9FAFB
   lightGray: '#F9FAFB',
+  dogerBlue: '#4A90E2',
+  Emerald_Green: '#50C878',
+  orange: '#FFAC1C',
+  purple: '#BF40BF',
 };

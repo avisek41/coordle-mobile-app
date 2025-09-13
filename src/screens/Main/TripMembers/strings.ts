@@ -23,5 +23,13 @@ export const TRIP_MEMBERS_STRINGS = {
 
   // Export and Travel actions
   EXPORT_ITINERARY: 'Export Itinerary',
+  EXPORT_MEMBER: 'Export Member Details',
+  IMPORT_MEMBER: 'Import Trip Memeber',
+  ADD_MEMBER: 'Add Trip Member',
   TRAVEL: 'Travel',
+
+  // Export messages
+  EXPORT_SUCCESS: 'Trip members exported successfully',
+  EXPORT_ERROR: 'Failed to export trip members',
+  EXPORTING: 'Exporting...',
 } as const;

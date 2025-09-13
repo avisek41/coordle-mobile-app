@@ -37,6 +37,10 @@
 	<string>Photo library access allows you to choose photos of completed tasks and other activities.</string>
 	<key>NSDocumentsFolderUsageDescription</key>
 	<string>Document access allows you to upload files for your trips and activities.</string>
+	<key>UIFileSharingEnabled</key>
+	<true/>
+	<key>LSSupportsOpeningDocumentsInPlace</key>
+	<true/>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string/>
 	<key>RCTNewArchEnabled</key>

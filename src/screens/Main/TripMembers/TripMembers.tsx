@@ -1,10 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { SafeAreaView, TouchableOpacity, StyleSheet } from 'react-native';
+import {
+  SafeAreaView,
+  TouchableOpacity,
+  StyleSheet,
+  Alert,
+  Platform,
+} from 'react-native';
 import { Box } from '@/components/ui/box';
 import { Text } from '@/components/ui/text';
 import { VStack } from '@/components/ui/vstack';
 import { HStack } from '@/components/ui/hstack';
 import { TRIP_MEMBERS_STRINGS } from './strings';
+import XLSX from 'xlsx';
+import RNFS from 'react-native-fs';
 import {
   CustomActionSheet,
   ExpandableFab,
@@ -21,12 +29,14 @@ import {
   useGetTripMembersQuery,
   useRemoveParticipantMutation,
   useMakeHostMutation,
-  useChangeUserRoleMutation,
   useRemoveHostMutation,
+  useLazyGetBulkUsersQuery,
+  type BulkUserData,
 } from '@/src/services';
 import { Loader } from '@/src/components';
 import { useSimpleToast } from '@/src/hooks/useSimpleToast';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import { Colors } from '@/src/configs/CustomTheme';
 
 interface TripMember {
   userId: string;
@@ -35,7 +45,36 @@ interface TripMember {
   userRole: string;
   inviteType: string;
   preferredName: string;
+  // Additional properties for export
+  pronoun?: string;
+  photoUrl?: string;
+  displayName?: string;
+  firstName?: string;
+  lastName?: string;
+  gender?: string;
+  ageDemographic?: string;
+  postalCode?: string;
+  state?: string;
+  country?: string;
+  dietaryRestriction?: string;
+  disabilityStatus?: string;
+  ethnicBackground?: string;
+  foodAllergy?: string;
+  preferredAirport?: string;
+  userType?: string;
 }
+
+// 🔹 Convert ArrayBuffer → Base64
+const bufferToBase64 = (buffer: ArrayBuffer) => {
+  let binary = '';
+  const bytes = new Uint8Array(buffer);
+  const chunkSize = 0x8000; // process in chunks
+  for (let i = 0; i < bytes.length; i += chunkSize) {
+    const chunk = bytes.subarray(i, i + chunkSize);
+    binary += String.fromCharCode.apply(null, chunk as unknown as number[]);
+  }
+  return global.btoa(binary); // encode to base64
+};
 
 const TripMembers = () => {
   const navigation = useNavigation<MainNavigationProps>();
@@ -48,6 +87,7 @@ const TripMembers = () => {
   const [isActionSheetOpen, setIsActionSheetOpen] = useState(false);
   const [selectedParticipant, setSelectedParticipant] =
     useState<TripMember | null>(null);
+  const [isExporting, setIsExporting] = useState(false);
 
   const {
     data: tripMembersData,
@@ -66,6 +106,9 @@ const TripMembers = () => {
 
   const [removeHost, { isLoading: isRemovingHost, reset: resetRemoveHost }] =
     useRemoveHostMutation();
+
+  const [getBulkUsers, { isLoading: isFetchingBulkUsers }] =
+    useLazyGetBulkUsersQuery();
 
   useEffect(() => {
     if (tripMembersData?.data?.members) {
@@ -209,7 +252,7 @@ const TripMembers = () => {
     }, [tripId]),
   );
 
-  if (isLoading || isRemovingHost || isMakingHost) {
+  if (isLoading || isRemovingHost || isMakingHost || isFetchingBulkUsers) {
     return <Loader />;
   }
 
@@ -227,6 +270,175 @@ const TripMembers = () => {
   }
 
   const { tripName } = tripMembersData.data;
+  const allMembers = [...owners, ...hosts, ...participants];
+
+  const exportTripMembers = async (
+    tripMembersData: TripMember[],
+    tripName: string,
+    showToast: (params: {
+      type: 'success' | 'error';
+      title: string;
+      message: string;
+      duration?: number;
+    }) => void,
+  ) => {
+    try {
+      // 1. Get user IDs from trip members
+      const userIds = tripMembersData.map(member => member.userId);
+
+      // 2. Fetch detailed user data from API
+      const bulkUsersResponse = await getBulkUsers({ userIds }).unwrap();
+
+      if (!bulkUsersResponse.success || !bulkUsersResponse.data?.users) {
+        throw new Error('Failed to fetch user details');
+      }
+
+      const detailedUsers: BulkUserData[] = bulkUsersResponse.data.users;
+
+      // 3. Create a map for quick lookup using _id from API
+      const userDataMap = new Map(detailedUsers.map(user => [user._id, user]));
+
+      const exportData = detailedUsers.map(member => {
+        return {
+          // Basic identity
+          'Display Name': member.displayName || member.preferredName || 'N/A',
+          'First Name': member.firstName || 'N/A',
+          'Last Name': member.lastName || 'N/A',
+          Email: member.email || 'N/A',
+          'Phone Number': member.phoneNumber || 'N/A',
+
+          // Personal details
+          Pronouns: member.pronouns || 'N/A', // ✅ correct key
+          Gender: member.genderIdentity || 'N/A', // ✅ genderIdentity
+          'Age Demographic': member.ageDemographic || 'N/A',
+          'Ethnic Background': member.racialEthnic || 'N/A', // ✅ racialEthnic
+          'Sexual Orientation': member.sexualOrientation || 'N/A',
+          'Disability Status': member.disabilityStatus || 'N/A',
+
+          // Dietary info
+          'Dietary Restriction': member.dietaryRestrictions || 'N/A', // ✅ dietaryRestrictions
+          'Food Allergies': member.foodAllergies?.join(', ') || 'N/A',
+
+          // Location
+          'Postal Code': member.postalCode || 'N/A',
+          State: member.state || 'N/A',
+          Country: member.country || 'N/A',
+          'Country Code': member.country_code || 'N/A',
+          'Preferred Airport': member.preferredAirport || 'N/A',
+
+          // Profile photo
+          'Photo URL': member.profilePhoto?.url || 'N/A',
+
+          // Membership / role
+          Role: member.userRole
+            ? member.userRole.charAt(0).toUpperCase() + member.userRole.slice(1)
+            : 'N/A',
+        };
+      });
+
+      // 5. Convert to worksheet
+      const ws = XLSX.utils.json_to_sheet(exportData);
+
+      // 6. Set column widths for better formatting
+      const colWidths = [
+        { wch: 30 }, // Email
+        { wch: 12 }, // Pronoun
+        { wch: 40 }, // Photo URL
+        { wch: 20 }, // Display Name
+        { wch: 15 }, // First Name
+        { wch: 15 }, // Last Name
+        { wch: 10 }, // Gender
+        { wch: 15 }, // Phone Number
+        { wch: 15 }, // Age Demographic
+        { wch: 12 }, // Postal Code
+        { wch: 15 }, // State
+        { wch: 15 }, // Country
+        { wch: 20 }, // Dietary Restriction
+        { wch: 18 }, // Disability Status
+        { wch: 18 }, // Ethnic Background
+        { wch: 15 }, // Food Allergy
+        { wch: 18 }, // Preferred Airport
+        { wch: 12 }, // User Type
+      ];
+      ws['!cols'] = colWidths;
+
+      // 7. Create workbook
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'TripMembers');
+
+      // 8. Write workbook to ArrayBuffer
+      const wbout = XLSX.write(wb, { type: 'array', bookType: 'xlsx' });
+
+      // 9. Generate filename with timestamp
+      const timestamp = new Date().toISOString().split('T')[0];
+      const filename = `${tripName.replace(
+        /[^a-zA-Z0-9]/g,
+        '_',
+      )}_members_${timestamp}.xlsx`;
+
+      // 10. File path - use accessible directory for each platform
+      let filePath: string;
+
+      if (Platform.OS === 'android') {
+        // Android: Use Downloads folder
+        filePath = `${RNFS.DownloadDirectoryPath}/${filename}`;
+      } else {
+        // iOS: Use Documents directory (will be accessible via Files app with proper Info.plist)
+        const documentsPath = RNFS.DocumentDirectoryPath;
+        if (!documentsPath) {
+          throw new Error('Unable to determine iOS Documents directory path');
+        }
+        filePath = `${documentsPath}/${filename}`;
+      }
+
+      // 11. Ensure directory exists
+      const dirPath =
+        Platform.OS === 'android'
+          ? RNFS.DownloadDirectoryPath
+          : RNFS.DocumentDirectoryPath;
+
+      if (dirPath) {
+        const dirExists = await RNFS.exists(dirPath);
+        if (!dirExists) {
+          await RNFS.mkdir(dirPath);
+        }
+      }
+
+      // 12. Write file
+      await RNFS.writeFile(filePath, bufferToBase64(wbout), 'base64');
+
+      // 13. Show success toast
+      const locationMessage =
+        Platform.OS === 'android'
+          ? 'Saved to Downloads folder'
+          : 'Saved to Files app';
+
+      showToast({
+        type: 'success',
+        title: TRIP_MEMBERS_STRINGS.SUCCESS,
+        message: `${TRIP_MEMBERS_STRINGS.EXPORT_SUCCESS}\n${locationMessage}`,
+        duration: 3000,
+      });
+    } catch (error: unknown) {
+      showToast({
+        type: 'error',
+        title: TRIP_MEMBERS_STRINGS.ERROR,
+        message: TRIP_MEMBERS_STRINGS.EXPORT_ERROR,
+        duration: 3000,
+      });
+    }
+  };
+
+  const handleExportMembers = async () => {
+    if (isExporting || isFetchingBulkUsers) return;
+
+    setIsExporting(true);
+    try {
+      await exportTripMembers(allMembers, tripName, showToast);
+    } finally {
+      setIsExporting(false);
+    }
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -445,27 +657,6 @@ const TripMembers = () => {
           ))}
         </VStack>
 
-        {isOwner && (
-          <ExpandableFab
-            actions={[
-              {
-                id: 'export',
-                title: TRIP_MEMBERS_STRINGS.EXPORT_ITINERARY,
-                icon: 'arrow-up-outline',
-                color: '#4A90E2',
-                onPress: () => {},
-              },
-              {
-                id: 'travel',
-                title: TRIP_MEMBERS_STRINGS.TRAVEL,
-                icon: 'airplane-outline',
-                color: '#50C878',
-                onPress: () => {},
-              },
-            ]}
-          />
-        )}
-
         <CustomActionSheet
           isOpen={isActionSheetOpen}
           onClose={handleCloseActionSheet}
@@ -530,6 +721,36 @@ const TripMembers = () => {
           onCancelPress={handleCloseActionSheet}
         />
       </VStack>
+      {isOwner && (
+        <ExpandableFab
+          actions={[
+            {
+              id: 'export',
+              title:
+                isExporting || isFetchingBulkUsers
+                  ? TRIP_MEMBERS_STRINGS.EXPORTING
+                  : TRIP_MEMBERS_STRINGS.EXPORT_MEMBER,
+              icon: 'arrow-up-outline',
+              color: Colors.dogerBlue,
+              onPress: handleExportMembers,
+            },
+            {
+              id: 'travel',
+              title: TRIP_MEMBERS_STRINGS.ADD_MEMBER,
+              icon: 'person-add-outline',
+              color: Colors.purple,
+              onPress: () => {},
+            },
+            {
+              id: 'import',
+              title: TRIP_MEMBERS_STRINGS.IMPORT_MEMBER,
+              icon: 'arrow-down-outline',
+              color: Colors.orange,
+              onPress: () => {},
+            },
+          ]}
+        />
+      )}
     </SafeAreaView>
   );
 };

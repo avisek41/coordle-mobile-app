@@ -28,6 +28,7 @@ import ItineraryCard from './ItineraryCard';
 import FeatureGrid from './FeatureGrid';
 import CoverImage from './CoverImage';
 import { globalStyles } from '@/src/styles';
+import { Colors } from '@/src/configs/CustomTheme';
 
 const TripDetails: React.FC = () => {
   const navigation = useNavigation<MainNavigationProps>();
@@ -291,7 +292,7 @@ const TripDetails: React.FC = () => {
               id: 'export',
               title: 'Export Itinerary',
               icon: 'arrow-up-outline',
-              color: '#4A90E2',
+              color: Colors.dogerBlue,
               onPress: handleExportItinerary,
             },
             {

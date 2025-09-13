@@ -186,6 +186,16 @@ export {
   type RemoveHostResponse,
 } from './removeHostApi';
 
+// Export bulk users API
+export {
+  bulkUsersApi,
+  useGetBulkUsersQuery,
+  useLazyGetBulkUsersQuery,
+  type BulkUserData,
+  type BulkUsersRequest,
+  type BulkUsersResponse,
+} from './bulkUsersApi';
+
 // Export announcements API
 export {
   announcementsApi,
