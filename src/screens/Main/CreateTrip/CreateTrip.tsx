@@ -5,6 +5,7 @@ import {
   TouchableOpacity,
   Image,
   StyleSheet,
+  Modal,
 } from 'react-native';
 import { Box } from '@/components/ui/box';
 import { Text } from '@/components/ui/text';
@@ -25,6 +26,7 @@ import { Platform } from 'react-native';
 import { Colors } from '@/src/configs/CustomTheme';
 import PhotoPicker from '@/src/components/PhotoPicker/PhotoPicker';
 import CustomAlert from '@/src/components/CustomAlert';
+
 import {
   useCreateTripMutation,
   useUpdateTripMutation,
@@ -38,6 +40,7 @@ import moment from 'moment';
 import { useSimpleToast } from '@/src/hooks/useSimpleToast';
 import ShareTripSection from './ShareTripSection';
 import { useAppSelector } from '@/src/hooks';
+import GooglePlacesModal from '@/src/components/GooglePlacesAutocomplete/GooglePlacesModal';
 
 const CreateTrip = () => {
   const { userRole } = useAppSelector(state => state.auth);
@@ -56,6 +59,10 @@ const CreateTrip = () => {
 
   const [tripName, setTripName] = useState('');
   const [destination, setDestination] = useState('');
+  const [destinationCoordinates, setDestinationCoordinates] = useState<{
+    latitude: number;
+    longitude: number;
+  } | null>(null);
   const [tripBegins, setTripBegins] = useState(new Date());
   const [tripEnds, setTripEnds] = useState(new Date());
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
@@ -64,6 +71,7 @@ const CreateTrip = () => {
   const [showPhotoPicker, setShowPhotoPicker] = useState(false);
   const [tripMembers, setTripMembers] = useState('');
   const [showDeleteAlert, setShowDeleteAlert] = useState(false);
+  const [showLocationModal, setShowLocationModal] = useState(false);
 
   // Fetch trip data for edit mode
   const { data: tripData, isLoading: isLoadingTrip } = useGetTripByIdQuery(
@@ -198,8 +206,14 @@ const CreateTrip = () => {
       // Add trip data
       formData.append('name', tripName.trim());
       formData.append('to_address', destination.trim());
-      formData.append('to_location_latitude', '26.9124');
-      formData.append('to_location_longitude', '75.7873');
+      formData.append(
+        'to_location_latitude',
+        destinationCoordinates?.latitude.toString() || '',
+      );
+      formData.append(
+        'to_location_longitude',
+        destinationCoordinates?.longitude.toString() || '',
+      );
       formData.append('from_address', '');
       formData.append('from_location_latitude', '');
       formData.append('from_location_longitude', '');
@@ -306,15 +320,15 @@ const CreateTrip = () => {
                 <Box className="bg-white border border-gray-200 rounded-lg h-16 flex-row items-center px-4">
                   <Ionicons name="location" size={20} color="#6B7280" />
                   <Box className="w-px h-8 bg-gray-300 mx-3" />
-                  <Input className="flex-1 bg-transparent border-0">
-                    <InputField
-                      placeholder={CREATE_TRIP_STRINGS.DESTINATION_PLACEHOLDER}
-                      value={destination}
-                      onChangeText={setDestination}
-                      className="text-base font-body text-gray-900 placeholder:text-gray-500"
-                      style={styles.destinationInput}
-                    />
-                  </Input>
+                  <Pressable
+                    className="flex-1 bg-transparent border-0"
+                    onPress={() => setShowLocationModal(true)}
+                  >
+                    <Text className="text-base font-body text-gray-500">
+                      {destination ||
+                        CREATE_TRIP_STRINGS.DESTINATION_PLACEHOLDER}
+                    </Text>
+                  </Pressable>
                 </Box>
               </VStack>
 
@@ -505,7 +519,6 @@ const CreateTrip = () => {
         cropperCircleOverlay={false}
       />
 
-      {/* Delete Trip Confirmation Alert */}
       <CustomAlert
         isOpen={showDeleteAlert}
         title="Delete Trip"
@@ -517,8 +530,20 @@ const CreateTrip = () => {
         isDestructive={true}
       />
 
-      {/* Toast Component */}
       <ToastComponent />
+
+      {showLocationModal && (
+        <GooglePlacesModal
+          visible={showLocationModal}
+          onClose={() => setShowLocationModal(false)}
+          onLocationSelect={(coords, details) => {
+            // console.log('Selected:', coords, details);
+            setDestination(details.formatted_address);
+            setDestinationCoordinates(coords);
+            setShowLocationModal(false);
+          }}
+        />
+      )}
     </SafeAreaView>
   );
 };

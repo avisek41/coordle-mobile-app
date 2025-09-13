@@ -40,6 +40,8 @@
     "react-native-country-codes-picker": "^2.3.5",
     "react-native-css-interop": "^0.1.22",
     "react-native-fs": "^2.20.0",
+    "react-native-get-random-values": "^1.11.0",
+    "react-native-google-places-autocomplete": "^2.5.7",
     "react-native-image-crop-picker": "^0.51.0",
     "react-native-linear-gradient": "^2.8.3",
     "react-native-mmkv": "^3.3.0",
