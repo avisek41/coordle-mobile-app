@@ -10,4 +10,5 @@ export const images = {
   trip: require('./Images/trip.png'),
   cover: require('./Images/Cover.png'),
   docs: require('./Images/docs.png'),
+  splash: require('./Images/splash.png'),
 };

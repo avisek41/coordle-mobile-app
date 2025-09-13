@@ -1,3 +1,4 @@
 import * as Auth from './Auth';
 import * as Main from './Main';
-export { Auth, Main };
+import * as SplashScreen from './SplashScreen';
+export { Auth, Main, SplashScreen };
