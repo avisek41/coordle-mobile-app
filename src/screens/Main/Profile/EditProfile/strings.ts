@@ -16,7 +16,7 @@ export const strings = {
   postalCode: 'Postal Code',
   postalCodePlaceholder: 'Enter your postal code',
   preferredAirport: 'Preferred Airport',
-  preferredAirportPlaceholder: 'Enter your preferred airport',
+  preferredAirportPlaceholder: 'Select your preferred airport',
   profileUpdateSuccessTitle: 'Success',
   profileUpdateSuccessMessage: 'Profile updated successfully',
   profileUpdateErrorTitle: 'Error',

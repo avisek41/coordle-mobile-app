@@ -27,6 +27,7 @@ interface GooglePlacesModalProps {
   mapRef?: React.RefObject<any>;
   countryCode?: string;
   language?: string;
+  type?: 'airport' | 'location';
 }
 
 const GooglePlacesModal: React.FC<GooglePlacesModalProps> = ({
@@ -37,6 +38,7 @@ const GooglePlacesModal: React.FC<GooglePlacesModalProps> = ({
   mapRef,
   countryCode = 'in',
   language = 'en',
+  type = 'location',
 }) => {
   const [hasError, setHasError] = useState(false);
 
@@ -88,7 +90,7 @@ const GooglePlacesModal: React.FC<GooglePlacesModalProps> = ({
           <GooglePlacesAutocomplete
             fetchDetails
             enablePoweredByContainer={false}
-            minLength={0}
+            minLength={2}
             debounce={200}
             placeholder={placeholder}
             onPress={handlePress}
@@ -101,7 +103,8 @@ const GooglePlacesModal: React.FC<GooglePlacesModalProps> = ({
             query={{
               key: GOOGLE_MAPS_API,
               language,
-              components: `country:${countryCode}`,
+              components: `country:in`,
+              types: type === 'airport' ? 'airport' : 'establishment',
             }}
             textInputProps={{
               autoFocus: true,

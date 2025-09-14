@@ -21,6 +21,7 @@ import {
   CountryStatePicker,
   ProfileAvatar,
 } from '@/src/components';
+import GooglePlacesModal from '@/src/components/GooglePlacesAutocomplete/GooglePlacesModal';
 import { Pressable } from '@/components/ui/pressable';
 import CountryPicker from '@/src/components/CountryPicker/CountryPicker';
 import countries from '@/src/constant/countries';
@@ -51,6 +52,7 @@ const findCountryByPhone = (phoneCode: string) => {
 
 const EditProfile: React.FC = () => {
   const { navigate } = useNavigation<MainNavigationProps>();
+
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -63,6 +65,8 @@ const EditProfile: React.FC = () => {
     postalCode: '',
     preferredAirport: '',
   });
+  const [showLocationModal, setShowLocationModal] = useState(false);
+  const [showAirportModal, setShowAirportModal] = useState(false);
 
   const [showCountryPicker, setShowCountryPicker] = useState(false);
   const [showCountryStatePicker, setShowCountryStatePicker] = useState(false);
@@ -218,6 +222,13 @@ const EditProfile: React.FC = () => {
     value: string | string[] | boolean,
   ) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleAirportSelect = (coordinates: any, details: any) => {
+    if (details?.formatted_address) {
+      updateFormData('preferredAirport', details.name);
+    }
+    setShowAirportModal(false);
   };
 
   const renderForm = () => (
@@ -447,18 +458,23 @@ const EditProfile: React.FC = () => {
           {strings.preferredAirport}
         </Text>
         <Box className="relative mt-2">
-          <Input
-            className="bg-gray-50 border border-gray-200 rounded-lg w-full h-12"
+          <Pressable
+            className="bg-gray-50 border border-gray-200 rounded-lg w-full py-2 px-4 justify-center"
             style={{ opacity: 1 }}
+            onPress={() => setShowAirportModal(true)}
           >
-            <InputField
-              placeholder={strings.preferredAirportPlaceholder}
-              value={formData.preferredAirport}
-              onChangeText={value => updateFormData('preferredAirport', value)}
-              className="text-base font-body"
-              style={{ gap: 1 }}
-            />
-          </Input>
+            <HStack className="items-center justify-between">
+              <Text
+                numberOfLines={4}
+                className={`text-base font-body ${
+                  formData.preferredAirport ? 'text-black' : 'text-gray-500'
+                }`}
+              >
+                {formData.preferredAirport ||
+                  strings.preferredAirportPlaceholder}
+              </Text>
+            </HStack>
+          </Pressable>
         </Box>
       </VStack>
     </VStack>
@@ -546,6 +562,17 @@ const EditProfile: React.FC = () => {
         type={pickerType}
         selectedCountry={formData.country}
       />
+      {showAirportModal && (
+        <GooglePlacesModal
+          visible={showAirportModal}
+          onClose={() => setShowAirportModal(false)}
+          onLocationSelect={handleAirportSelect}
+          placeholder="Search for airports..."
+          countryCode="us"
+          language="en"
+          type="airport"
+        />
+      )}
     </SafeAreaView>
   );
 };
