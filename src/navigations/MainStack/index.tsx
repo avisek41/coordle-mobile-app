@@ -23,6 +23,7 @@ import BottomTabs from '@/src/layouts/BottomTabs';
 import EditAnnouncement from '@/src/screens/Main/EditAnnouncement';
 import { AppNotifications } from '@/src/screens/Main/AppNotifications';
 import { Poll } from '@/src/screens/Main/Poll';
+import CreatePoll from '@/src/screens/Main/Poll/CreatePoll';
 
 const Stack = createNativeStackNavigator<MainStackParams>();
 const MainStack = () => {
@@ -121,6 +122,11 @@ const MainStack = () => {
       <Stack.Screen
         name="Poll"
         component={Poll}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="CreatePoll"
+        component={CreatePoll}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>

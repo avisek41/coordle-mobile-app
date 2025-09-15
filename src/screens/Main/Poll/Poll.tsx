@@ -14,7 +14,7 @@ const Poll: React.FC = () => {
   const navigation = useNavigation<MainNavigationProps>();
 
   const handleCreatePoll = () => {
-    console.log('Create Poll pressed');
+    navigation.navigate('CreatePoll' as any);
   };
 
   return (
@@ -26,7 +26,7 @@ const Poll: React.FC = () => {
           <Box className="mb-8">
             <Image
               source={images.poll}
-              style={{ width: 40, height: 40 }}
+              style={styles.img}
               resizeMode="contain"
             />
           </Box>
@@ -57,6 +57,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#FFFFFF',
+  },
+  img: {
+    width: 35,
+    height: 35,
   },
 });
 

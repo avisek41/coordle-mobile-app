@@ -81,6 +81,7 @@ export type MainStackParams = {
     tripId: string;
     tripName: string;
   };
+  CreatePoll: undefined;
 };
 
 export type MainNavigationProps = NativeStackNavigationProp<MainStackParams>;
