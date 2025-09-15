@@ -10,7 +10,7 @@ export interface TripMember {
   userId: string;
   email: string;
   phoneNumber: string | null;
-  userRole: string;
+  tripRole: string;
   preferredName: string;
   inviteType: string | null;
 }

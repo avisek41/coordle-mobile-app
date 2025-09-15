@@ -42,7 +42,7 @@ interface TripMember {
   userId: string;
   email: string;
   phoneNumber: string | null;
-  userRole: string;
+  tripRole: string;
   inviteType: string;
   preferredName: string;
   // Additional properties for export
@@ -96,6 +96,8 @@ const TripMembers = () => {
     refetch,
   } = useGetTripMembersQuery(tripId);
 
+  console.log('tripMembersData', tripMembersData);
+
   const [
     removeParticipant,
     { isLoading: isRemoving, reset: resetRemoveParticipant },
@@ -114,10 +116,17 @@ const TripMembers = () => {
     if (tripMembersData?.data?.members) {
       const members = tripMembersData.data.members;
 
-      const ownersList = members.filter(member => member.userRole === 'owner');
-      const hostsList = members.filter(member => member.userRole === 'host');
-      const participantsList = members.filter(
-        member => member.userRole === 'traveller',
+      // API response now uses tripRole, so no mapping needed
+      const mappedMembers: TripMember[] = members;
+
+      const ownersList = mappedMembers.filter(
+        member => member.tripRole === 'owner',
+      );
+      const hostsList = mappedMembers.filter(
+        member => member.tripRole === 'host',
+      );
+      const participantsList = mappedMembers.filter(
+        member => member.tripRole === 'traveller',
       );
 
       setOwners(ownersList);
@@ -330,8 +339,8 @@ const TripMembers = () => {
           'Photo URL': member.profilePhoto?.url || 'N/A',
 
           // Membership / role
-          Role: member.userRole
-            ? member.userRole.charAt(0).toUpperCase() + member.userRole.slice(1)
+          Role: member.tripRole
+            ? member.tripRole.charAt(0).toUpperCase() + member.tripRole.slice(1)
             : 'N/A',
         };
       });
@@ -674,7 +683,7 @@ const TripMembers = () => {
                     title: TRIP_MEMBERS_STRINGS.VIEW_PROFILE,
                     onPress: handleViewProfile,
                   },
-                  ...(selectedParticipant?.userRole === 'traveller'
+                  ...(selectedParticipant?.tripRole === 'traveller'
                     ? [
                         {
                           id: 'makeAsHost',
@@ -685,7 +694,7 @@ const TripMembers = () => {
                           isDisabled: isMakingHost,
                         },
                       ]
-                    : selectedParticipant?.userRole === 'host'
+                    : selectedParticipant?.tripRole === 'host'
                     ? [
                         {
                           id: 'demoteToTraveller',

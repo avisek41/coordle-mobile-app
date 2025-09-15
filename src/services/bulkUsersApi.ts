@@ -5,7 +5,7 @@ export interface BulkUserData {
   userId?: string; // Keep for backward compatibility
   email: string;
   phoneNumber: string | null;
-  userRole: string;
+  tripRole: string;
   inviteType: string;
   preferredName: string;
   // Additional user profile data

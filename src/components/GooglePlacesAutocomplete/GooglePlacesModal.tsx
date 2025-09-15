@@ -104,7 +104,7 @@ const GooglePlacesModal: React.FC<GooglePlacesModalProps> = ({
               key: GOOGLE_MAPS_API,
               language,
               components: `country:in`,
-              types: type === 'airport' ? 'airport' : 'establishment',
+              types: type === 'airport' ? 'airport' : null,
             }}
             textInputProps={{
               autoFocus: true,

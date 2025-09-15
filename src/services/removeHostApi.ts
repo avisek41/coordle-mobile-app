@@ -18,7 +18,7 @@ export interface RemoveHostResponse {
       userId: string;
       email: string;
       phoneNumber: string | null;
-      userRole: string;
+      tripRole: string;
       preferredName: string;
       inviteType: string | null;
     }[];

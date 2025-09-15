@@ -4,7 +4,7 @@ import { API_ENDPOINTS } from '@/src/constant/apiConstant';
 // Types for change user role API
 export interface ChangeUserRoleRequest {
   userId: string;
-  userRole: string;
+  tripRole: string;
 }
 
 export interface ChangeUserRoleResponse {
@@ -19,7 +19,7 @@ export interface ChangeUserRoleResponse {
       userId: string;
       email: string;
       phoneNumber: string | null;
-      userRole: string;
+      tripRole: string;
       preferredName: string;
       inviteType: string | null;
     }[];

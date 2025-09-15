@@ -2,7 +2,7 @@ import { apiSlice } from './apiSlice';
 
 interface AddTripParticipantRequest {
   userId: string;
-  userRole: string;
+  tripRole: string;
 }
 
 interface AddTripParticipantResponse {
@@ -11,14 +11,14 @@ interface AddTripParticipantResponse {
     _id: string;
     tripId: string;
     userId: string;
-    userRole: string;
+    tripRole: string;
     addedAt: string;
   };
   message: string;
 }
 
 export const addTripParticipantApi = apiSlice.injectEndpoints({
-  endpoints: (builder) => ({
+  endpoints: builder => ({
     addTripParticipant: builder.mutation<
       AddTripParticipantResponse,
       { tripId: string; data: AddTripParticipantRequest }
@@ -32,4 +32,4 @@ export const addTripParticipantApi = apiSlice.injectEndpoints({
   }),
 });
 
-export const { useAddTripParticipantMutation } = addTripParticipantApi; 
+export const { useAddTripParticipantMutation } = addTripParticipantApi;

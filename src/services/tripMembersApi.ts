@@ -4,7 +4,7 @@ interface TripMember {
   userId: string;
   email: string;
   phoneNumber: string | null;
-  userRole: string;
+  tripRole: string;
   inviteType: string;
   preferredName: string;
 }
