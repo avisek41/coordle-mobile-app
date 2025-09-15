@@ -90,6 +90,11 @@ const TripDetails: React.FC = () => {
         startDate: trip.display_start,
         endDate: trip.display_end,
       });
+    } else if (feature === tripDetailsStrings.poll) {
+      navigation.navigate('Poll', {
+        tripId: trip._id,
+        tripName: trip.name,
+      });
     } else {
       // TODO: Navigate to respective feature screens
       showToast({

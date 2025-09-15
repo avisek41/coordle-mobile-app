@@ -18,6 +18,7 @@ export { default as NoData } from './NoData';
 export { default as BannerCarousel } from './BannerCarousel';
 export { default as DocumentsView } from './DocumentsView';
 export { default as PlanUsers } from './PlanUsers';
-export { default as IconButton } from './IconButton';
-export { default as GooglePlacesAutocomplete } from './GooglePlacesAutocomplete';
+
+export { GooglePlacesAutocomplete } from './GooglePlacesAutocomplete';
+export { PollIcon } from './PollIcon';
 export { ToastProvider, useToast } from './ToastProvider';

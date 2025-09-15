@@ -77,6 +77,10 @@ export type MainStackParams = {
     endDate: string;
   };
   AppNotifications: undefined;
+  Poll: {
+    tripId: string;
+    tripName: string;
+  };
 };
 
 export type MainNavigationProps = NativeStackNavigationProp<MainStackParams>;

@@ -11,4 +11,5 @@ export const images = {
   cover: require('./Images/Cover.png'),
   docs: require('./Images/docs.png'),
   splash: require('./Images/splash.png'),
+  poll: require('./Images/poll.png'),
 };
