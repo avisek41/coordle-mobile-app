@@ -45,7 +45,6 @@ const Poll: React.FC = () => {
           <GradientButton
             title={POLL_STRINGS.CREATE_POLL}
             onPress={handleCreatePoll}
-            colors={['#2E6F9E', '#51B1C0']}
             size="large"
           />
         </Box>
