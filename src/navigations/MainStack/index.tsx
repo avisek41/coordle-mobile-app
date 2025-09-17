@@ -25,6 +25,8 @@ import { AppNotifications } from '@/src/screens/Main/AppNotifications';
 import { Poll } from '@/src/screens/Main/Poll';
 import CreatePoll from '@/src/screens/Main/Poll/CreatePoll';
 import ManageFoodOrder from '@/src/screens/Main/ManageFoodOrder';
+import { AddLodging } from '@/src/screens/Main/AddLodging';
+import { AddActivity } from '@/src/screens/Main/AddActivity';
 
 const Stack = createNativeStackNavigator<MainStackParams>();
 const MainStack = () => {
@@ -133,6 +135,16 @@ const MainStack = () => {
       <Stack.Screen
         name="ManageFoodOrder"
         component={ManageFoodOrder}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="AddLodging"
+        component={AddLodging}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="AddActivity"
+        component={AddActivity}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>

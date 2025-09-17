@@ -88,6 +88,14 @@ export type MainStackParams = {
     tripEndDate: string;
     tripId: string;
   };
+  AddLodging: {
+    tripId: string;
+    tripName: string;
+  };
+  AddActivity: {
+    tripId: string;
+    tripName?: string;
+  };
 };
 
 export type MainNavigationProps = NativeStackNavigationProp<MainStackParams>;

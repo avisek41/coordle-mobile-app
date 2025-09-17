@@ -134,20 +134,16 @@ const TripDetails: React.FC = () => {
   };
 
   const handleLodging = () => {
-    showToast({
-      type: 'info',
-      title: 'Lodging',
-      message: 'Lodging options coming soon',
-      duration: 2000,
+    navigation.navigate('AddLodging', {
+      tripId: trip._id,
+      tripName: trip.name,
     });
   };
 
   const handleActivity = () => {
-    showToast({
-      type: 'info',
-      title: 'Activity',
-      message: 'Activity options coming soon',
-      duration: 2000,
+    navigation.navigate('AddActivity', {
+      tripId,
+      tripName: tripData?.data?.name || 'Trip',
     });
   };
 
