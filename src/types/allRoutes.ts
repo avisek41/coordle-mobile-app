@@ -82,6 +82,12 @@ export type MainStackParams = {
     tripName: string;
   };
   CreatePoll: undefined;
+  ManageFoodOrder: {
+    tripName: string;
+    tripStartDate: string;
+    tripEndDate: string;
+    tripId: string;
+  };
 };
 
 export type MainNavigationProps = NativeStackNavigationProp<MainStackParams>;

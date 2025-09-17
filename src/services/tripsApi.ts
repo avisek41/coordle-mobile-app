@@ -14,6 +14,14 @@ export interface CreateTripFormData {
   start_date: string;
   end_date: string;
   coverImage?: any; // File object for FormData
+  to_location: {
+    latitude: number;
+    longitude: number;
+  };
+  from_location: {
+    latitude: number;
+    longitude: number;
+  };
 }
 
 export interface CreateTripResponse {

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { SafeAreaView, ScrollView, StyleSheet } from 'react-native';
+import { Linking, SafeAreaView, ScrollView, StyleSheet } from 'react-native';
 import { Box } from '@/components/ui/box';
 import { Text } from '@/components/ui/text';
 import { VStack } from '@/components/ui/vstack';
@@ -61,7 +61,6 @@ const TripDetails: React.FC = () => {
   };
 
   const handleImportItinerary = () => {
-    // TODO: Implement import itinerary functionality
     showToast({
       type: 'info',
       title: tripDetailsStrings.importItinerary,
@@ -95,8 +94,18 @@ const TripDetails: React.FC = () => {
         tripId: trip._id,
         tripName: trip.name,
       });
+    } else if (feature === tripDetailsStrings.manageFoodOrder) {
+      navigation.navigate('ManageFoodOrder', {
+        tripId: trip._id,
+        tripName: trip.name,
+        tripStartDate: trip.display_start,
+        tripEndDate: trip.display_end,
+      });
+    } else if (feature === tripDetailsStrings.map) {
+      Linking.openURL(
+        `https://www.google.com/maps?q=${trip.to_location.latitude},${trip.to_location.longitude}`,
+      );
     } else {
-      // TODO: Navigate to respective feature screens
       showToast({
         type: 'info',
         title: feature,
@@ -189,7 +198,6 @@ const TripDetails: React.FC = () => {
         duration: 2000,
       });
 
-      // Navigate to MyTrips after successful deletion
       navigation.navigate('BottomTabs');
     } catch (error) {
       showToast({

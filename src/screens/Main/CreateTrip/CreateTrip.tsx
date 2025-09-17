@@ -537,7 +537,7 @@ const CreateTrip = () => {
           visible={showLocationModal}
           onClose={() => setShowLocationModal(false)}
           onLocationSelect={(coords, details) => {
-            // console.log('Selected:', coords, details);
+            console.log('Selected:', coords, details);
             setDestination(details.formatted_address);
             setDestinationCoordinates(coords);
             setShowLocationModal(false);

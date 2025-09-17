@@ -24,6 +24,7 @@ import EditAnnouncement from '@/src/screens/Main/EditAnnouncement';
 import { AppNotifications } from '@/src/screens/Main/AppNotifications';
 import { Poll } from '@/src/screens/Main/Poll';
 import CreatePoll from '@/src/screens/Main/Poll/CreatePoll';
+import ManageFoodOrder from '@/src/screens/Main/ManageFoodOrder';
 
 const Stack = createNativeStackNavigator<MainStackParams>();
 const MainStack = () => {
@@ -127,6 +128,11 @@ const MainStack = () => {
       <Stack.Screen
         name="CreatePoll"
         component={CreatePoll}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="ManageFoodOrder"
+        component={ManageFoodOrder}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>

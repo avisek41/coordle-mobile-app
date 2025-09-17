@@ -13,3 +13,4 @@ export { TripMembers } from './TripMembers';
 export { MemberProfile } from './MemberProfile';
 export { Announcements } from './Announcements';
 export { Poll } from './Poll';
+export { default as ManageFoodOrder } from './ManageFoodOrder';
