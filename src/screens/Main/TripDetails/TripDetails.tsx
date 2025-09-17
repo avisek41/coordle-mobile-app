@@ -297,7 +297,6 @@ const TripDetails: React.FC = () => {
         </VStack>
       </ScrollView>
 
-      {/* Expandable Floating Action Button */}
       {!isPastTrip && (
         <ExpandableFab
           actions={[
@@ -333,7 +332,6 @@ const TripDetails: React.FC = () => {
         />
       )}
 
-      {/* Delete Confirmation Alert */}
       <CustomAlert
         isOpen={showDeleteAlert}
         title={tripDetailsStrings.deleteTripTitle}
