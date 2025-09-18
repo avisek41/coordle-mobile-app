@@ -16,3 +16,4 @@ export { Poll } from './Poll';
 export { default as ManageFoodOrder } from './ManageFoodOrder';
 export { AddLodging } from './AddLodging';
 export { AddActivity } from './AddActivity';
+export { CreateActivity } from './CreateActivity';

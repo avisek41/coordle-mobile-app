@@ -96,6 +96,11 @@ export type MainStackParams = {
     tripId: string;
     tripName?: string;
   };
+  CreateActivity: {
+    tripId: string;
+    tripName?: string;
+    activityName?: string;
+  };
 };
 
 export type MainNavigationProps = NativeStackNavigationProp<MainStackParams>;

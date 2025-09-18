@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   SafeAreaView,
   ScrollView,
@@ -13,7 +13,6 @@ import { VStack } from '@/components/ui/vstack';
 import { HStack } from '@/components/ui/hstack';
 import { Header } from '@/src/components';
 import { globalStyles } from '@/src/styles';
-import { useSimpleToast } from '@/src/hooks/useSimpleToast';
 import { Colors } from '@/src/configs/CustomTheme';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
@@ -90,52 +89,36 @@ const AddActivity: React.FC = () => {
   const navigation = useNavigation<MainNavigationProps>();
   const route = useRoute<MainRouteProps<'AddActivity'>>();
   const { tripId, tripName } = route.params;
-  const { showToast, ToastComponent } = useSimpleToast();
-
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
   const handleBackPress = () => {
     navigation.goBack();
   };
 
   const handleCategorySelect = (categoryId: string) => {
-    setSelectedCategory(categoryId);
-
     const selectedActivity = activityCategories.find(c => c.id === categoryId);
-    showToast({
-      type: 'success',
-      title: 'Activity Selected',
-      message: `${selectedActivity?.name} activity type selected`,
-      duration: 2000,
-    });
 
-    // Navigate back after selection
-    setTimeout(() => {
-      navigation.goBack();
-    }, 2000);
+    // Navigate to CreateActivity with the selected activity name
+    navigation.navigate('CreateActivity', {
+      tripId,
+      tripName,
+      activityName: selectedActivity?.name || '',
+    });
   };
 
   const renderActivityCategory = (category: ActivityCategory) => (
     <TouchableOpacity
       key={category.id}
       onPress={() => handleCategorySelect(category.id)}
-      style={[
-        styles.categoryButton,
-        selectedCategory === category.id && styles.selectedCategory,
-      ]}
+      style={styles.categoryButton}
       activeOpacity={0.7}
     >
       <HStack className="items-center" space="sm">
         <Ionicons
           name={category.icon as any}
           size={24}
-          color={selectedCategory === category.id ? '#FFFFFF' : category.color}
+          color={category.color}
         />
-        <Text
-          className={`text-base font-body ${
-            selectedCategory === category.id ? 'text-white' : 'text-gray-700'
-          }`}
-        >
+        <Text className="text-base font-body text-gray-700">
           {category.name}
         </Text>
       </HStack>
@@ -144,8 +127,6 @@ const AddActivity: React.FC = () => {
 
   return (
     <SafeAreaView style={globalStyles.container}>
-      <ToastComponent />
-
       <Header title="Add Activity" onBackPress={handleBackPress} />
 
       <ScrollView
@@ -165,24 +146,6 @@ const AddActivity: React.FC = () => {
               </Box>
             ))}
           </Box>
-
-          {selectedCategory && (
-            <Box
-              className="mt-6 p-4 rounded-lg border"
-              style={{
-                backgroundColor: `${Colors.primary}15`,
-                borderColor: `${Colors.primary}40`,
-              }}
-            >
-              <Text
-                className="text-center font-body"
-                style={{ color: Colors.primary }}
-              >
-                Selected:{' '}
-                {activityCategories.find(c => c.id === selectedCategory)?.name}
-              </Text>
-            </Box>
-          )}
         </VStack>
       </ScrollView>
     </SafeAreaView>
@@ -202,10 +165,6 @@ const styles = StyleSheet.create({
     padding: 16,
     minHeight: 60,
     justifyContent: 'center',
-  },
-  selectedCategory: {
-    backgroundColor: Colors.primary,
-    borderColor: Colors.primary,
   },
 });
 
