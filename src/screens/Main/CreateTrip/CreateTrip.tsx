@@ -217,8 +217,8 @@ const CreateTrip = () => {
       formData.append('from_address', '');
       formData.append('from_location_latitude', '');
       formData.append('from_location_longitude', '');
-      formData.append('display_start', moment(tripBegins).format('MM/DD/YYYY'));
-      formData.append('display_end', moment(tripEnds).format('MM/DD/YYYY'));
+      formData.append('display_start', moment(tripBegins).format(dateFormat));
+      formData.append('display_end', moment(tripEnds).format(dateFormat));
       formData.append('start_date', moment(tripBegins).toISOString());
       formData.append('end_date', moment(tripEnds).toISOString());
 
@@ -341,7 +341,7 @@ const CreateTrip = () => {
                   <Box className="w-px h-8 bg-gray-300 mx-3" />
                   <Text className="text-base font-body text-gray-500 flex-1">
                     {tripBegins
-                      ? moment(tripBegins).format('MM/DD/YYYY')
+                      ? moment(tripBegins).format(dateFormat)
                       : CREATE_TRIP_STRINGS.TRIP_BEGINS_PLACEHOLDER}
                   </Text>
                 </Pressable>
@@ -356,7 +356,7 @@ const CreateTrip = () => {
                   <Box className="w-px h-8 bg-gray-300 mx-3" />
                   <Text className="text-base font-body text-gray-500 flex-1">
                     {tripEnds
-                      ? moment(tripEnds).format('MM/DD/YYYY')
+                      ? moment(tripEnds).format(dateFormat)
                       : CREATE_TRIP_STRINGS.TRIP_ENDS_PLACEHOLDER}
                   </Text>
                 </Pressable>

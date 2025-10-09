@@ -20,6 +20,7 @@ import { Colors } from '@/src/configs/CustomTheme';
 import { MainNavigationProps } from '@/src/types/allRoutes';
 import Clipboard from '@react-native-clipboard/clipboard';
 import { useSimpleToast } from '@/src/hooks/useSimpleToast';
+import { dateFormat } from '@/src/utils/dateTimeFormat';
 
 interface AnnouncementListProps {
   announcements: Announcement[];
@@ -135,7 +136,7 @@ const AnnouncementList: React.FC<AnnouncementListProps> = ({
               {/* Name and date */}
               <Text className="text-sm  font-body text-gray-600">
                 {announcement.createdBy.preferredName}{' '}
-                {moment(announcement.createdAt).format('MM/DD/YYYY')}
+                {moment(announcement.createdAt).format(dateFormat)}
               </Text>
             </HStack>
 
@@ -168,7 +169,7 @@ const AnnouncementList: React.FC<AnnouncementListProps> = ({
         onClose={handleActionSheetClose}
         title={
           selectedAnnouncement
-            ? moment(selectedAnnouncement.createdAt).format('MM/DD/YYYY')
+            ? moment(selectedAnnouncement.createdAt).format(dateFormat)
             : ''
         }
         actions={getActionItems()}

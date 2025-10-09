@@ -9,6 +9,8 @@ import { GradientAvatar, GradientButton } from '@/src/components';
 import { Poll } from '@/src/types/poll';
 import { POLL_STRINGS } from '../strings';
 import { Colors } from '@/src/configs/CustomTheme';
+import { formatTimeRemaining } from '@/src/utils';
+import { customPollDateTimeFormat, dateFormat } from '@/src/utils/dateTimeFormat';
 
 interface PollCardProps {
   poll: Poll;
@@ -24,38 +26,12 @@ const PollCard: React.FC<PollCardProps> = ({
   userVote
 }) => {
   const isActive = poll.status === 'Active';
-  
-  const formatTimeRemaining = (closeDateTime: string) => {
-    const now = moment();
-    const closeDate = moment(closeDateTime);
-    const diffMinutes = closeDate.diff(now, 'minutes');
-    const diffHours = closeDate.diff(now, 'hours');
-    const diffDays = closeDate.diff(now, 'days');
-    
-    if (diffMinutes <= 0) {
-      return 'Expired';
-    } else if (diffMinutes < 60) {
-      return `${diffMinutes} min`;
-    } else if (diffHours < 24) {
-      return `${diffHours} hr`;
-    } else {
-      return `${diffDays} day`;
-    }
-  };
 
   const getStatusText = () => {
     if (isActive) {
-      return `${POLL_STRINGS.POLL_ENDS_ON} ${moment(poll.close_poll_date_time).format('MM/DD/YYYY [at] h:mm A')}`;
+      return `${POLL_STRINGS.POLL_ENDS_ON} ${moment(poll.close_poll_date_time).format(customPollDateTimeFormat)}`;
     } else {
-      return `${POLL_STRINGS.CLOSED_ON} ${moment(poll.close_poll_date_time).add(7, 'days').format('MM/DD/YYYY')}`;
-    }
-  };
-
-  const getButtonText = () => {
-    if (isActive) {
-      return POLL_STRINGS.VOTE;
-    } else {
-      return POLL_STRINGS.VIEW_VOTES;
+      return `${POLL_STRINGS.CLOSED_ON} ${moment(poll.close_poll_date_time).add(7, 'days').format(dateFormat)}`;
     }
   };
 
@@ -138,7 +114,7 @@ const PollCard: React.FC<PollCardProps> = ({
           </Box>
           
            <GradientButton
-             title={getButtonText()}
+             title={isActive ? POLL_STRINGS.VOTE : POLL_STRINGS.VIEW_VOTES}
              onPress={handlePress}
              style={buttonConfig.style}
              gradientStyle={buttonConfig.gradientStyle}

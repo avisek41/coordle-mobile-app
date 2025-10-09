@@ -10,6 +10,7 @@ import { Document, TripDocument } from '@/src/services';
 import { Colors } from '@/src/configs/CustomTheme';
 import moment from 'moment';
 import { dateFormat } from '@/src/utils/dateTimeFormat';
+
 interface DocumentCardProps {
   document: Document | TripDocument;
   onPress?: (document: Document | TripDocument) => void;

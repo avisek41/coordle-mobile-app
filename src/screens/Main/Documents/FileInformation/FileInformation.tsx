@@ -11,6 +11,7 @@ import { fileInformationStrings } from './strings';
 import Ionicon from 'react-native-vector-icons/Ionicons';
 import { Colors } from '@/src/configs/CustomTheme';
 import moment from 'moment';
+import { dateFormat } from '@/src/utils/dateTimeFormat';
 
 type FileInformationRouteProps = MainRouteProps<'FileInformation'>;
 
@@ -34,7 +35,7 @@ const FileInformation: React.FC = () => {
   };
 
   const formatDate = (dateString: string): string => {
-    return moment(dateString).format('MM/DD/YYYY');
+    return moment(dateString).format(dateFormat);
   };
 
   const getFileExtension = (fileName: string): string => {
