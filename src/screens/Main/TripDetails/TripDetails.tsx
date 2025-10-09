@@ -93,6 +93,8 @@ const TripDetails: React.FC = () => {
       navigation.navigate('Poll', {
         tripId: trip._id,
         tripName: trip.name,
+        tripStartDate: trip.display_start,
+        tripEndDate: trip.display_end,
       });
     } else if (feature === tripDetailsStrings.manageFoodOrder) {
       navigation.navigate('ManageFoodOrder', {
