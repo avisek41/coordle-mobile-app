@@ -15,6 +15,7 @@ import DateTimePicker, {
 } from '@react-native-community/datetimepicker';
 import moment from 'moment';
 import { useSimpleToast } from '@/src/hooks/useSimpleToast';
+import { dateFormatWithDay } from '@/src/utils/dateTimeFormat';
 
 const AddLodging: React.FC = () => {
   const navigation = useNavigation<MainNavigationProps>();
@@ -89,7 +90,7 @@ const AddLodging: React.FC = () => {
   };
 
   const formatDate = (date: Date) => {
-    return moment(date).format('MMM DD, YYYY');
+    return moment(date).format(dateFormatWithDay);
   };
 
   return (

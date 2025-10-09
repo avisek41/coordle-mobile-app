@@ -24,6 +24,7 @@ import { Colors } from '@/src/configs/CustomTheme';
 import { RootState } from '@/src/redux/Store';
 import { Header, GradientButton } from '@/src/components';
 import { globalStyles } from '@/src/styles';
+import { dateFormatWithDay, timeFormat } from '@/src/utils/dateTimeFormat';
 
 interface PollOption {
   id: string;
@@ -127,8 +128,8 @@ const CreatePoll: React.FC = () => {
         createdBy: userId,
         trip_id: tripId,
         close_poll_date_time: combinedDateTime,
-        display_poll_date: moment(combinedDateTime).format('MMM DD, YYYY'),
-        display_poll_time: moment(combinedDateTime).format('hh:mm A'),
+        display_poll_date: moment(combinedDateTime).format(dateFormatWithDay),
+        display_poll_time: moment(combinedDateTime).format(timeFormat),
         reminders: selectedReminders.map(Number),
       };
 
@@ -240,7 +241,7 @@ const CreatePoll: React.FC = () => {
               >
                 <HStack className="items-center justify-between" space="sm">
                   <Text className="text-gray-600 font-body text-base">
-                    {moment(selectedDate).format('MMM DD, YYYY')}
+                    {moment(selectedDate).format(dateFormatWithDay)}
                   </Text>
                   <Ionicons name="calendar-outline" size={20} color={Colors.iconGray} />
                 </HStack>
@@ -253,7 +254,7 @@ const CreatePoll: React.FC = () => {
               >
                 <HStack className="items-center justify-between" space="sm">
                   <Text className="text-gray-600 font-body text-base">
-                    {moment(selectedTime).format('hh:mm A')}
+                    {moment(selectedTime).format(timeFormat)}
                   </Text>
                   <Ionicons name="time-outline" size={20} color={Colors.iconGray} />
                 </HStack>
