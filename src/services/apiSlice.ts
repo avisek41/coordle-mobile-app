@@ -1,18 +1,13 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
-import { RootState } from '../redux/Store';
 import { BASE_URL } from '../configs';
-import { getItem, setItem, removeItem } from '../utils';
-import { logOut, setCredentials } from '../features';
-
+import { getItem } from '../utils';
 const baseQuery = fetchBaseQuery({
   baseUrl: BASE_URL,
 
   prepareHeaders: (
-    headers: Headers,
-    { getState }: { getState: () => unknown },
+    headers: Headers
   ) => {
-    const state = getState() as RootState;
     const token = getItem('accessToken');
     console.log('token', token);
     if (token) {
@@ -46,8 +41,9 @@ export const apiSlice = createApi({
     'TripDocuments',
     'TripMembers',
     'Announcements',
+    'Polls',
   ],
-  endpoints: builder => ({}),
+  endpoints: () => ({}),
 });
 
 // https://coordle-backend-4.onrender.com/api/trips

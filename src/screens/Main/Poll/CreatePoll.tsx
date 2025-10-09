@@ -4,23 +4,26 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Alert,
   Switch,
   Platform,
 } from 'react-native';
-import { Box } from '@/components/ui/box';
-import { Text } from '@/components/ui/text';
-import { VStack } from '@/components/ui/vstack';
-import { HStack } from '@/components/ui/hstack';
-import { Input, InputField } from '@/components/ui/input';
-import { Header } from '@/src/components';
-import { GradientButton } from '@/src/components';
-import { useNavigation } from '@react-navigation/native';
-import { MainNavigationProps } from '@/src/types/allRoutes';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import moment from 'moment';
+import { useSelector } from 'react-redux';
+
+// imports from gluestack components
+import { Box, HStack, VStack, Text, Input, InputField } from '@/components/ui';
+
+import { MainNavigationProps, MainRouteProps } from '@/src/types/allRoutes';
+import { useCreatePollMutation } from '@/src/services/pollApi';
+import { useSimpleToast } from '@/src/hooks/useSimpleToast';
 import { CREATE_POLL_STRINGS } from './strings';
 import { Colors } from '@/src/configs/CustomTheme';
+import { RootState } from '@/src/redux/Store';
+import { Header, GradientButton } from '@/src/components';
+import { globalStyles } from '@/src/styles';
 
 interface PollOption {
   id: string;
@@ -29,14 +32,24 @@ interface PollOption {
 
 const CreatePoll: React.FC = () => {
   const navigation = useNavigation<MainNavigationProps>();
+  const { userId } = useSelector((state: RootState) => state.auth);
+  const [createPoll, { isLoading: isCreating }] = useCreatePollMutation();
+  const { showToast, ToastComponent } = useSimpleToast();
+  const route = useRoute<MainRouteProps<'CreatePoll'>>();
+  const { tripId } = route.params ?? {
+    tripId: '',
+  };
+
   const [question, setQuestion] = useState('');
   const [options, setOptions] = useState<PollOption[]>([{ id: '1', text: '' }]);
   const [allowMultipleAnswers, setAllowMultipleAnswers] = useState(false);
   const [reminders, setReminders] = useState(false);
+  const [selectedReminders, setSelectedReminders] = useState<string[]>([]);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showTimePicker, setShowTimePicker] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedTime, setSelectedTime] = useState(new Date());
+  const reminderOptions = CREATE_POLL_STRINGS.REMINDER_OPTION_LIST;
 
   const addOption = () => {
     const newId = (options.length + 1).toString();
@@ -55,69 +68,93 @@ const CreatePoll: React.FC = () => {
     );
   };
 
-  const handleDateChange = (event: any, selectedDate?: Date) => {
+  const toggleReminderOption = (value: string) => {
+    setSelectedReminders(prev =>
+      prev.includes(value)
+        ? prev.filter(item => item !== value)
+        : [...prev, value],
+    );
+  };
+
+  const handleDateChange = (event: any, date?: Date) => {
     if (Platform.OS === 'android') {
       setShowDatePicker(false);
     }
-    if (event.type === 'set' && selectedDate) {
-      setSelectedDate(selectedDate);
+    if (event.type === 'set' && date) {
+      setSelectedDate(date);
     } else if (event.type === 'dismissed') {
       setShowDatePicker(false);
     }
   };
 
-  const handleTimeChange = (event: any, selectedTime?: Date) => {
+  const handleTimeChange = (event: any, time?: Date) => {
     if (Platform.OS === 'android') {
       setShowTimePicker(false);
     }
-    if (event.type === 'set' && selectedTime) {
-      setSelectedTime(selectedTime);
+    if (event.type === 'set' && time) {
+      setSelectedTime(time);
     } else if (event.type === 'dismissed') {
       setShowTimePicker(false);
     }
   };
 
-  const formatDate = (date: Date) => {
-    return date.toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-    });
-  };
-
-  const formatTime = (date: Date) => {
-    return date.toLocaleTimeString('en-US', {
-      hour: 'numeric',
-      minute: '2-digit',
-      hour12: true,
-    });
-  };
-
-  const handleCreatePoll = () => {
+  const handleCreatePoll = async () => {
     if (!question.trim()) {
-      Alert.alert('Error', 'Please enter a question for your poll.');
+      showToast({
+        type: 'error',
+        title: CREATE_POLL_STRINGS.VALIDATION_ERROR,
+        message: CREATE_POLL_STRINGS.PLEASE_ENTER_A_QUESTION_FOR_YOUR_POLL,
+      });
       return;
     }
 
-    const validOptions = options.filter(option => option.text.trim());
-    if (validOptions.length < 2) {
-      Alert.alert('Error', 'Please provide at least 2 answer options.');
-      return;
-    }
+    const validOptions = options?.filter(option => option.text.trim()) || [];
 
-    Alert.alert('Success', 'Poll created successfully!', [
-      { text: 'OK', onPress: () => navigation.goBack() },
-    ]);
+    try {
+      const combinedDateTime = moment(selectedDate)
+        .set({
+          hour: moment(selectedTime).hour(),
+          minute: moment(selectedTime).minute(),
+          second: 0,
+        })
+        .toISOString();
+      const pollData = {
+        question: question.trim(),
+        options: validOptions.map(option => option.text.trim()),
+        allow_multi_answers: allowMultipleAnswers,
+        published: true,
+        status: 'Active' as const,
+        createdBy: userId,
+        trip_id: tripId,
+        close_poll_date_time: combinedDateTime,
+        display_poll_date: moment(combinedDateTime).format('MMM DD, YYYY'),
+        display_poll_time: moment(combinedDateTime).format('hh:mm A'),
+        reminders: selectedReminders.map(Number),
+      };
+
+      await createPoll(pollData).unwrap();
+      showToast({
+        type: 'success',
+        message: CREATE_POLL_STRINGS.POLL_CREATED_SUCCESSFULLY,
+      });
+      setTimeout(() => {
+        navigation.goBack();
+      }, 2000);
+    } catch (error) {
+      console.error('Failed to create poll:', error);
+      showToast({
+        type: 'error',
+        title: 'Error',
+        message: CREATE_POLL_STRINGS.POLL_CREATION_FAILED,
+      });
+    }
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={globalStyles.container}>
       <Header title={CREATE_POLL_STRINGS.TITLE} />
 
-      <ScrollView
-        style={styles.scrollView}
-        showsVerticalScrollIndicator={false}
-      >
+      <ScrollView showsVerticalScrollIndicator={false}>
         <VStack className="px-6 py-4" space="lg">
           {/* Question Section */}
           <VStack className="space-y-2 mb-4">
@@ -126,8 +163,7 @@ const CreatePoll: React.FC = () => {
             </Text>
             <Box className="relative mt-2">
               <Input
-                className="bg-gray-50 border border-gray-200 rounded-lg w-full h-12"
-                style={{ opacity: 1 }}
+                className="bg-gray-50 border border-gray-200 rounded-lg w-full h-12 opacity-100"
               >
                 <InputField
                   placeholder={CREATE_POLL_STRINGS.QUESTION_PLACEHOLDER}
@@ -149,17 +185,14 @@ const CreatePoll: React.FC = () => {
                 <HStack key={option.id} className="items-center" space="sm">
                   <Box className="relative flex-1">
                     <Input
-                      className="bg-gray-50 border border-gray-200 rounded-lg w-full h-12"
-                      style={{ opacity: 1 }}
-                    >
+                      className="bg-gray-50 border border-gray-200 rounded-lg w-full h-12 opacity-100">
                       <InputField
                         placeholder={`${
                           CREATE_POLL_STRINGS.OPTION_PLACEHOLDER
                         } ${index + 1}`}
                         value={option.text}
                         onChangeText={text => updateOption(option.id, text)}
-                        className="text-base font-body"
-                        style={{ gap: 1 }}
+                        className="text-base font-body gap-1"
                       />
                     </Input>
                   </Box>
@@ -172,7 +205,7 @@ const CreatePoll: React.FC = () => {
                       <Ionicons
                         name="remove-circle"
                         size={24}
-                        color="#EF4444"
+                        color={Colors.secondary}
                       />
                     </TouchableOpacity>
                   )}
@@ -207,9 +240,9 @@ const CreatePoll: React.FC = () => {
               >
                 <HStack className="items-center justify-between" space="sm">
                   <Text className="text-gray-600 font-body text-base">
-                    {formatDate(selectedDate)}
+                    {moment(selectedDate).format('MMM DD, YYYY')}
                   </Text>
-                  <Ionicons name="calendar-outline" size={20} color="#6B7280" />
+                  <Ionicons name="calendar-outline" size={20} color={Colors.iconGray} />
                 </HStack>
               </TouchableOpacity>
 
@@ -220,9 +253,9 @@ const CreatePoll: React.FC = () => {
               >
                 <HStack className="items-center justify-between" space="sm">
                   <Text className="text-gray-600 font-body text-base">
-                    {formatTime(selectedTime)}
+                    {moment(selectedTime).format('hh:mm A')}
                   </Text>
-                  <Ionicons name="time-outline" size={20} color="#6B7280" />
+                  <Ionicons name="time-outline" size={20} color={Colors.iconGray} />
                 </HStack>
               </TouchableOpacity>
             </HStack>
@@ -237,9 +270,9 @@ const CreatePoll: React.FC = () => {
                 <Switch
                   value={allowMultipleAnswers}
                   onValueChange={setAllowMultipleAnswers}
-                  trackColor={{ false: '#D1D5DB', true: Colors.primary }}
-                  thumbColor={allowMultipleAnswers ? '#ffffff' : '#ffffff'}
-                  ios_backgroundColor="#D1D5DB"
+                  trackColor={{ false: Colors.borderGray, true: Colors.primary }}
+                  thumbColor={allowMultipleAnswers ? Colors.white : Colors.white}
+                  ios_backgroundColor={Colors.borderGray}
                 />
               </HStack>
             </Box>
@@ -252,12 +285,101 @@ const CreatePoll: React.FC = () => {
                 <Switch
                   value={reminders}
                   onValueChange={setReminders}
-                  trackColor={{ false: '#D1D5DB', true: Colors.primary }}
-                  thumbColor={reminders ? '#ffffff' : '#ffffff'}
-                  ios_backgroundColor="#D1D5DB"
+                  trackColor={{ false: Colors.borderGray, true: Colors.primary }}
+                  thumbColor={reminders ? Colors.white : Colors.white}
+                  ios_backgroundColor={Colors.borderGray}
                 />
               </HStack>
             </Box>
+
+            {/* Reminder Options */}
+            {reminders && (
+              <VStack className="mt-4" space="sm">
+                <Text className="text-sm font-body text-gray-600 mb-2">
+                  {CREATE_POLL_STRINGS.REMINDER_OPTIONS}
+                </Text>
+                <VStack space="sm">
+                  <HStack space="sm">
+                    {reminderOptions.slice(0, 2).map(option => (
+                      <TouchableOpacity
+                        key={option.value}
+                        onPress={() => toggleReminderOption(option.value)}
+                        style={[
+                          styles.reminderOption,
+                          selectedReminders?.includes(option.value) &&
+                            styles.reminderOptionSelected,
+                        ]}
+                        activeOpacity={0.7}
+                      >
+                        <HStack className="items-center" space="xs">
+                          <Ionicons
+                            name={
+                              selectedReminders?.includes(option.value)
+                                ? 'checkmark-circle'
+                                : 'checkmark-circle-outline'
+                            }
+                            size={16}
+                            color={
+                              selectedReminders?.includes(option.value)
+                                ? Colors.primary
+                                : Colors.textGray
+                            }
+                          />
+                          <Text
+                            className={`text-sm font-body ${
+                              selectedReminders?.includes(option.value)
+                                ? 'text-blue-700'
+                                : 'text-gray-600'
+                            }`}
+                          >
+                            {option.label}
+                          </Text>
+                        </HStack>
+                      </TouchableOpacity>
+                    ))}
+                  </HStack>
+                  <HStack space="sm">
+                    {reminderOptions?.slice(2, 4).map(option => (
+                      <TouchableOpacity
+                        key={option.value}
+                        onPress={() => toggleReminderOption(option.value)}
+                        style={[
+                          styles.reminderOption,
+                          selectedReminders?.includes(option.value) &&
+                            styles.reminderOptionSelected,
+                        ]}
+                        activeOpacity={0.7}
+                      >
+                        <HStack className="items-center" space="xs">
+                          <Ionicons
+                            name={
+                              selectedReminders?.includes(option.value)
+                                ? 'checkmark-circle'
+                                : 'checkmark-circle-outline'
+                            }
+                            size={16}
+                            color={
+                              selectedReminders?.includes(option.value)
+                                ? Colors.primary
+                                : Colors.textGray
+                            }
+                          />
+                          <Text
+                            className={`text-sm font-body ${
+                              selectedReminders?.includes(option.value)
+                                ? 'text-blue-700'
+                                : 'text-gray-600'
+                            }`}
+                          >
+                            {option.label}
+                          </Text>
+                        </HStack>
+                      </TouchableOpacity>
+                    ))}
+                  </HStack>
+                </VStack>
+              </VStack>
+            )}
           </VStack>
         </VStack>
       </ScrollView>
@@ -267,6 +389,7 @@ const CreatePoll: React.FC = () => {
           title={CREATE_POLL_STRINGS.CREATE_POLL}
           onPress={handleCreatePoll}
           size="large"
+          loading={isCreating}
         />
       </Box>
 
@@ -305,7 +428,6 @@ const CreatePoll: React.FC = () => {
         </>
       )}
 
-      {/* Time Picker */}
       {showTimePicker && (
         <>
           <DateTimePicker
@@ -338,24 +460,17 @@ const CreatePoll: React.FC = () => {
           )}
         </>
       )}
+      <ToastComponent />
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#FFFFFF',
-  },
-  scrollView: {
-    flex: 1,
-  },
   removeButton: {
     padding: 4,
   },
   addOptionButton: {
     paddingVertical: 12,
-
     borderRadius: 8,
     alignSelf: 'flex-end',
   },
@@ -364,9 +479,22 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 16,
     borderWidth: 1,
-    borderColor: '#D1D5DB',
+    borderColor: Colors.borderGray,
     borderRadius: 8,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: Colors.white,
+  },
+  reminderOption: {
+    flex: 1,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderWidth: 1,
+    borderColor: Colors.borderGray,
+    borderRadius: 8,
+    backgroundColor: Colors.white,
+  },
+  reminderOptionSelected: {
+    backgroundColor: Colors.lightBlue,
+    borderColor: Colors.primary,
   },
 });
 

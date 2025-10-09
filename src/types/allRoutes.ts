@@ -1,7 +1,6 @@
 import { RouteProp } from '@react-navigation/native';
 import {
   NativeStackNavigationProp,
-  NativeStackScreenProps,
 } from '@react-navigation/native-stack';
 import { Document } from '@/src/services';
 
@@ -80,8 +79,12 @@ export type MainStackParams = {
   Poll: {
     tripId: string;
     tripName: string;
+    tripStartDate: string;
+    tripEndDate: string;
   };
-  CreatePoll: undefined;
+  CreatePoll:  {
+    tripId: string;
+  };
   ManageFoodOrder: {
     tripName: string;
     tripStartDate: string;

@@ -3,6 +3,17 @@ export const POLL_STRINGS = {
   NO_POLL_CREATED: 'No Poll Created',
   START_GATHERING: 'Start Gathering Opinions and Insights',
   CREATE_POLL: 'Create Poll',
+  ACTIVE: 'Active',
+  PAST: 'Past',
+  POLL_ENDS_ON: 'Poll ends on',
+  POLL_EXPIRED: 'Poll expired',
+  CLOSED_ON: 'Closed on',
+  YOUR_VOTE: 'Your vote',
+  VOTE: 'VOTE',
+  VIEW_VOTES: 'VIEW VOTES',
+  MIN_AGO: 'min',
+  HR_AGO: 'hr',
+  DAY_AGO: 'day',
 } as const;
 
 export const CREATE_POLL_STRINGS = {
@@ -15,5 +26,27 @@ export const CREATE_POLL_STRINGS = {
   CLOSE_POLL_LABEL: 'Close poll on',
   ALLOW_MULTIPLE_ANSWERS: 'Allow multiple answers',
   REMINDERS: 'Reminders',
+  REMINDER_OPTIONS: 'Select reminder times:',
+  REMINDER_OPTION_LIST: [
+    { value: '5', label: '5 minutes before' },
+    { value: '15', label: '15 minutes before' },
+    { value: '30', label: '30 minutes before' },
+    { value: '60', label: '1 hour before' },
+  ],
   CREATE_POLL: 'Create Poll',
+  POLL_CREATED_SUCCESSFULLY: 'Poll created successfully!',
+  POLL_CREATION_FAILED: 'Failed to create poll. Please try again.',
+  VALIDATION_ERROR: 'Validation Error',
+  PLEASE_ENTER_A_QUESTION_FOR_YOUR_POLL: 'Please enter a question for your poll.',
+  PLEASE_PROVIDE_AT_LEAST_2_ANSWER_OPTIONS: 'Please provide at least 2 answer options.',
+} as const;
+
+export const pollDetailStrings = {
+  title: 'Poll Detail',
+  pollEndsIn: 'Poll ends in',
+  singleSelect: 'Single select',
+  multipleSelect: 'Multiple select',
+  viewVotes: 'View Votes',
+  submit: 'Submit',
+  errorLoading: 'Error loading poll details',
 } as const;

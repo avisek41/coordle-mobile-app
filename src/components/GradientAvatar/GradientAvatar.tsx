@@ -7,7 +7,7 @@ import { Box } from '@/components/ui/box';
 interface GradientAvatarProps {
   userName: string;
   userImage?: string;
-  size?: 'small' | 'medium' | 'large' | 'xlarge';
+  size?: 'xs' | 'small' | 'medium' | 'large' | 'xlarge';
   colors?: string[];
   onPress?: () => void;
   className?: string;
@@ -23,6 +23,11 @@ const GradientAvatar: React.FC<GradientAvatarProps> = ({
 }) => {
   const getSizeStyles = () => {
     switch (size) {
+      case 'xs':
+        return {
+          container: { width: 24, height: 24, borderRadius: 12 },
+          text: 'text-xs',
+        };
       case 'small':
         return {
           container: { width: 32, height: 32, borderRadius: 16 },
