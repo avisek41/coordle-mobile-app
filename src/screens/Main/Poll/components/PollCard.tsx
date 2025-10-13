@@ -35,22 +35,6 @@ const PollCard: React.FC<PollCardProps> = ({
     }
   };
 
-  // Button style configurations
-  const buttonStyles = {
-    vote: {
-      style: { height: 30, width: 50, marginTop: 0 },
-      gradientStyle: { width: '100%' as const, height: '100%' as const, borderRadius: 5 },
-      textStyle: { fontSize: 12 },
-    },
-    viewVotes: {
-      style: { height: 35, marginTop: 0 },
-      gradientStyle: { width: '100%' as const, height: '100%' as const },
-      textStyle: { fontSize: 14 },
-    },
-  };
-
-  const buttonConfig = isActive ? buttonStyles.vote : buttonStyles.viewVotes;
-
   const handlePress = () => {
     if (isActive) {
       onVote(poll._id);
@@ -112,14 +96,25 @@ const PollCard: React.FC<PollCardProps> = ({
               </VStack>
             )}
           </Box>
-          
+            {isActive ? (
            <GradientButton
-             title={isActive ? POLL_STRINGS.VOTE : POLL_STRINGS.VIEW_VOTES}
+             title={POLL_STRINGS.VOTE}
              onPress={handlePress}
-             style={buttonConfig.style}
-             gradientStyle={buttonConfig.gradientStyle}
-             textStyle={buttonConfig.textStyle}
+             style={styles.voteButton}
+             gradientStyle={styles.gradientButton}
+             textStyle={styles.textButton}
            />
+           ) : (
+            <TouchableOpacity
+            onPress={handlePress}
+            style={styles.viewVotesButton}
+            activeOpacity={0.8}
+          >
+            <Text className="text-primary-500 font-heading text-xs">
+              {POLL_STRINGS.VIEW_VOTES}
+            </Text>
+          </TouchableOpacity>
+           )}
         </HStack>
       </VStack>
     </TouchableOpacity>
@@ -140,6 +135,28 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 3.84,
     elevation: 5,
+  },
+  gradientButton: {
+    height: 28,
+    width: 54,
+    marginTop: 0,
+  },
+  textButton: {
+    fontSize: 11,
+  },
+  voteButton:{
+    height: 35,
+    width: 50,
+    marginTop: 0,
+  },
+  viewVotesButton: {
+      borderWidth: 1,
+      borderColor: Colors.primary,
+      borderRadius: 8,
+      paddingHorizontal: 12,
+      paddingVertical: 6,
+      paddingLeft: 12,
+      paddingRight: 12,
   },
 });
 

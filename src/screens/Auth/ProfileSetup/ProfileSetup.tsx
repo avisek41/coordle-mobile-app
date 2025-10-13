@@ -3,10 +3,7 @@ import {
   SafeAreaView,
   ScrollView,
   TouchableOpacity,
-  Modal,
-  View,
   Image,
-  Alert,
 } from 'react-native';
 import { Box } from '@/components/ui/box';
 import { Text } from '@/components/ui/text';
