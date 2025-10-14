@@ -7,11 +7,16 @@ import {
   Switch,
   Platform,
 } from 'react-native';
+import DraggableFlatList, {
+  RenderItemParams,
+  ScaleDecorator,
+} from 'react-native-draggable-flatlist';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import moment from 'moment';
 import { useSelector } from 'react-redux';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 // imports from gluestack components
 import { Box, HStack, VStack, Text, Input, InputField } from '@/components/ui';
@@ -19,12 +24,14 @@ import { Box, HStack, VStack, Text, Input, InputField } from '@/components/ui';
 import { MainNavigationProps, MainRouteProps } from '@/src/types/allRoutes';
 import { useCreatePollMutation } from '@/src/services/pollApi';
 import { useSimpleToast } from '@/src/hooks/useSimpleToast';
+import PollCreatedAlert from '@/src/components/PollCreatedAlert';
 import { CREATE_POLL_STRINGS } from './strings';
 import { Colors } from '@/src/configs/CustomTheme';
 import { RootState } from '@/src/redux/Store';
 import { Header, GradientButton } from '@/src/components';
 import { globalStyles } from '@/src/styles';
 import { dateFormatWithDay, timeFormat } from '@/src/utils/dateTimeFormat';
+import { formatTimeRemaining } from '@/src/utils';
 
 interface PollOption {
   id: string;
@@ -36,6 +43,7 @@ const CreatePoll: React.FC = () => {
   const { userId } = useSelector((state: RootState) => state.auth);
   const [createPoll, { isLoading: isCreating }] = useCreatePollMutation();
   const { showToast, ToastComponent } = useSimpleToast();
+  const [showPollCreatedAlert, setShowPollCreatedAlert] = useState(false);
   const route = useRoute<MainRouteProps<'CreatePoll'>>();
   const { tripId } = route.params ?? {
     tripId: '',
@@ -51,6 +59,7 @@ const CreatePoll: React.FC = () => {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedTime, setSelectedTime] = useState(new Date());
   const reminderOptions = CREATE_POLL_STRINGS.REMINDER_OPTION_LIST;
+  const [closePollDateTime, setClosePollDateTime] = useState(moment());
 
   const addOption = () => {
     const newId = (options.length + 1).toString();
@@ -66,6 +75,69 @@ const CreatePoll: React.FC = () => {
   const updateOption = (id: string, text: string) => {
     setOptions(
       options.map(option => (option.id === id ? { ...option, text } : option)),
+    );
+  };
+
+  const onDragEnd = ({ data }: { data: PollOption[] }) => {
+    setOptions(data);
+  };
+
+  const renderOption = ({ item, drag, isActive }: RenderItemParams<PollOption>) => {
+    const index = options.findIndex(option => option.id === item.id);
+    
+    return (
+      <ScaleDecorator>
+        <Box 
+          className="bg-gray-50 rounded-lg p-4 mb-3 shadow-sm border border-gray-100"
+          style={{ opacity: isActive ? 0.8 : 1 }}
+        >
+          <HStack className="items-center justify-between">
+            {/* Remove Button - Left Side */}
+            {options.length > 1 && (
+              <TouchableOpacity
+                onPress={() => removeOption(item.id)}
+                style={styles.removeButton}
+                activeOpacity={0.7}
+              >
+                <Ionicons
+                  name="remove-circle"
+                  size={24}
+                  color={Colors.secondary}
+                />
+              </TouchableOpacity>
+            )}
+
+            {/* Input Field - Middle */}
+            <Box className="flex-1 mx-3">
+              <Input
+                className="bg-white border border-gray-200 rounded-lg h-12">
+                <InputField
+                  placeholder={`${
+                    CREATE_POLL_STRINGS.OPTION_PLACEHOLDER
+                  } ${index + 1}`}
+                  value={item.text}
+                  onChangeText={text => updateOption(item.id, text)}
+                  className="text-base font-body text-black"
+                />
+              </Input>
+            </Box>
+
+            {/* Drag Handle - Right Side */}
+            <TouchableOpacity
+              onPressIn={drag}
+              disabled={isActive}
+              style={styles.dragHandle}
+              activeOpacity={0.7}
+            >
+              <Ionicons
+                name="reorder-three"
+                size={20}
+                color={Colors.iconGray}
+              />
+            </TouchableOpacity>
+          </HStack>
+        </Box>
+      </ScaleDecorator>
     );
   };
 
@@ -110,15 +182,15 @@ const CreatePoll: React.FC = () => {
     }
 
     const validOptions = options?.filter(option => option.text.trim()) || [];
+    let combinedDateTime = moment(selectedDate)
+    .set({
+      hour: moment(selectedTime).hour(),
+      minute: moment(selectedTime).minute(),
+      second: 0,
+    });
+    setClosePollDateTime(combinedDateTime);
 
     try {
-      const combinedDateTime = moment(selectedDate)
-        .set({
-          hour: moment(selectedTime).hour(),
-          minute: moment(selectedTime).minute(),
-          second: 0,
-        })
-        .toISOString();
       const pollData = {
         question: question.trim(),
         options: validOptions.map(option => option.text.trim()),
@@ -127,31 +199,33 @@ const CreatePoll: React.FC = () => {
         status: 'Active' as const,
         createdBy: userId,
         trip_id: tripId,
-        close_poll_date_time: combinedDateTime,
-        display_poll_date: moment(combinedDateTime).format(dateFormatWithDay),
-        display_poll_time: moment(combinedDateTime).format(timeFormat),
+        close_poll_date_time: closePollDateTime.toISOString(),
+        display_poll_date: moment(closePollDateTime).format(dateFormatWithDay),
+        display_poll_time: moment(closePollDateTime).format(timeFormat),
         reminders: selectedReminders.map(Number),
       };
 
       await createPoll(pollData).unwrap();
-      showToast({
-        type: 'success',
-        message: CREATE_POLL_STRINGS.POLL_CREATED_SUCCESSFULLY,
-      });
-      setTimeout(() => {
-        navigation.goBack();
-      }, 2000);
-    } catch (error) {
-      console.error('Failed to create poll:', error);
-      showToast({
-        type: 'error',
-        title: 'Error',
-        message: CREATE_POLL_STRINGS.POLL_CREATION_FAILED,
-      });
+      setShowPollCreatedAlert(true);
+    } catch (error: unknown) {
+      // Check if error is an object and has 'data' property
+      const errorMessage =
+      typeof error === 'object' && error !== null && 'data' in error && typeof (error as any).data === 'object' && (error as any).data !== null && 'message' in (error as any).data
+        ? ((error as any).data.message as string)
+        : 'Something went wrong';
+
+    console.error('Failed to create poll:', errorMessage);
+
+    showToast({
+      type: 'error',
+      title: 'Error',
+      message: errorMessage,
+    });
     }
   };
 
   return (
+    <GestureHandlerRootView style={{ flex: 1 }}>
     <SafeAreaView style={globalStyles.container}>
       <Header title={CREATE_POLL_STRINGS.TITLE} />
 
@@ -182,36 +256,14 @@ const CreatePoll: React.FC = () => {
               {CREATE_POLL_STRINGS.ANSWER_OPTIONS_LABEL}
             </Text>
             <VStack space="md">
-              {options.map((option, index) => (
-                <HStack key={option.id} className="items-center" space="sm">
-                  <Box className="relative flex-1">
-                    <Input
-                      className="bg-gray-50 border border-gray-200 rounded-lg w-full h-12 opacity-100">
-                      <InputField
-                        placeholder={`${
-                          CREATE_POLL_STRINGS.OPTION_PLACEHOLDER
-                        } ${index + 1}`}
-                        value={option.text}
-                        onChangeText={text => updateOption(option.id, text)}
-                        className="text-base font-body gap-1"
-                      />
-                    </Input>
-                  </Box>
-                  {options.length > 1 && (
-                    <TouchableOpacity
-                      onPress={() => removeOption(option.id)}
-                      style={styles.removeButton}
-                      activeOpacity={0.7}
-                    >
-                      <Ionicons
-                        name="remove-circle"
-                        size={24}
-                        color={Colors.secondary}
-                      />
-                    </TouchableOpacity>
-                  )}
-                </HStack>
-              ))}
+              <DraggableFlatList
+                data={options}
+                onDragEnd={onDragEnd}
+                keyExtractor={item => item.id}
+                renderItem={renderOption}
+                scrollEnabled={false}
+                contentContainerStyle={{ paddingVertical: 0 }}
+              />
             </VStack>
 
             <TouchableOpacity
@@ -461,14 +513,34 @@ const CreatePoll: React.FC = () => {
           )}
         </>
       )}
+      
+      {/* Poll Created Alert */}
+      <PollCreatedAlert
+        isOpen={showPollCreatedAlert}
+        title={CREATE_POLL_STRINGS.POLL_CREATED}
+        subtitle={`This poll will close in ${formatTimeRemaining(closePollDateTime.toISOString())}`}
+        onClose={() => {
+          setShowPollCreatedAlert(false);
+          navigation.goBack();
+        }}
+      />
+      
       <ToastComponent />
     </SafeAreaView>
+    </GestureHandlerRootView>
   );
 };
 
 const styles = StyleSheet.create({
   removeButton: {
     padding: 4,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  dragHandle: {
+    padding: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   addOptionButton: {
     paddingVertical: 12,
