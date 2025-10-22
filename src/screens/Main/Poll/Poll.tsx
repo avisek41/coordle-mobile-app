@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Image, SafeAreaView, StyleSheet, ScrollView, TouchableOpacity, RefreshControl } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import moment from 'moment';
+import { useAppSelector } from '@/src/hooks';
 
 //gluestack components imports
 import { Box, Text, VStack, HStack } from '@/components/ui';
@@ -14,12 +15,14 @@ import { images } from '@/src/assets';
 import { useGetPollsByTripQuery, useClosePollMutation } from '@/src/services/pollApi';
 import { Colors } from '@/src/configs/CustomTheme';
 import { globalStyles } from '@/src/styles';
+import { formatDateRange } from '@/src/utils';
 
 const Poll: React.FC = () => {
   const navigation = useNavigation<MainNavigationProps>();
   const route = useRoute<MainRouteProps<'Poll'>>();
   const { tripId, tripName, tripStartDate, tripEndDate } = route.params;
-  
+  const currentUserId = useAppSelector(state => state.auth.userId);
+
   const [activeTab, setActiveTab] = useState<'Active' | 'Past'>('Active');
   const [refreshing, setRefreshing] = useState(false);
 
@@ -29,8 +32,7 @@ const Poll: React.FC = () => {
     refetch 
   } = useGetPollsByTripQuery({ 
     tripId: tripId || '', 
-    status: activeTab === 'Active' ? 'Active' : 'Closed',
-    published: true 
+    status: activeTab === 'Active' ? 'Active' : 'Closed'
   });
 
   const [closePoll] = useClosePollMutation();
@@ -67,12 +69,12 @@ const Poll: React.FC = () => {
 
   const handleVote = (pollId: string) => {
     // TODO: Navigate to PollDetail when route is available
-    console.log('Navigate to poll detail:', pollId);
+      navigation.navigate('PollDetail', { pollId: pollId });
   };
 
   const handleViewVotes = (pollId: string) => {
     // TODO: Navigate to PollDetail when route is available
-    console.log('Navigate to poll detail:', pollId);
+    navigation.navigate('PollVotes', { pollId: pollId });
   };
 
   const onRefresh = async () => {
@@ -119,7 +121,7 @@ const Poll: React.FC = () => {
             {tripName}
           </Text>
           <Text className="text-sm text-gray-500">
-            {tripStartDate} - {tripEndDate}
+            {formatDateRange(tripStartDate, tripEndDate)}
           </Text>
         </HStack>
       </VStack>
@@ -184,13 +186,13 @@ const Poll: React.FC = () => {
           </VStack>
         ) : (
           <VStack className="px-6 py-4">
-            {currentPolls.map((poll) => (
+            {currentUserId && currentPolls.map((poll) => (
               <PollCard
                 key={poll._id}
                 poll={poll}
                 onVote={handleVote}
                 onViewVotes={handleViewVotes}
-                userVote={undefined} // TODO: Add user vote data when available
+                userVote={poll.votes?.find(vote => vote.userId === currentUserId)?.selectedOptionText || null} // TODO: Add user vote data when available
               />
             ))}
           </VStack>

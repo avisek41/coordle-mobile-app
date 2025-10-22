@@ -1,6 +1,6 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import React from 'react';
-import { Main } from '../../screens';
+
 import { ProfileOtherInfo } from '../../screens/Main/Profile/ProfileOtherInfo';
 import EditProfile from '../../screens/Main/Profile/EditProfile';
 import {
@@ -22,7 +22,7 @@ import { MainStackParams } from '@/src/types/allRoutes';
 import BottomTabs from '@/src/layouts/BottomTabs';
 import EditAnnouncement from '@/src/screens/Main/EditAnnouncement';
 import { AppNotifications } from '@/src/screens/Main/AppNotifications';
-import { Poll } from '@/src/screens/Main/Poll';
+import { Poll, PollDetail, PollVotes } from '@/src/screens/Main/Poll';
 import CreatePoll from '@/src/screens/Main/Poll/CreatePoll';
 import ManageFoodOrder from '@/src/screens/Main/ManageFoodOrder';
 import { AddLodging } from '@/src/screens/Main/AddLodging';
@@ -131,6 +131,16 @@ const MainStack = () => {
       <Stack.Screen
         name="CreatePoll"
         component={CreatePoll}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="PollDetail"
+        component={PollDetail}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="PollVotes"
+        component={PollVotes}
         options={{ headerShown: false }}
       />
       <Stack.Screen

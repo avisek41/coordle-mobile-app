@@ -1,6 +1,5 @@
 import React from 'react';
 import { TouchableOpacity, StyleSheet } from 'react-native';
-import moment from 'moment';
 
 // imports from gluestack components
 import { Box, HStack, VStack, Text } from '@/components/ui';
@@ -10,13 +9,12 @@ import { Poll } from '@/src/types/poll';
 import { POLL_STRINGS } from '../strings';
 import { Colors } from '@/src/configs/CustomTheme';
 import { formatTimeRemaining } from '@/src/utils';
-import { customPollDateTimeFormat, dateFormat } from '@/src/utils/dateTimeFormat';
 
 interface PollCardProps {
   poll: Poll;
   onVote: (pollId: string) => void;
   onViewVotes: (pollId: string) => void;
-  userVote?: string;
+  userVote?: string[] | null;
 }
 
 const PollCard: React.FC<PollCardProps> = ({ 
@@ -29,9 +27,9 @@ const PollCard: React.FC<PollCardProps> = ({
 
   const getStatusText = () => {
     if (isActive) {
-      return `${POLL_STRINGS.POLL_ENDS_ON} ${moment(poll.close_poll_date_time).format(customPollDateTimeFormat)}`;
+      return `${POLL_STRINGS.POLL_ENDS_ON} ${poll.display_close_poll_date} ${poll.display_close_poll_time}`;
     } else {
-      return `${POLL_STRINGS.CLOSED_ON} ${moment(poll.close_poll_date_time).add(7, 'days').format(dateFormat)}`;
+      return `${POLL_STRINGS.CLOSED_ON} ${poll.display_close_poll_date}`;
     }
   };
 
@@ -54,12 +52,12 @@ const PollCard: React.FC<PollCardProps> = ({
         <HStack className="items-center justify-between">
           <HStack className="items-center" space="sm">
           <GradientAvatar
-              userName={poll.createdBy?.preferredName || poll.createdBy?.firstName || 'User'}
+              userName={poll.createdBy?.preferredName  || 'User'}
               userImage={poll.createdBy?.profilePhotoURL || poll.createdBy?.preferredName}
               size="xs"
             />
            <Text className="text-medium font-heading text-gray-900">
-              {poll.createdBy?.preferredName || poll.createdBy?.firstName || 'User'}
+              {poll.createdBy?.preferredName || 'User'}
            </Text>
           </HStack>
           <Text className="text-xs text-gray-500">
@@ -78,7 +76,7 @@ const PollCard: React.FC<PollCardProps> = ({
         {/* Status and Action */}
         <HStack className="items-center justify-between">
           <Box className="flex-1">
-            {isActive ? (
+            {isActive && userVote === null ? (
               <Text className="text-sm text-red-600">
                 {getStatusText()}
               </Text>
@@ -86,7 +84,7 @@ const PollCard: React.FC<PollCardProps> = ({
               <VStack space="xs">
                 {userVote ? (
                   <Text className="text-sm text-gray-900">
-                    {POLL_STRINGS.YOUR_VOTE} : <Text className="text-blue-600">{userVote}</Text>
+                    {POLL_STRINGS.YOUR_VOTE} : <Text style={{ color: Colors.primary }} className="font-medium">{userVote.join(', ')}</Text>
                   </Text>
                 ) : (
                   <Text className="text-sm text-red-600">
@@ -148,11 +146,12 @@ const styles = StyleSheet.create({
     height: 35,
     width: 50,
     marginTop: 0,
+    borderRadius: 2,
   },
   viewVotesButton: {
       borderWidth: 1,
       borderColor: Colors.primary,
-      borderRadius: 8,
+      borderRadius: 4,
       paddingHorizontal: 12,
       paddingVertical: 6,
       paddingLeft: 12,

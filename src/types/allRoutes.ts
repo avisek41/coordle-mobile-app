@@ -85,6 +85,12 @@ export type MainStackParams = {
   CreatePoll:  {
     tripId: string;
   };
+  PollDetail: {
+    pollId: string;
+  };  
+  PollVotes: {
+    pollId: string;
+  };
   ManageFoodOrder: {
     tripName: string;
     tripStartDate: string;

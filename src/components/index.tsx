@@ -1,4 +1,6 @@
 export { default as GradientButton } from './GradientButton';
+export { default as GradientText } from './GradientText';
+export { default as GradientProgressBar } from './GradientProgressBar';
 export { default as GradientAvatar } from './GradientAvatar';
 export { default as GradientFabButton } from './GradientFabButton';
 export { default as ExpandableFab } from './ExpandableFab';

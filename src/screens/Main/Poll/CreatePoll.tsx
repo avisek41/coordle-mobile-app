@@ -24,14 +24,14 @@ import { Box, HStack, VStack, Text, Input, InputField } from '@/components/ui';
 import { MainNavigationProps, MainRouteProps } from '@/src/types/allRoutes';
 import { useCreatePollMutation } from '@/src/services/pollApi';
 import { useSimpleToast } from '@/src/hooks/useSimpleToast';
-import PollCreatedAlert from '@/src/components/PollCreatedAlert';
 import { CREATE_POLL_STRINGS } from './strings';
 import { Colors } from '@/src/configs/CustomTheme';
 import { RootState } from '@/src/redux/Store';
-import { Header, GradientButton } from '@/src/components';
+import { Header, GradientButton, CustomAlert } from '@/src/components';
 import { globalStyles } from '@/src/styles';
 import { dateFormatWithDay, timeFormat } from '@/src/utils/dateTimeFormat';
 import { formatTimeRemaining } from '@/src/utils';
+import { images } from '@/src/assets';
 
 interface PollOption {
   id: string;
@@ -43,7 +43,7 @@ const CreatePoll: React.FC = () => {
   const { userId } = useSelector((state: RootState) => state.auth);
   const [createPoll, { isLoading: isCreating }] = useCreatePollMutation();
   const { showToast, ToastComponent } = useSimpleToast();
-  const [showPollCreatedAlert, setShowPollCreatedAlert] = useState(false);
+  const [showCustomAlert, setShowCustomAlert] = useState(false);
   const route = useRoute<MainRouteProps<'CreatePoll'>>();
   const { tripId } = route.params ?? {
     tripId: '',
@@ -200,13 +200,13 @@ const CreatePoll: React.FC = () => {
         createdBy: userId,
         trip_id: tripId,
         close_poll_date_time: closePollDateTime.toISOString(),
-        display_poll_date: moment(closePollDateTime).format(dateFormatWithDay),
-        display_poll_time: moment(closePollDateTime).format(timeFormat),
+        display_close_poll_date: moment(closePollDateTime).format(dateFormatWithDay),
+        display_close_poll_time: moment(closePollDateTime).format(timeFormat),
         reminders: selectedReminders.map(Number),
       };
 
       await createPoll(pollData).unwrap();
-      setShowPollCreatedAlert(true);
+      setShowCustomAlert(true);
     } catch (error: unknown) {
       // Check if error is an object and has 'data' property
       const errorMessage =
@@ -514,16 +514,17 @@ const CreatePoll: React.FC = () => {
         </>
       )}
       
-      {/* Poll Created Alert */}
-      <PollCreatedAlert
-        isOpen={showPollCreatedAlert}
+      <CustomAlert
+        isOpen={showCustomAlert}
+        icon={images.poll}
         title={CREATE_POLL_STRINGS.POLL_CREATED}
-        subtitle={`This poll will close in ${formatTimeRemaining(closePollDateTime.toISOString())}`}
-        onClose={() => {
-          setShowPollCreatedAlert(false);
+        message={`This poll will close in ${formatTimeRemaining(closePollDateTime.toISOString())}`}
+        onCancel={() => {
+          setShowCustomAlert(false);
           navigation.goBack();
         }}
-      />
+        onConfirm={() => {}}
+        />
       
       <ToastComponent />
     </SafeAreaView>
