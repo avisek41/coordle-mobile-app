@@ -1,5 +1,5 @@
 import { apiSlice } from './apiSlice';
-import { PollsResponse, PollResponse, CreatePollFormData, UpdatePollFormData, CreatePollResponse, GetPollsByTripParams, GetAllPollsParams } from '@/src/types/poll';
+import { PollsResponse, PollResponse, CreatePollFormData, UpdatePollFormData, CreatePollResponse, GetPollsByTripParams, GetAllPollsParams, VoteOnPollRequest, VoteOnPollResponse, GetPollVotesResponse } from '@/src/types/poll';
 import { API_ENDPOINTS } from '@/src/constant/apiConstant';
 
 export const pollApi = apiSlice.injectEndpoints({
@@ -94,6 +94,31 @@ export const pollApi = apiSlice.injectEndpoints({
         'Polls'
       ],
     }),
+    
+    // Vote on poll
+    voteOnPoll: builder.mutation<VoteOnPollResponse, { pollId: string; voteData: VoteOnPollRequest }>({
+      query: ({ pollId, voteData }) => ({
+        url: `${API_ENDPOINTS.POLL}/${pollId}/vote`,
+        method: 'POST',
+        body: voteData,
+      }),
+      invalidatesTags: (result, error, { pollId }) => [
+        { type: 'Polls', id: pollId },
+        'Polls'
+      ],
+    }),
+    
+    // Get poll votes
+    getPollVotes: builder.query<GetPollVotesResponse, string>({
+      query: pollId => ({
+        url: `${API_ENDPOINTS.POLL}/${pollId}/votes`,
+        method: 'GET',
+      }),
+      providesTags: (result, error, pollId) => [
+        { type: 'Polls', id: pollId },
+        'Polls'
+      ],
+    }),
   }),
   overrideExisting: false,
 });
@@ -107,4 +132,6 @@ export const {
   useDeletePollMutation,
   usePublishPollMutation,
   useClosePollMutation,
+  useVoteOnPollMutation,
+  useGetPollVotesQuery,
 } = pollApi;

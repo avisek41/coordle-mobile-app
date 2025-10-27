@@ -1,20 +1,22 @@
 import React from 'react';
-import { Modal, TouchableOpacity, StyleSheet } from 'react-native';
-import { Text } from '@/components/ui/text';
-import { VStack } from '@/components/ui/vstack';
-import { HStack } from '@/components/ui/hstack';
-import { Box } from '@/components/ui/box';
+import { Modal, TouchableOpacity, StyleSheet, Image } from 'react-native';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+
+import { Text, VStack, Box, HStack } from '@/components/ui';
+
 import GradientButton from './GradientButton';
-import { Colors } from '../configs/CustomTheme';
+import { Colors } from '@/src/configs/CustomTheme';
 
 export interface CustomAlertProps {
   isOpen: boolean;
+  icon?: string;
   title: string;
   message: string;
   cancelText?: string;
   confirmText?: string;
   onCancel?: () => void;
   onConfirm: () => void;
+  isCreatedAlert?: boolean;
   isDestructive?: boolean;
 }
 
@@ -26,6 +28,8 @@ const CustomAlert: React.FC<CustomAlertProps> = ({
   confirmText = 'Confirm',
   onCancel,
   onConfirm,
+  isCreatedAlert = false,
+  icon = '',
   isDestructive = false,
 }) => {
   const handleCancel = () => {
@@ -46,6 +50,7 @@ const CustomAlert: React.FC<CustomAlertProps> = ({
       onRequestClose={handleCancel}
     >
       <Box className="flex-1 justify-center items-center bg-black/50">
+        {isCreatedAlert ? (
         <Box className="bg-white rounded-2xl mx-6 p-6 w-full max-w-sm">
           {/* Title and Message */}
           <VStack className="mb-6">
@@ -53,7 +58,7 @@ const CustomAlert: React.FC<CustomAlertProps> = ({
               {title}
             </Text>
             <Text className="text-sm font-body text-gray-600  leading-5">
-              {message}
+              {message.replace(/\\n/g, '\n')}
             </Text>
           </VStack>
 
@@ -80,7 +85,41 @@ const CustomAlert: React.FC<CustomAlertProps> = ({
               textStyle={styles.confirmButtonText}
             />
           </HStack>
-        </Box>
+        </Box>) : (
+        <Box className="bg-white px-6 py-8 rounded-2xl mx-6 w-full max-w-sm shadow-lg">
+         {/* Close Button */}
+         <TouchableOpacity
+           onPress={handleCancel}
+           style={styles.closeButton}
+           activeOpacity={0.7}
+         >
+           <Ionicons name="close" size={20} color="#6B7280" />
+         </TouchableOpacity>
+
+         {/* Content */}
+         <VStack className="items-center">
+           {/* Icon */}
+           <Image
+             source={{ uri: icon }}
+             style={{
+               width: 44,
+               height: 38.13,
+             }}
+             className='fontFamilyAvenir mb-3'
+             resizeMode='contain'
+           />
+
+           {/* Title */}
+           <Text className="text-xl font-bold text-black leading-5 text-center mb-4 fontFamilyAvenir">
+             {title}
+           </Text>
+
+           {/* Subtitle */}
+           <Text className="text-sm text-gray-600 text-center leading-5 fontFamilyAvenir">
+             {message}
+           </Text>
+         </VStack>
+       </Box>)}
       </Box>
     </Modal>
   );
@@ -107,6 +146,16 @@ const styles = StyleSheet.create({
   },
   confirmButtonText: {
     fontSize: 16,
+  },
+  closeButton: {
+    position: 'absolute',
+    top: 16,
+    right: 16,
+    zIndex: 10,
+    padding: 4,
+  },
+  fontFamilyAvenir: {
+    fontFamily: 'AvenirLTProRoman',
   },
 });
 

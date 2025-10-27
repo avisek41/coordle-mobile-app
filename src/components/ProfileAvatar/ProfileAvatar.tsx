@@ -6,7 +6,6 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import LinearGradient from 'react-native-linear-gradient';
 import { Loader, PhotoPicker } from '@/src/components';
 import { useProfilePhoto } from '@/src/hooks/useProfilePhoto';
-import { ProfilePhoto } from '@/src/services';
 
 interface ProfileAvatarProps {
   size?: 'small' | 'medium' | 'large';

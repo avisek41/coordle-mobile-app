@@ -1,11 +1,11 @@
 import React from 'react';
-import { Box } from '@/components/ui/box';
-import { Text } from '@/components/ui/text';
-import { HStack } from '@/components/ui/hstack';
-import { Pressable } from '@/components/ui/pressable';
-import { Icon } from '@/components/ui/icon';
-import { GradientAvatar } from '@/src/components';
-import { CheckIcon } from 'lucide-react-native';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+
+// imports from gluestack components
+import { Box, Text, HStack, Pressable, Radio, RadioIndicator, RadioGroup } from '@/components/ui';
+
+import { GradientAvatar, GradientText, GradientProgressBar } from '@/src/components';
+import { Colors } from '@/src/configs/CustomTheme';
 
 interface PollOption {
   id?: string;
@@ -14,7 +14,7 @@ interface PollOption {
   voters?: Array<{
     id: string;
     name: string;
-    avatarUrl?: string;
+    profilePhotoURL?: string;
   }>;
 }
 
@@ -28,7 +28,7 @@ interface PollOptionCardProps {
 const PollOptionCard: React.FC<PollOptionCardProps> = ({
   option,
   totalVotes,
-  isSelected,
+  isSelected, 
   onPress,
 }) => {
   const votes = option.votes || 0;
@@ -38,66 +38,83 @@ const PollOptionCard: React.FC<PollOptionCardProps> = ({
   return (
     <Pressable onPress={onPress}>
       <Box
-        className={`rounded-lg p-3 border ${
+        className={`rounded-lg p-4 border mb-3 ${
           isSelected 
-            ? 'bg-blue-50 border-blue-300' 
-            : 'bg-white border-gray-200'
+            ? `border-primary-300 shadow-sm` 
+            : 'border-gray-200'
         }`}
+        style={{ backgroundColor: isSelected ? `#${Colors.primaryLight}` : `#${Colors.white}` }}
       >
-        <HStack className="items-center space-x-3 mb-2">
-          {/* Selection Indicator */}
-          <Box
-            className={`w-6 h-6 rounded-full border-2 items-center justify-center ${
-              isSelected
-                ? 'bg-blue-500 border-blue-500'
-                : 'border-blue-500'
-            }`}
-          >
-            {isSelected && (
-              <Icon as={CheckIcon} size="sm" color="$white" />
-            )}
-          </Box>
+        <HStack className="items-center space-x-3 mb-1">
+          {/* Radio Selection Indicator */}
+          <RadioGroup>
+            <Radio
+              value={option.id || option.text}
+              onPress={onPress}
+              size="md"
+            >
+              <RadioIndicator
+                className={`w-6 h-6 rounded-full border-2 items-center justify-center mr-2`}
+                style={{ backgroundColor:isSelected ? Colors.primary : Colors.white, borderColor:isSelected ? Colors.primary : Colors.gray }}
+              >
+                {isSelected && (
+                  <Ionicons name="checkmark" size={13} color={Colors.white} />
+                )}
+              </RadioIndicator>
+            </Radio>
+          </RadioGroup>
 
-          {/* Option Text */}
-          <Text 
-            className={`text-base flex-1 ${
-              isSelected ? 'text-blue-600 font-medium' : 'text-gray-900'
-            }`}
-          >
-            {option.text}
-          </Text>
+          {/* Option Text */}         
+          {isSelected ? (
+          <GradientText
+            text={option.text}
+            textStyle={{ fontSize: 16, fontWeight: '800', textAlign: 'center', fontFamily: 'AvenirLTPro-Medium' }}
+          />):(
+            <Text className={`text-lg font-medium`} style={{ color: Colors.black, fontWeight: '500', textAlign: 'center', fontFamily: 'AvenirLTPro-Medium' }}>
+              {option.text}
+            </Text>
+          )}
         </HStack>
 
         {/* Progress Bar and Vote Count */}
-        <HStack className="justify-between items-center">
-          <Box className="flex-1 mr-2">
-            <Box className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
-              <Box 
-                className="h-full bg-blue-500 rounded-full"
-                style={{ width: `${percentage}%` }}
+        {votes > 0 && (<HStack className={`justify-between items-center ${isSelected ? '' : 'mt-3'}`}>
+          <Box className="flex-1 mr-3">
+              <GradientProgressBar
+                percentage={percentage}
+                colors={isSelected ? ['#2E6F9E', Colors.primary] : ['#E5E7EB', '#E5E7EB']}
+                height={4}
+                backgroundColor="#E5E7EB"
               />
-            </Box>
           </Box>
           
-          <HStack className="items-center space-x-1">
+          
+          <HStack className="justify-between items-center space-x-1">
+           
             {/* Voter Avatars */}
             {voters.slice(0, 2).map((voter, index) => (
-              <GradientAvatar 
-                key={voter.id || index} 
-                userName={voter.name}
-                size="small"
-                userImage={voter.avatarUrl}
-              />
+              <Box key={voter.id || index} className="ml-[-8px] first:ml-0">
+                <GradientAvatar 
+                  userName={voter.name}
+                  size="small"
+                  userImage={voter.profilePhotoURL}
+                />
+              </Box>
             ))}
             
             {/* Vote Count */}
-            {votes > 0 && (
-              <Text className="text-sm text-gray-500 ml-1">
+            <Box className="ml-3">
+            { isSelected ?  (
+            <GradientText
+              text={votes > 0 ? votes.toString() : ''}
+              textStyle={{ fontSize: 16, fontWeight: '800', textAlign: 'center', fontFamily: 'AvenirLTPro-Medium' }}
+            />) : (
+              <Text className={`text-lg font-medium`} style={{ color: Colors.black, fontWeight: '500', textAlign: 'center', fontFamily: 'AvenirLTPro-Medium' }}>
                 {votes}
               </Text>
             )}
+            </Box>
           </HStack>
-        </HStack>
+        </HStack>)}
       </Box>
     </Pressable>
   );

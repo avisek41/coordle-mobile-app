@@ -1,27 +1,37 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   SafeAreaView,
   ScrollView,
   RefreshControl,
+  TouchableOpacity,
+  Image,
+  StyleSheet
 } from 'react-native';
-import { Box } from '@/components/ui/box';
-import { Text } from '@/components/ui/text';
-import { VStack } from '@/components/ui/vstack';
-import { HStack } from '@/components/ui/hstack';
-import { Pressable } from '@/components/ui/pressable';
-import { Icon } from '@/components/ui/icon';
-import { CheckIcon, ArrowLeftIcon, MoreVerticalIcon } from 'lucide-react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+
+import {Box, Text, VStack, HStack} from '@/components/ui';
+
 import { MainNavigationProps } from '@/src/types/allRoutes';
-import { useGetPollByIdQuery } from '@/src/services/pollApi';
-import { GradientButton, GradientAvatar, Loader } from '@/src/components';
-import { pollDetailStrings } from './strings';
+import { useVoteOnPollMutation, useClosePollMutation, useDeletePollMutation, useGetPollVotesQuery } from '@/src/services/pollApi';
+import { GradientButton, GradientAvatar, Loader, CustomActionSheet, CustomAlert, Header, GradientText } from '@/src/components';
+import { POLL_STRINGS, pollDetailStrings } from './strings';
 import { globalStyles } from '@/src/styles';
 import PollOptionCard from './components/PollOptionCard';
+import { PollOptionWithVotes } from '@/src/types/poll';
+import { useAppSelector } from '@/src/hooks';
+import { ActionItem } from '@/src/components/CustomActionSheet';
+import { images } from '@/src/assets';
+import { Colors } from '@/src/configs/CustomTheme';
 
 interface PollDetailRouteParams {
   pollId: string;
 }
+
+// Type guard to check if option is PollOptionWithVotes
+const isPollOptionWithVotes = (option: string | PollOptionWithVotes): option is PollOptionWithVotes => {
+  return typeof option === 'object' && 'text' in option;
+};
 
 const PollDetail: React.FC = () => {
   const navigation = useNavigation<MainNavigationProps>();
@@ -29,50 +39,159 @@ const PollDetail: React.FC = () => {
   const { pollId } = route.params as PollDetailRouteParams;
   const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
   const [refreshing, setRefreshing] = useState(false);
+  const [isActionSheetOpen, setIsActionSheetOpen] = useState(false);
+  const [showEndPollAlert, setShowEndPollAlert] = useState(false);
+  const [showDeletePollAlert, setShowDeletePollAlert] = useState(false);
 
   const {
     data: pollData,
     isLoading,
     error,
     refetch,
-  } = useGetPollByIdQuery(pollId);
+  } = useGetPollVotesQuery(pollId);
+
+  const [voteOnPoll, { isLoading: isVoting }] = useVoteOnPollMutation();
+  const [closePoll, { isLoading: isClosingPoll }] = useClosePollMutation();
+  const [deletePoll, { isLoading: isDeletingPoll }] = useDeletePollMutation();
+  const { userId } = useAppSelector(state => state.auth);  // This should come from auth context
+
+  // Initialize selected options based on user's previous votes
+  useEffect(() => {
+    console.log('userId>>', userId);
+    console.log('pollData?.data>>', pollData?.data);
+    debugger;
+    if (pollData?.data?.options) {
+      const userSelectedOptions = pollData.data.options.filter(option => isPollOptionWithVotes(option) && option.voters.some(voter => voter._id === userId))
+        .map(option => isPollOptionWithVotes(option) ? option.text : option);
+      setSelectedOptions(userSelectedOptions);
+    }
+  }, [pollData?.data?.options, userId, pollData?.data]);
 
   const onRefresh = async () => {
     setRefreshing(true);
     try {
       await refetch();
-    } catch (error) {
-      console.error('Error refreshing poll:', error);
+    } catch (refreshError) {
+      console.error('Error refreshing poll:', refreshError);
     } finally {
       setRefreshing(false);
     }
   };
 
-  const handleOptionSelect = (optionId: string) => {
+  const handleOptionSelect = (optionText: string) => {
     if (!pollData?.data) return;
 
     if (pollData.data.allow_multi_answers) {
       // Multiple selection
       setSelectedOptions(prev => 
-        prev.includes(optionId) 
-          ? prev.filter(id => id !== optionId)
-          : [...prev, optionId]
+        prev.includes(optionText) 
+          ? prev.filter(text => text !== optionText)
+          : [...prev, optionText]
       );
     } else {
       // Single selection
-      setSelectedOptions([optionId]);
+      setSelectedOptions([optionText]);
     }
   };
 
-  const handleSubmit = () => {
-    console.log('Submitting votes:', selectedOptions);
-    // TODO: Implement vote submission API call
+  const handleSubmit = async () => {
+    if (selectedOptions.length === 0) return;
+    
+    try {
+      if (!userId) {
+        console.error('User ID not found');
+        return;
+      }
+      await voteOnPoll({
+        pollId,
+        voteData: {
+          userId,
+          selectedOptionTexts: selectedOptions
+        }
+      }).unwrap();
+      
+      // Optionally show success message
+      console.log('Vote submitted successfully');
+    } catch (voteError) {
+      console.error('Error submitting vote:', voteError);
+      // TODO: Show error message to user
+    }
   };
 
   const handleViewVotes = () => {
     console.log('View votes');
     // TODO: Navigate to votes view screen
+    navigation.navigate('PollVotes', { pollId: pollId });
   };
+
+  const handleEditPoll = () => {
+    console.log('Edit poll');
+    // TODO: Navigate to edit poll screen
+  };
+
+  const handleEndPoll = () => {
+    setShowEndPollAlert(true);
+  };
+
+  const handleDeletePoll = () => {
+    setShowDeletePollAlert(true);
+  };
+
+  const getStatusText = () => {
+    return `${POLL_STRINGS.POLL_ENDS_ON} ${poll.display_close_poll_date} ${poll.display_close_poll_time}`;
+  };
+
+  const confirmEndPoll = () => {
+    setShowEndPollAlert(false);
+    closePoll(pollId)
+      .unwrap()
+      .then(() => {
+        console.log('Poll ended successfully');
+        // Optionally show success message or navigate back
+        navigation.goBack();
+      })
+      .catch((closeError) => {
+        console.error('Error ending poll:', closeError);
+        // TODO: Show error message to user
+      });
+  };
+
+  const confirmDeletePoll = () => {
+    setShowDeletePollAlert(false);
+    deletePoll(pollId)
+      .unwrap()
+      .then(() => {
+        console.log('Poll deleted successfully');
+        // Navigate back after successful deletion
+        navigation.goBack();
+      })
+      .catch((deleteError) => {
+        console.error('Error deleting poll:', deleteError);
+        // TODO: Show error message to user
+      });
+  };
+
+  const actionSheetItems: ActionItem[] = [
+    {
+      id: 'edit',
+      title: 'Edit Poll',
+      onPress: handleEditPoll,
+      isDisabled: isClosingPoll || isDeletingPoll,
+    },
+    {
+      id: 'end',
+      title: isClosingPoll ? 'Ending Poll...' : 'End Poll',
+      onPress: handleEndPoll,
+      isDisabled: isClosingPoll || isDeletingPoll,
+    },
+    {
+      id: 'delete',
+      title: isDeletingPoll ? 'Deleting...' : 'Delete',
+      onPress: handleDeletePoll,
+      isDestructive: true,
+      isDisabled: isClosingPoll || isDeletingPoll,
+    },
+  ];
 
   if (isLoading) {
     return <Loader />;
@@ -91,33 +210,19 @@ const PollDetail: React.FC = () => {
   }
 
   const poll = pollData.data;
-  const totalVotes = 0; // TODO: Get actual vote counts from API
+  const totalVotes = poll?.options?.reduce((sum, option) => {
+    // Handle both string array (from base Poll) and PollOptionWithVotes array (from API response)
+    if (isPollOptionWithVotes(option)) {
+      return sum + (option.vote_count || 0);
+    }
+    return sum;
+  }, 0) || 0;
 
   return (
     <SafeAreaView style={globalStyles.container}>
-      {/* Header */}
-      <Box className="bg-blue-500 px-4 py-3">
-        <HStack className="items-center justify-between">
-          <Pressable
-            className="p-2 rounded-full bg-blue-600"
-            onPress={() => navigation.goBack()}
-          >
-            <Icon as={ArrowLeftIcon} size="xl" color="$white" />
-          </Pressable>
-          <Text className="text-white text-xl font-bold">
-            {pollDetailStrings.title}
-          </Text>
-          <Pressable
-            className="p-2 rounded-full bg-blue-600"
-            onPress={() => console.log('More options')}
-          >
-            <Icon as={MoreVerticalIcon} size="xl" color="$white" />
-          </Pressable>
-        </HStack>
-      </Box>
-
       <ScrollView
-        className="flex-1"
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.scrollContent}
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
@@ -127,69 +232,187 @@ const PollDetail: React.FC = () => {
           />
         }
       >
-        <VStack className="p-4 space-y-4">
+        {/* Cover Image with Curve */}
+        <Box className="relative">
+          <Image source={images.cover} style={styles.coverImage} />
+
+          {/* Header Overlay */}
+          <Box className="absolute top-0 left-0 right-0">
+            <Header
+              title={pollDetailStrings.title}
+              onBackPress={() => navigation.goBack()}
+              showBackButton={true}
+              titleStyle={styles.headerTitle}
+              iconColor="#fff"
+              rightComponent={
+                <TouchableOpacity
+                  onPress={() => setIsActionSheetOpen(true)}
+                  className="p-2"
+                >
+                  <Ionicons name="ellipsis-vertical" size={20} color="#fff" />
+                </TouchableOpacity>
+              }
+            />
+          </Box>
+        </Box>
+
+        {/* Poll Content */}
+        <VStack className="flex-1 px-6" style={styles.questionCard}>
           {/* Poll Question Card */}
-          <Box className="bg-white rounded-xl p-4 shadow-sm">
-            <Text className="text-xl font-bold text-gray-900 mb-2">
+          <Box style={styles.card}>
+            <Text className="text-xl font-bold text-gray-900 mb-4 fontFamilyAvenir">
               {poll.question}
             </Text>
             
             <HStack className="justify-between items-center mb-4">
-              <Text className="text-red-500 text-sm">
-                {pollDetailStrings.pollEndsIn} 1 hr 12 min
+              <Text className="text-red-500 text-sm font-medium fontFamilyAvenir">
+                {getStatusText()}
               </Text>
-              <HStack className="items-center space-x-2">
-                <GradientAvatar 
-                  userName="Kristin Watson"
-                  size="small"
-                />
-                <Text className="text-sm text-gray-700">Kristin Watson</Text>
+              <HStack className="items-center" space="sm">
+                <GradientAvatar
+                    userName={poll.createdBy?.preferredName || 'User'}
+                    userImage={poll.createdBy?.profilePhotoURL || poll.createdBy?.preferredName}
+                    size="xs"
+                  />
+                <Text className="text-medium font-heading text-gray-900">
+                    {poll.createdBy?.preferredName || 'User'}
+                </Text>
               </HStack>
             </HStack>
-
-            <HStack className="items-center space-x-2">
-              <Icon as={CheckIcon} size="sm" color="$blue500" />
-              <Text className="text-sm text-gray-600">
-                {poll.allow_multi_answers ? pollDetailStrings.multipleSelect : pollDetailStrings.singleSelect}
-              </Text>
-            </HStack>
           </Box>
+          
+          {/* Poll Type */}
+          <HStack className="items-center space-x-3 mt-2 mb-4">
+            <Ionicons name={poll.allow_multi_answers ? "checkmark-done-circle": "checkmark-circle"} size={16} color="#51B1C0" />
+            <Text className="text-medium text-gray-600 fontFamilyAvenir">
+              {poll.allow_multi_answers ? pollDetailStrings.multipleSelect : pollDetailStrings.singleSelect}
+            </Text>
+          </HStack>
 
           {/* Poll Options */}
-          <VStack className="space-y-3">
-            {poll.options?.map((option, index) => (
-              <PollOptionCard
-                key={index}
-                option={{ id: index.toString(), text: option, votes: 0 }}
-                totalVotes={totalVotes}
-                isSelected={selectedOptions.includes(index.toString())}
-                onPress={() => handleOptionSelect(index.toString())}
-              />
-            ))}
+          <VStack className="space-y-3 mb-6">
+            {poll.options?.map((option, index) => {
+              // Handle both string array and PollOptionWithVotes array
+              const optionText = isPollOptionWithVotes(option) ? option.text : option;
+              const optionVotes = isPollOptionWithVotes(option) ? (option.vote_count || 0) : 0;
+              const optionVoters = isPollOptionWithVotes(option) ? (option.voters || []) : [];
+              
+              return (
+                <PollOptionCard
+                  key={optionText}
+                  option={{
+                    id: index.toString(),
+                    text: optionText,
+                    votes: optionVotes,
+                    voters: optionVoters.map(voter => ({
+                      id: voter._id,
+                      name: voter.preferredName,
+                      profilePhotoURL: voter.profilePhotoURL
+                    }))
+                  }}
+                  totalVotes={totalVotes}
+                  isSelected={selectedOptions.includes(optionText)}
+                  onPress={() => handleOptionSelect(optionText)}
+                />
+              );
+            })}
           </VStack>
+
         </VStack>
       </ScrollView>
 
-      {/* Footer Buttons */}
-      <Box className="bg-white border-t border-gray-200 p-4">
+        {/* Action Buttons */}
+      <Box className="bg-white border-t border-gray-200 p-3 mb-3 px-6">
         <HStack className="space-x-3">
-          <Box className="flex-1">
-            <GradientButton
-              onPress={handleViewVotes}
-              title={pollDetailStrings.viewVotes}
-            />
+          <Box className="flex-1 justify-end">
+          <TouchableOpacity
+              className={`p-4 border border-primary-500 rounded-lg bg-white items-center justify-center`}
+              onPress={handleViewVotes}>
+              <GradientText
+                text={pollDetailStrings.viewVotes}
+                textStyle={{ fontSize: 16, fontWeight: '800', textAlign: 'center', fontFamily: 'AvenirLTPro-Medium' }}
+              />
+            </TouchableOpacity>
           </Box>
-          <Box className="flex-1">
-            <GradientButton
-              onPress={handleSubmit}
-              disabled={selectedOptions.length === 0}
-              title={pollDetailStrings.submit}
-            />
+          <Box className="flex-1 ml-3">
+          <GradientButton
+                onPress={handleSubmit}
+                disabled={selectedOptions.length === 0 || isVoting}
+                title={isVoting ? 'Submitting...' : pollDetailStrings.submit}
+                loading={isVoting}
+              />
           </Box>
         </HStack>
       </Box>
+
+      {/* Action Sheet for Poll Options */}
+      <CustomActionSheet
+        isOpen={isActionSheetOpen}
+        onClose={() => setIsActionSheetOpen(false)}
+        actions={actionSheetItems}
+        showCancelButton={true}
+        cancelButtonText="Cancel"
+      />
+
+      {/* End Poll Confirmation Alert */}
+      <CustomAlert
+        isOpen={showEndPollAlert}
+        title="Are you sure?"
+        message="Do you really want to end this poll? This process cannot be undone.\n\nThe trip members will no longer be able to vote in the poll."
+        cancelText="Cancel"
+        confirmText="End Poll"
+        onCancel={() => setShowEndPollAlert(false)}
+        onConfirm={confirmEndPoll}
+        isCreatedAlert={true}
+      />
+
+      {/* Delete Poll Confirmation Alert */}
+      <CustomAlert
+        isOpen={showDeletePollAlert}
+        title="Are you sure?"
+        message="Do you really want to delete this poll? This process cannot be undone."
+        cancelText="Cancel"
+        confirmText="Delete Poll"
+        onCancel={() => setShowDeletePollAlert(false)}
+        onConfirm={confirmDeletePoll}
+        isCreatedAlert={true}
+        isDestructive={true}
+      />
     </SafeAreaView>
   );
 };
+
+const styles = StyleSheet.create({
+  questionCard: {
+    marginTop: -50
+  },
+  card: {
+    backgroundColor: Colors.white,
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 12,
+    shadowColor: Colors.black,
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  coverImage: {
+    width: '100%',
+    height: 180,
+    resizeMode: 'cover',
+    borderBottomLeftRadius: 10,
+    borderBottomRightRadius: 10,
+  },
+  scrollContent: {
+    flexGrow: 1,
+  },
+  headerTitle: {
+    color: '#fff',
+  },
+});
 
 export default PollDetail;
