@@ -5,24 +5,21 @@ import {
   TouchableOpacity,
   Image,
   StyleSheet,
-  Modal,
+  Platform
 } from 'react-native';
-import { Box } from '@/components/ui/box';
-import { Text } from '@/components/ui/text';
-import { VStack } from '@/components/ui/vstack';
-import { HStack } from '@/components/ui/hstack';
-import { Input, InputField } from '@/components/ui/input';
-import { Pressable } from '@/components/ui/pressable';
-import { CREATE_TRIP_STRINGS } from './strings';
-import { GradientButton } from '@/src/components';
-import { globalStyles } from '@/src/styles';
-import { images } from '@/src/assets';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import DateTimePicker, {
   DateTimePickerEvent,
 } from '@react-native-community/datetimepicker';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import moment from 'moment';
 
-import { Platform } from 'react-native';
+import { Box, Text, VStack, HStack, Input, InputField, Pressable } from '@/components/ui';
+
+import { CREATE_TRIP_STRINGS } from './strings';
+import { GradientButton } from '@/src/components';
+import { globalStyles } from '@/src/styles';
+import { images } from '@/src/assets';
 import { Colors } from '@/src/configs/CustomTheme';
 import PhotoPicker from '@/src/components/PhotoPicker/PhotoPicker';
 import CustomAlert from '@/src/components/CustomAlert';
@@ -33,14 +30,13 @@ import {
   useDeleteTripMutation,
   useGetTripByIdQuery,
 } from '@/src/services';
-import { useNavigation, useRoute } from '@react-navigation/native';
 import { MainNavigationProps, MainRouteProps } from '@/src/types/allRoutes';
 
-import moment from 'moment';
 import { useSimpleToast } from '@/src/hooks/useSimpleToast';
 import ShareTripSection from './ShareTripSection';
 import { useAppSelector } from '@/src/hooks';
 import GooglePlacesModal from '@/src/components/GooglePlacesAutocomplete/GooglePlacesModal';
+import { dateFormat } from '@/src/utils/dateTimeFormat';
 
 const CreateTrip = () => {
   const { userRole } = useAppSelector(state => state.auth);
@@ -74,7 +70,7 @@ const CreateTrip = () => {
   const [showLocationModal, setShowLocationModal] = useState(false);
 
   // Fetch trip data for edit mode
-  const { data: tripData, isLoading: isLoadingTrip } = useGetTripByIdQuery(
+  const { data: tripData} = useGetTripByIdQuery(
     tripId || '',
     { skip: !isEditMode || !tripId },
   );

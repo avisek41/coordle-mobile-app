@@ -62,14 +62,6 @@ export interface PollsResponse {
   timestamp: string;
 }
 
-export interface PollResponse {
-  success: boolean;
-  statusCode: number;
-  message: string;
-  data: Poll;
-  timestamp: string;
-}
-
 export interface CreatePollFormData {
   question: string;
   options: string[];
@@ -109,14 +101,6 @@ export interface GetPollsByTripParams {
   limit?: number;
   status?: string;
   published?: boolean;
-}
-
-export interface GetAllPollsParams {
-  page?: number;
-  limit?: number;
-  status?: string;
-  published?: boolean;
-  trip_id?: string;
 }
 
 // Voting related types

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   SafeAreaView,
   StyleSheet,
@@ -22,14 +22,14 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { Box, HStack, VStack, Text, Input, InputField } from '@/components/ui';
 
 import { MainNavigationProps, MainRouteProps } from '@/src/types/allRoutes';
-import { useCreatePollMutation } from '@/src/services/pollApi';
+import { useCreatePollMutation, useUpdatePollMutation, useGetPollVotesQuery } from '@/src/services/pollApi';
 import { useSimpleToast } from '@/src/hooks/useSimpleToast';
-import { CREATE_POLL_STRINGS } from './strings';
+import { CREATE_EDIT_POLL_STRINGS, POLL_STRINGS } from './strings';
 import { Colors } from '@/src/configs/CustomTheme';
 import { RootState } from '@/src/redux/Store';
 import { Header, GradientButton, CustomAlert } from '@/src/components';
 import { globalStyles } from '@/src/styles';
-import { dateFormatWithDay, timeFormat } from '@/src/utils/dateTimeFormat';
+import { dateFormat, dateFormatWithDay, dateTime, timeFormat, dateMonthYearFormat } from '@/src/utils/dateTimeFormat';
 import { formatTimeRemaining } from '@/src/utils';
 import { images } from '@/src/assets';
 
@@ -42,12 +42,26 @@ const CreatePoll: React.FC = () => {
   const navigation = useNavigation<MainNavigationProps>();
   const { userId } = useSelector((state: RootState) => state.auth);
   const [createPoll, { isLoading: isCreating }] = useCreatePollMutation();
+  const [updatePoll, { isLoading: isUpdating }] = useUpdatePollMutation();
   const { showToast, ToastComponent } = useSimpleToast();
   const [showCustomAlert, setShowCustomAlert] = useState(false);
+  const [showLeaveAlert, setShowLeaveAlert] = useState(false);
   const route = useRoute<MainRouteProps<'CreatePoll'>>();
-  const { tripId } = route.params ?? {
+  const { tripId, tripEndDate, pollId } = route.params ?? {
     tripId: '',
+    tripEndDate: null,
+    pollId: undefined,
   };
+  
+  // Determine if we're in edit mode
+  const isEditMode = !!pollId;
+
+  // Fetch existing poll data for edit mode
+  const {
+    data: pollData,
+    isLoading: isLoadingPoll,
+    error: pollError,
+  } = useGetPollVotesQuery(pollId!, { skip: !isEditMode });
 
   const [question, setQuestion] = useState('');
   const [options, setOptions] = useState<PollOption[]>([{ id: '1', text: '' }]);
@@ -58,8 +72,45 @@ const CreatePoll: React.FC = () => {
   const [showTimePicker, setShowTimePicker] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedTime, setSelectedTime] = useState(new Date());
-  const reminderOptions = CREATE_POLL_STRINGS.REMINDER_OPTION_LIST;
+  const reminderOptions = CREATE_EDIT_POLL_STRINGS.REMINDER_OPTION_LIST;
   const [closePollDateTime, setClosePollDateTime] = useState(moment());
+
+  // Load existing poll data when in edit mode
+  useEffect(() => {
+    if (isEditMode && pollData?.data) {
+      const poll = pollData.data;
+      setQuestion(poll.question || '');
+      setAllowMultipleAnswers(poll.allow_multi_answers || false);
+      
+      if(poll?.reminders && poll?.reminders?.length > 0) {
+        let pollReminders = reminderOptions.filter((rem, i) => { 
+          if(poll?.reminders?.find((r: number) => parseInt(r.toString(), 10) === parseInt(rem.value, 10))) {
+            return reminderOptions[i]; }
+        });
+        if(pollReminders) {
+          setReminders(true);
+          setSelectedReminders(pollReminders.map((r: { value: string; label: string; }) => r.value));
+        }
+      }
+      
+      // Convert poll options to our format
+      if (poll.options && poll.options.length > 0) {
+        const formattedOptions = poll.options.map((option, index) => ({
+          id: (index + 1).toString(),
+          text: typeof option === 'string' ? option : (option as PollOption).text.trim(),
+        }));
+        setOptions(formattedOptions);
+      }
+
+      // Set close poll date/time
+      if (poll.close_poll_date_time) {
+        const pollCloseDate = moment(poll.close_poll_date_time);
+        setSelectedDate(pollCloseDate.toDate());
+        setSelectedTime(pollCloseDate.toDate());
+        setClosePollDateTime(pollCloseDate);
+      }
+    }
+  }, [isEditMode, pollData?.data, reminderOptions]);
 
   const addOption = () => {
     const newId = (options.length + 1).toString();
@@ -113,7 +164,7 @@ const CreatePoll: React.FC = () => {
                 className="bg-white border border-gray-200 rounded-lg h-12">
                 <InputField
                   placeholder={`${
-                    CREATE_POLL_STRINGS.OPTION_PLACEHOLDER
+                    CREATE_EDIT_POLL_STRINGS.OPTION_PLACEHOLDER
                   } ${index + 1}`}
                   value={item.text}
                   onChangeText={text => updateOption(item.id, text)}
@@ -171,16 +222,21 @@ const CreatePoll: React.FC = () => {
     }
   };
 
+  const handleBackPress = () => {
+    setShowLeaveAlert(true);
+  };
+
   const handleCreatePoll = async () => {
+    console.log('question>>', question);
     if (!question.trim()) {
       showToast({
         type: 'error',
-        title: CREATE_POLL_STRINGS.VALIDATION_ERROR,
-        message: CREATE_POLL_STRINGS.PLEASE_ENTER_A_QUESTION_FOR_YOUR_POLL,
+        title: CREATE_EDIT_POLL_STRINGS.VALIDATION_ERROR,
+        message: CREATE_EDIT_POLL_STRINGS.PLEASE_ENTER_A_QUESTION_FOR_YOUR_POLL,
       });
       return;
     }
-
+   
     const validOptions = options?.filter(option => option.text.trim()) || [];
     let combinedDateTime = moment(selectedDate)
     .set({
@@ -189,9 +245,18 @@ const CreatePoll: React.FC = () => {
       second: 0,
     });
     setClosePollDateTime(combinedDateTime);
+    
+    if (moment(combinedDateTime).format(dateFormat) > moment(tripEndDate, dateMonthYearFormat).format(dateFormat)) {
+      showToast({
+        type: 'error',
+        title: CREATE_EDIT_POLL_STRINGS.VALIDATION_ERROR,
+        message: CREATE_EDIT_POLL_STRINGS.PLEASE_SELECT_A_CLOSE_POLL_DATE_IS_NOT_GREATER_THAN_TRIP_END_DATE,
+      });
+      return;
+    }
 
     try {
-      const pollData = {
+      const pollPayload = {
         question: question.trim(),
         options: validOptions.map(option => option.text.trim()),
         allow_multi_answers: allowMultipleAnswers,
@@ -199,14 +264,25 @@ const CreatePoll: React.FC = () => {
         status: 'Active' as const,
         createdBy: userId,
         trip_id: tripId,
-        close_poll_date_time: closePollDateTime.toISOString(),
-        display_close_poll_date: moment(closePollDateTime).format(dateFormatWithDay),
-        display_close_poll_time: moment(closePollDateTime).format(timeFormat),
+        close_poll_date_time: combinedDateTime.format(dateTime),
+        display_close_poll_date: moment(combinedDateTime).format(dateFormat),
+        display_close_poll_time: moment(combinedDateTime).format(timeFormat),
         reminders: selectedReminders.map(Number),
       };
 
-      await createPoll(pollData).unwrap();
-      setShowCustomAlert(true);
+      if (isEditMode && pollId) {
+        await updatePoll({ pollId, pollData: pollPayload }).unwrap();
+        showToast({
+          type: 'success',
+          title: CREATE_EDIT_POLL_STRINGS.POLL_UPDATED_TITLE,
+          message: CREATE_EDIT_POLL_STRINGS.POLL_UPDATED_SUCCESSFULLY,
+          duration: 3000,
+        });
+        navigation.goBack();
+      } else {
+        await createPoll(pollPayload).unwrap();
+        setShowCustomAlert(true);
+      }
     } catch (error: unknown) {
       // Check if error is an object and has 'data' property
       const errorMessage =
@@ -214,7 +290,7 @@ const CreatePoll: React.FC = () => {
         ? ((error as any).data.message as string)
         : 'Something went wrong';
 
-    console.error('Failed to create poll:', errorMessage);
+    console.error(`Failed to ${isEditMode ? 'update' : 'create'} poll:`, errorMessage);
 
     showToast({
       type: 'error',
@@ -224,24 +300,53 @@ const CreatePoll: React.FC = () => {
     }
   };
 
+  // Show loading state for edit mode
+  if (isEditMode && isLoadingPoll) {
+    return (
+      <SafeAreaView style={globalStyles.container}>
+        <Header title={CREATE_EDIT_POLL_STRINGS.EDIT_POLL_TITLE} />
+        <Box className="flex-1 justify-center items-center">
+          <Text className="text-lg text-gray-600">{CREATE_EDIT_POLL_STRINGS.LOADING_POLL_DATA}</Text>
+        </Box>
+      </SafeAreaView>
+    );
+  }
+
+  // Show error state for edit mode
+  if (isEditMode && (pollError || !pollData?.data)) {
+    return (
+      <SafeAreaView style={globalStyles.container}>
+        <Header title={CREATE_EDIT_POLL_STRINGS.EDIT_POLL_TITLE} onBackPress={handleBackPress}/>
+        <Box className="flex-1 justify-center items-center px-6">
+          <Text className="text-lg text-gray-600 text-center">
+            {CREATE_EDIT_POLL_STRINGS.ERROR_LOADING_POLL_DATA}
+          </Text>
+        </Box>
+      </SafeAreaView>
+    );
+  }
+
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
+    <GestureHandlerRootView className='flex-1'>
     <SafeAreaView style={globalStyles.container}>
-      <Header title={CREATE_POLL_STRINGS.TITLE} />
+      <Header 
+        title={isEditMode ? CREATE_EDIT_POLL_STRINGS.EDIT_POLL_TITLE : CREATE_EDIT_POLL_STRINGS.CREATE_POLL_TITLE} 
+        onBackPress={handleBackPress}
+      />
 
       <ScrollView showsVerticalScrollIndicator={false}>
         <VStack className="px-6 py-4" space="lg">
           {/* Question Section */}
           <VStack className="space-y-2 mb-4">
             <Text className="text-sm font-body text-black mb-1">
-              {CREATE_POLL_STRINGS.QUESTION_LABEL}
+              {CREATE_EDIT_POLL_STRINGS.QUESTION_LABEL}
             </Text>
             <Box className="relative mt-2">
               <Input
                 className="bg-gray-50 border border-gray-200 rounded-lg w-full h-12 opacity-100"
               >
                 <InputField
-                  placeholder={CREATE_POLL_STRINGS.QUESTION_PLACEHOLDER}
+                  placeholder={CREATE_EDIT_POLL_STRINGS.QUESTION_PLACEHOLDER}
                   value={question}
                   onChangeText={setQuestion}
                   className="text-base font-body"
@@ -251,9 +356,9 @@ const CreatePoll: React.FC = () => {
           </VStack>
 
           {/* Answer Options Section */}
-          <VStack className="space-y-2 mb-4">
+          <VStack className="space-y-2">
             <Text className="text-sm font-body text-black mb-1">
-              {CREATE_POLL_STRINGS.ANSWER_OPTIONS_LABEL}
+              {CREATE_EDIT_POLL_STRINGS.ANSWER_OPTIONS_LABEL}
             </Text>
             <VStack space="md">
               <DraggableFlatList
@@ -274,16 +379,16 @@ const CreatePoll: React.FC = () => {
               <HStack className="items-center" space="sm">
                 <Ionicons name="add-circle" size={20} color={Colors.primary} />
                 <Text className="text-primary-500 font-body text-base">
-                  {CREATE_POLL_STRINGS.ADD_OPTION}
+                  {CREATE_EDIT_POLL_STRINGS.ADD_OPTION}
                 </Text>
               </HStack>
             </TouchableOpacity>
           </VStack>
 
           {/* Close Poll Section */}
-          <VStack className="space-y-2 mb-4">
-            <Text className="text-sm font-body text-black mb-1">
-              {CREATE_POLL_STRINGS.CLOSE_POLL_LABEL}
+          <VStack className="space-y-2 border-t border-gray-200 pt-7 mb-4">
+            <Text className="text-sm font-body text-black mb-2">
+              {CREATE_EDIT_POLL_STRINGS.CLOSE_POLL_LABEL}
             </Text>
             <HStack space="sm">
               <TouchableOpacity
@@ -318,7 +423,7 @@ const CreatePoll: React.FC = () => {
             <Box>
               <HStack className="items-center justify-between">
                 <Text className="text-base font-body text-black">
-                  {CREATE_POLL_STRINGS.ALLOW_MULTIPLE_ANSWERS}
+                  {CREATE_EDIT_POLL_STRINGS.ALLOW_MULTIPLE_ANSWERS}
                 </Text>
                 <Switch
                   value={allowMultipleAnswers}
@@ -333,7 +438,7 @@ const CreatePoll: React.FC = () => {
             <Box className="mt-5">
               <HStack className="items-center justify-between">
                 <Text className="text-base font-body text-black">
-                  {CREATE_POLL_STRINGS.REMINDERS}
+                  {CREATE_EDIT_POLL_STRINGS.REMINDERS}
                 </Text>
                 <Switch
                   value={reminders}
@@ -349,7 +454,7 @@ const CreatePoll: React.FC = () => {
             {reminders && (
               <VStack className="mt-4" space="sm">
                 <Text className="text-sm font-body text-gray-600 mb-2">
-                  {CREATE_POLL_STRINGS.REMINDER_OPTIONS}
+                  {CREATE_EDIT_POLL_STRINGS.REMINDER_OPTIONS}
                 </Text>
                 <VStack space="sm">
                   <HStack space="sm">
@@ -437,12 +542,15 @@ const CreatePoll: React.FC = () => {
         </VStack>
       </ScrollView>
 
-      <Box className="px-6 pb-6">
+      <Box className={`px-6 ${isEditMode ? 'bg-white border-t border-gray-200 p-3 mb-3' : 'pb-6'}`}>
+        {isEditMode && (<><Text className="text-sm font-body text-red-600 mb-1">
+              {`${POLL_STRINGS.POLL_ENDS_IN} ${formatTimeRemaining(pollData?.data?.close_poll_date_time || '')}`}
+            </Text></>)}
         <GradientButton
-          title={CREATE_POLL_STRINGS.CREATE_POLL}
+          title={isEditMode ? CREATE_EDIT_POLL_STRINGS.SAVE_BUTTON_TITLE : CREATE_EDIT_POLL_STRINGS.CREATE_POLL_BUTTON_TITLE}
           onPress={handleCreatePoll}
           size="large"
-          loading={isCreating}
+          loading={isCreating || isUpdating}
         />
       </Box>
 
@@ -517,7 +625,7 @@ const CreatePoll: React.FC = () => {
       <CustomAlert
         isOpen={showCustomAlert}
         icon={images.poll}
-        title={CREATE_POLL_STRINGS.POLL_CREATED}
+        title={isEditMode ? "Poll Updated" : CREATE_EDIT_POLL_STRINGS.POLL_CREATED}
         message={`This poll will close in ${formatTimeRemaining(closePollDateTime.toISOString())}`}
         onCancel={() => {
           setShowCustomAlert(false);
@@ -525,6 +633,22 @@ const CreatePoll: React.FC = () => {
         }}
         onConfirm={() => {}}
         />
+
+      {/* Leave Poll Confirmation Alert */}
+      <CustomAlert
+        isOpen={showLeaveAlert}
+        title="Leave Poll?"
+        message="Your edits won't be saved"
+        cancelText="Leave"
+        confirmText="Keep Editing"
+        onCancel={() => {
+          setShowLeaveAlert(false);
+          navigation.goBack(); }}
+        onConfirm={() => {
+          setShowLeaveAlert(false)
+        }}
+        isCreatedAlert={true}
+      />
       
       <ToastComponent />
     </SafeAreaView>

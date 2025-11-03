@@ -16,4 +16,5 @@ export const Colors = {
   lightBlue: '#EFF6FF',
   transparent: '#00FFFFFF',
   primaryLight: '#F4FEFF',
+  blue: '#3B82F6',
 };

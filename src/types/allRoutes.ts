@@ -84,10 +84,13 @@ export type MainStackParams = {
   };
   CreatePoll:  {
     tripId: string;
+    tripEndDate: string;
+    pollId?: string;
   };
   PollDetail: {
     pollId: string;
-  };  
+    tripEndDate: string;
+  };
   PollVotes: {
     pollId: string;
   };

@@ -4,7 +4,7 @@ import { TouchableOpacity, StyleSheet } from 'react-native';
 // imports from gluestack components
 import { Box, HStack, VStack, Text } from '@/components/ui';
 
-import { GradientAvatar, GradientButton } from '@/src/components';
+import { GradientAvatar, GradientButton, GradientText } from '@/src/components';
 import { Poll } from '@/src/types/poll';
 import { POLL_STRINGS } from '../strings';
 import { Colors } from '@/src/configs/CustomTheme';
@@ -20,14 +20,14 @@ interface PollCardProps {
 const PollCard: React.FC<PollCardProps> = ({ 
   poll,
   onVote, 
-  onViewVotes, 
+  onViewVotes,
   userVote
 }) => {
   const isActive = poll.status === 'Active';
 
   const getStatusText = () => {
     if (isActive) {
-      return `${POLL_STRINGS.POLL_ENDS_ON} ${poll.display_close_poll_date} ${poll.display_close_poll_time}`;
+      return `${POLL_STRINGS.POLL_ENDS_ON} ${poll.display_close_poll_date} at ${poll.display_close_poll_time}`;
     } else {
       return `${POLL_STRINGS.CLOSED_ON} ${poll.display_close_poll_date}`;
     }
@@ -94,7 +94,7 @@ const PollCard: React.FC<PollCardProps> = ({
               </VStack>
             )}
           </Box>
-            {isActive ? (
+            {isActive && userVote === null && (
            <GradientButton
              title={POLL_STRINGS.VOTE}
              onPress={handlePress}
@@ -102,7 +102,17 @@ const PollCard: React.FC<PollCardProps> = ({
              gradientStyle={styles.gradientButton}
              textStyle={styles.textButton}
            />
-           ) : (
+           )}
+           {isActive && userVote !== null && (<TouchableOpacity
+              className={`border border-primary-500 bg-white items-center justify-center`}
+              style={styles.voteButton}
+              onPress={handlePress}>
+              <GradientText
+                text={POLL_STRINGS.VOTE}
+                textStyle={styles.textButton}
+              />
+            </TouchableOpacity>)}
+            {!isActive && (
             <TouchableOpacity
             onPress={handlePress}
             style={styles.viewVotesButton}
@@ -138,15 +148,16 @@ const styles = StyleSheet.create({
     height: 28,
     width: 54,
     marginTop: 0,
+    borderRadius: 4
   },
   textButton: {
     fontSize: 11,
   },
   voteButton:{
-    height: 35,
-    width: 50,
+    height: 28,
+    width: 54,
     marginTop: 0,
-    borderRadius: 2,
+    borderRadius: 4
   },
   viewVotesButton: {
       borderWidth: 1,

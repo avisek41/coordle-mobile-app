@@ -6,6 +6,7 @@ export const POLL_STRINGS = {
   ACTIVE: 'Active',
   PAST: 'Past',
   POLL_ENDS_ON: 'Poll ends on',
+  POLL_ENDS_IN: 'Poll ends in',
   POLL_EXPIRED: 'Poll expired',
   CLOSED_ON: 'Closed on',
   YOUR_VOTE: 'Your vote',
@@ -16,8 +17,11 @@ export const POLL_STRINGS = {
   DAY_AGO: 'day',
 } as const;
 
-export const CREATE_POLL_STRINGS = {
-  TITLE: 'Create Poll',
+export const CREATE_EDIT_POLL_STRINGS = {
+  CREATE_POLL_TITLE: 'Create Poll',
+  EDIT_POLL_TITLE: 'Edit Poll',
+  LOADING_POLL_DATA: 'Loading poll data...',
+  ERROR_LOADING_POLL_DATA: 'Error loading poll data',
   QUESTION_LABEL: 'Question*',
   QUESTION_PLACEHOLDER: 'Type your question here',
   ANSWER_OPTIONS_LABEL: 'Answer options* (at least 2 options)',
@@ -33,20 +37,39 @@ export const CREATE_POLL_STRINGS = {
     { value: '30', label: '30 minutes before' },
     { value: '60', label: '1 hour before' },
   ],
-  CREATE_POLL: 'Create Poll',
+  SAVE_BUTTON_TITLE: 'Save',
+  CREATE_POLL_BUTTON_TITLE: 'Create Poll',
   POLL_CREATED: 'Poll Created',
   POLL_CREATION_FAILED: 'Failed to create poll. Please try again.',
   VALIDATION_ERROR: 'Validation Error',
   PLEASE_ENTER_A_QUESTION_FOR_YOUR_POLL: 'Please enter a question for your poll.',
   PLEASE_PROVIDE_AT_LEAST_2_ANSWER_OPTIONS: 'Please provide at least 2 answer options.',
+  PLEASE_SELECT_A_CLOSE_POLL_DATE_IS_NOT_GREATER_THAN_TRIP_END_DATE: 'Please select a close poll date is not greater than trip end date.',
+  POLL_UPDATED_SUCCESSFULLY: 'Poll updated successfully',
+  POLL_UPDATED_TITLE: 'Poll Updated',
 } as const;
 
-export const pollDetailStrings = {
-  title: 'Poll Detail',
-  pollEndsIn: 'Poll ends in',
-  singleSelect: 'Single select',
-  multipleSelect: 'Multiple select',
-  viewVotes: 'View Votes',
-  submit: 'Submit',
-  errorLoading: 'Error loading poll details',
+export const POLL_DETAIL_STRINGS = {
+  TITLE: 'Poll Detail',
+  SINGLE_SELECT: 'Single select',
+  MULTIPLE_SELECT: 'Multiple select',
+  VIEW_VOTES: 'View Votes',
+  SUBMIT: 'Submit',
+  ERROR_LOADING: 'Error loading poll details',
+  VOTE_SUBMITTED_SUCCESSFULLY: 'Vote submitted successfully',
+  VOTE_SUBMITTED_TITLE: 'Vote Submitted',
+} as const;
+
+export const POLL_VOTES_STRINGS = {
+  TITLE: 'View Votes',
+  TRIP_MEMBERS_VOTED: 'of',
+  VOTES: 'votes',
+  VOTE: 'vote',
+  SHARE_RESULT: 'Share Result with Team Members',
+  ACTIVE: 'Active',
+  CLOSED: 'Closed',
+  LOADING: 'Loading poll votes...',
+  ERROR_LOADING: 'Error loading poll votes',
+  POLL_PUBLISHED_SUCCESSFULLY: 'Poll published successfully',
+  POLL_PUBLISHED_TITLE: 'Poll Published',
 } as const;

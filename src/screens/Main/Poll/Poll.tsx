@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Image, SafeAreaView, StyleSheet, ScrollView, TouchableOpacity, RefreshControl } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import moment from 'moment';
@@ -12,7 +12,7 @@ import { PollCard } from './components';
 import { POLL_STRINGS } from './strings';
 import { MainNavigationProps, MainRouteProps } from '@/src/types/allRoutes';
 import { images } from '@/src/assets';
-import { useGetPollsByTripQuery, useClosePollMutation } from '@/src/services/pollApi';
+import { useGetPollsByTripQuery } from '@/src/services/pollApi';
 import { Colors } from '@/src/configs/CustomTheme';
 import { globalStyles } from '@/src/styles';
 import { formatDateRange } from '@/src/utils';
@@ -35,41 +35,13 @@ const Poll: React.FC = () => {
     status: activeTab === 'Active' ? 'Active' : 'Closed'
   });
 
-  const [closePoll] = useClosePollMutation();
-
-  // Check for expired polls when data changes
-  useEffect(() => {
-    const closeExpiredPolls = async () => {
-      if (!pollsData?.data?.polls) return;
-
-      const expiredPolls = pollsData.data.polls.filter(poll => {
-        const isActive = poll.status === 'Active';
-        const isExpired = moment(poll.close_poll_date_time).isBefore(moment());
-        return isActive && isExpired;
-      });
-
-      for (const poll of expiredPolls) {
-        try {
-          await closePoll(poll._id).unwrap();
-          // Optionally, you can trigger a refetch here if needed
-        } catch {
-          // Handle error silently or show a user-friendly message if desired
-        }
-      }
-    };
-
-    if (pollsData?.data?.polls) {
-      closeExpiredPolls();
-    }
-  }, [pollsData, closePoll]);
-
   const handleCreatePoll = () => {    
-    navigation.navigate('CreatePoll', { tripId: tripId ?? '' });
+    navigation.navigate('CreatePoll', { tripId: tripId ?? '', tripEndDate: tripEndDate ?? '' });
   };
 
   const handleVote = (pollId: string) => {
     // TODO: Navigate to PollDetail when route is available
-      navigation.navigate('PollDetail', { pollId: pollId });
+    navigation.navigate('PollDetail', { pollId: pollId, tripEndDate: tripEndDate ?? '' });
   };
 
   const handleViewVotes = (pollId: string) => {
@@ -82,8 +54,6 @@ const Poll: React.FC = () => {
     await refetch();
     setRefreshing(false);
   };
-
-  console.log('pollsData>>', pollsData);
 
   const activePolls = pollsData?.data?.polls?.filter(poll => {
     const isActive = poll.status === 'Active';
