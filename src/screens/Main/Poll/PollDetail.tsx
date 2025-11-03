@@ -15,7 +15,7 @@ import {Box, Text, VStack, HStack} from '@/components/ui';
 import { MainNavigationProps } from '@/src/types/allRoutes';
 import { useVoteOnPollMutation, useClosePollMutation, useDeletePollMutation, useGetPollVotesQuery } from '@/src/services/pollApi';
 import { GradientButton, GradientAvatar, Loader, CustomActionSheet, CustomAlert, Header, GradientText } from '@/src/components';
-import { POLL_STRINGS, pollDetailStrings } from './strings';
+import { POLL_STRINGS, POLL_DETAIL_STRINGS } from './strings';
 import { globalStyles } from '@/src/styles';
 import PollOptionCard from './components/PollOptionCard';
 import { PollOptionWithVotes } from '@/src/types/poll';
@@ -23,9 +23,11 @@ import { useAppSelector } from '@/src/hooks';
 import { ActionItem } from '@/src/components/CustomActionSheet';
 import { images } from '@/src/assets';
 import { Colors } from '@/src/configs/CustomTheme';
-
+import { formatTimeRemaining } from '@/src/utils';
+import { useSimpleToast } from '@/src/hooks/useSimpleToast';
 interface PollDetailRouteParams {
   pollId: string;
+  tripEndDate: string;
 }
 
 // Type guard to check if option is PollOptionWithVotes
@@ -36,12 +38,13 @@ const isPollOptionWithVotes = (option: string | PollOptionWithVotes): option is 
 const PollDetail: React.FC = () => {
   const navigation = useNavigation<MainNavigationProps>();
   const route = useRoute();
-  const { pollId } = route.params as PollDetailRouteParams;
+  const { pollId, tripEndDate } = route.params as PollDetailRouteParams;
   const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
   const [refreshing, setRefreshing] = useState(false);
   const [isActionSheetOpen, setIsActionSheetOpen] = useState(false);
   const [showEndPollAlert, setShowEndPollAlert] = useState(false);
   const [showDeletePollAlert, setShowDeletePollAlert] = useState(false);
+  const { showToast, ToastComponent } = useSimpleToast();
 
   const {
     data: pollData,
@@ -57,9 +60,6 @@ const PollDetail: React.FC = () => {
 
   // Initialize selected options based on user's previous votes
   useEffect(() => {
-    console.log('userId>>', userId);
-    console.log('pollData?.data>>', pollData?.data);
-    debugger;
     if (pollData?.data?.options) {
       const userSelectedOptions = pollData.data.options.filter(option => isPollOptionWithVotes(option) && option.voters.some(voter => voter._id === userId))
         .map(option => isPollOptionWithVotes(option) ? option.text : option);
@@ -79,14 +79,13 @@ const PollDetail: React.FC = () => {
   };
 
   const handleOptionSelect = (optionText: string) => {
+    const isSelected = (selectedOptions.includes(optionText));
     if (!pollData?.data) return;
 
     if (pollData.data.allow_multi_answers) {
       // Multiple selection
       setSelectedOptions(prev => 
-        prev.includes(optionText) 
-          ? prev.filter(text => text !== optionText)
-          : [...prev, optionText]
+        isSelected ? prev.filter(text => text !== optionText) : [...prev, optionText]
       );
     } else {
       // Single selection
@@ -109,7 +108,14 @@ const PollDetail: React.FC = () => {
           selectedOptionTexts: selectedOptions
         }
       }).unwrap();
-      
+
+      showToast({
+        type: 'success',
+        title: POLL_DETAIL_STRINGS.VOTE_SUBMITTED_SUCCESSFULLY,
+        message: POLL_DETAIL_STRINGS.VOTE_SUBMITTED_SUCCESSFULLY,
+        duration: 3000,
+      });
+
       // Optionally show success message
       console.log('Vote submitted successfully');
     } catch (voteError) {
@@ -119,14 +125,14 @@ const PollDetail: React.FC = () => {
   };
 
   const handleViewVotes = () => {
-    console.log('View votes');
     // TODO: Navigate to votes view screen
     navigation.navigate('PollVotes', { pollId: pollId });
   };
 
   const handleEditPoll = () => {
-    console.log('Edit poll');
-    // TODO: Navigate to edit poll screen
+    console.log('tripEndDate>>', tripEndDate);
+    // TODO: Navigate to create poll screen
+    navigation.navigate('CreatePoll', { tripId: poll.trip_id, tripEndDate: tripEndDate, pollId: pollId });
   };
 
   const handleEndPoll = () => {
@@ -138,7 +144,7 @@ const PollDetail: React.FC = () => {
   };
 
   const getStatusText = () => {
-    return `${POLL_STRINGS.POLL_ENDS_ON} ${poll.display_close_poll_date} ${poll.display_close_poll_time}`;
+    return `${POLL_STRINGS.POLL_ENDS_IN} ${formatTimeRemaining(poll.close_poll_date_time)}`;
   };
 
   const confirmEndPoll = () => {
@@ -202,7 +208,7 @@ const PollDetail: React.FC = () => {
       <SafeAreaView style={globalStyles.container}>
         <Box className="flex-1 justify-center items-center px-6">
           <Text className="text-lg text-gray-600 text-center">
-            {pollDetailStrings.errorLoading}
+            {POLL_DETAIL_STRINGS.ERROR_LOADING}
           </Text>
         </Box>
       </SafeAreaView>
@@ -227,8 +233,8 @@ const PollDetail: React.FC = () => {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            colors={['#3B82F6']}
-            tintColor="#3B82F6"
+            colors={[Colors.blue]}
+            tintColor={Colors.blue}
           />
         }
       >
@@ -239,7 +245,7 @@ const PollDetail: React.FC = () => {
           {/* Header Overlay */}
           <Box className="absolute top-0 left-0 right-0">
             <Header
-              title={pollDetailStrings.title}
+              title={POLL_DETAIL_STRINGS.TITLE}
               onBackPress={() => navigation.goBack()}
               showBackButton={true}
               titleStyle={styles.headerTitle}
@@ -249,7 +255,7 @@ const PollDetail: React.FC = () => {
                   onPress={() => setIsActionSheetOpen(true)}
                   className="p-2"
                 >
-                  <Ionicons name="ellipsis-vertical" size={20} color="#fff" />
+                  <Ionicons name="ellipsis-vertical-outline" size={20} color="#fff" />
                 </TouchableOpacity>
               }
             />
@@ -282,40 +288,29 @@ const PollDetail: React.FC = () => {
           </Box>
           
           {/* Poll Type */}
-          <HStack className="items-center space-x-3 mt-2 mb-4">
-            <Ionicons name={poll.allow_multi_answers ? "checkmark-done-circle": "checkmark-circle"} size={16} color="#51B1C0" />
-            <Text className="text-medium text-gray-600 fontFamilyAvenir">
-              {poll.allow_multi_answers ? pollDetailStrings.multipleSelect : pollDetailStrings.singleSelect}
+          <HStack className="items-center mt-2 mb-4 font-semibold">
+            {poll.allow_multi_answers ? (
+              <Box style={styles.multipleIconContainer}>
+              <Ionicons name="checkmark-outline" size={16} style={styles.allowMultipleIcon1} />
+              <Ionicons name="checkmark-outline" size={16} style={styles.allowMultipleIcon2} />
+            </Box>            
+            ) : (
+              <Ionicons name="checkmark-circle" size={18} color={Colors.primary} />
+            )}
+            <Text className="text-medium text-gray-900 ml-2 fontFamilyAvenir font-semibold">
+              {poll.allow_multi_answers ? POLL_DETAIL_STRINGS.MULTIPLE_SELECT : POLL_DETAIL_STRINGS.SINGLE_SELECT}
             </Text>
           </HStack>
 
           {/* Poll Options */}
           <VStack className="space-y-3 mb-6">
-            {poll.options?.map((option, index) => {
-              // Handle both string array and PollOptionWithVotes array
-              const optionText = isPollOptionWithVotes(option) ? option.text : option;
-              const optionVotes = isPollOptionWithVotes(option) ? (option.vote_count || 0) : 0;
-              const optionVoters = isPollOptionWithVotes(option) ? (option.voters || []) : [];
-              
-              return (
-                <PollOptionCard
-                  key={optionText}
-                  option={{
-                    id: index.toString(),
-                    text: optionText,
-                    votes: optionVotes,
-                    voters: optionVoters.map(voter => ({
-                      id: voter._id,
-                      name: voter.preferredName,
-                      profilePhotoURL: voter.profilePhotoURL
-                    }))
-                  }}
-                  totalVotes={totalVotes}
-                  isSelected={selectedOptions.includes(optionText)}
-                  onPress={() => handleOptionSelect(optionText)}
-                />
-              );
-            })}
+            <PollOptionCard
+              options={poll?.options || []}
+              totalVotes={totalVotes}
+              selectedOptions={selectedOptions}
+              allowMultipleAnswers={poll.allow_multi_answers || false}
+              onOptionSelect={handleOptionSelect}
+            />
           </VStack>
 
         </VStack>
@@ -325,22 +320,22 @@ const PollDetail: React.FC = () => {
       <Box className="bg-white border-t border-gray-200 p-3 mb-3 px-6">
         <HStack className="space-x-3">
           <Box className="flex-1 justify-end">
-          <TouchableOpacity
+            <TouchableOpacity
               className={`p-4 border border-primary-500 rounded-lg bg-white items-center justify-center`}
               onPress={handleViewVotes}>
               <GradientText
-                text={pollDetailStrings.viewVotes}
-                textStyle={{ fontSize: 16, fontWeight: '800', textAlign: 'center', fontFamily: 'AvenirLTPro-Medium' }}
-              />
+                text={POLL_DETAIL_STRINGS.VIEW_VOTES}
+                textStyle={styles.viewVotesGradientText}
+            />
             </TouchableOpacity>
           </Box>
           <Box className="flex-1 ml-3">
           <GradientButton
-                onPress={handleSubmit}
-                disabled={selectedOptions.length === 0 || isVoting}
-                title={isVoting ? 'Submitting...' : pollDetailStrings.submit}
-                loading={isVoting}
-              />
+            onPress={handleSubmit}
+            disabled={selectedOptions.length === 0 || isVoting}
+            title={isVoting ? 'Submitting...' : POLL_DETAIL_STRINGS.SUBMIT}
+            loading={isVoting}
+          />
           </Box>
         </HStack>
       </Box>
@@ -378,6 +373,8 @@ const PollDetail: React.FC = () => {
         isCreatedAlert={true}
         isDestructive={true}
       />
+      <ToastComponent />
+      
     </SafeAreaView>
   );
 };
@@ -413,6 +410,40 @@ const styles = StyleSheet.create({
   headerTitle: {
     color: '#fff',
   },
+  viewVotesGradientText: {
+    fontSize: 16,
+    fontWeight: '800',
+    textAlign: 'center',
+    fontFamily: 'AvenirLTPro-Medium',
+  },
+  multipleIconContainer: {
+    position: 'relative',
+    width: 30,
+    height: 22,
+    marginRight: -2,
+  },
+  
+  allowMultipleIcon1: {
+    position: 'absolute',
+    left: 3,
+    top: 2,
+    backgroundColor: Colors.primary,
+    borderRadius: 20,
+    color: Colors.white,
+    zIndex: 1,
+  },
+  
+  allowMultipleIcon2: {
+    position: 'absolute',
+    left: 10,
+    top: 1.2,
+    backgroundColor: Colors.primary,
+    zIndex: 2,
+    borderRadius: 20,
+    color: Colors.white,
+    borderWidth: 1,
+    borderColor: Colors.white,
+  },  
 });
 
 export default PollDetail;

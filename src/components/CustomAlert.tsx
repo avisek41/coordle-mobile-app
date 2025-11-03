@@ -1,15 +1,16 @@
 import React from 'react';
-import { Modal, TouchableOpacity, StyleSheet, Image } from 'react-native';
+import { Modal, TouchableOpacity, StyleSheet, Image, ImageSourcePropType } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import { Text, VStack, Box, HStack } from '@/components/ui';
 
 import GradientButton from './GradientButton';
-import { Colors } from '@/src/configs/CustomTheme';
+import GradientText from './GradientText';
+import { Colors } from '../configs/CustomTheme';
 
 export interface CustomAlertProps {
   isOpen: boolean;
-  icon?: string;
+  icon?: ImageSourcePropType;
   title: string;
   message: string;
   cancelText?: string;
@@ -54,29 +55,30 @@ const CustomAlert: React.FC<CustomAlertProps> = ({
         <Box className="bg-white rounded-2xl mx-6 p-6 w-full max-w-sm">
           {/* Title and Message */}
           <VStack className="mb-6">
-            <Text className="text-xl font-heading text-gray-900  mb-2">
+            {title && <Text className="text-xl font-heading text-gray-900  mb-2 fontFamilyAvenir font-bold" >
               {title}
-            </Text>
-            <Text className="text-sm font-body text-gray-600  leading-5">
+            </Text>}
+            {message && <Text className={`text-sm font-body text-gray-500 leading-5 ${Colors.darkGray}`}>
               {message.replace(/\\n/g, '\n')}
-            </Text>
+            </Text>}
           </VStack>
 
           {/* Action Buttons */}
-          <HStack className="justify-between">
+          <HStack className="flex-row gap-3 justify-between">
+
             {/* Cancel Button */}
             <TouchableOpacity
+              className={`border border-primary-500 rounded-md bg-white items-center justify-center font-semibold`}
+              style ={styles.cancelButton}
               onPress={handleCancel}
-              style={styles.cancelButton}
-              activeOpacity={0.8}
-            >
-              <Text className="text-primary-500 font-heading text-base">
-                {cancelText}
-              </Text>
+              activeOpacity={0.8}>
+              <GradientText
+                text= {cancelText}
+                textStyle={styles.cancelButtonText}
+            />
             </TouchableOpacity>
 
             {/* Confirm Button */}
-
             <GradientButton
               title={confirmText}
               onPress={handleConfirm}
@@ -87,6 +89,7 @@ const CustomAlert: React.FC<CustomAlertProps> = ({
           </HStack>
         </Box>) : (
         <Box className="bg-white px-6 py-8 rounded-2xl mx-6 w-full max-w-sm shadow-lg">
+         
          {/* Close Button */}
          <TouchableOpacity
            onPress={handleCancel}
@@ -98,26 +101,27 @@ const CustomAlert: React.FC<CustomAlertProps> = ({
 
          {/* Content */}
          <VStack className="items-center">
+           
            {/* Icon */}
-           <Image
-             source={{ uri: icon }}
+           {icon && <Image
+             source={icon as ImageSourcePropType}
              style={{
                width: 44,
                height: 38.13,
              }}
              className='fontFamilyAvenir mb-3'
              resizeMode='contain'
-           />
+           />}
 
            {/* Title */}
-           <Text className="text-xl font-bold text-black leading-5 text-center mb-4 fontFamilyAvenir">
+           {title && <Text className="text-xl font-bold text-black leading-5 text-center mb-4 fontFamilyAvenir">
              {title}
-           </Text>
+           </Text>}
 
            {/* Subtitle */}
-           <Text className="text-sm text-gray-600 text-center leading-5 fontFamilyAvenir">
+           {message && <Text className="text-sm text-gray-600 text-center leading-5 fontFamilyAvenir">
              {message}
-           </Text>
+           </Text>}
          </VStack>
        </Box>)}
       </Box>
@@ -129,20 +133,23 @@ const styles = StyleSheet.create({
   cancelButton: {
     height: 40,
     width: '40%',
-    borderWidth: 1,
-    borderColor: Colors.primary,
-    borderRadius: 8,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#FFFFFF',
+    flex: 0.5,
   },
   confirmButton: {
     marginTop: 0,
     height: 40,
     width: '40%',
+    flex: 0.5,
   },
   gradientStyle: {
     height: 40,
+    borderRadius: 4,
+  },
+  cancelButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    textAlign: 'center',
+    fontFamily: 'AvenirLTPro-Medium',
   },
   confirmButtonText: {
     fontSize: 16,
@@ -153,6 +160,9 @@ const styles = StyleSheet.create({
     right: 16,
     zIndex: 10,
     padding: 4,
+  },
+  fontFamilyBold: {
+    fontFamily: 'AvenirLTPro-Bold',
   },
   fontFamilyAvenir: {
     fontFamily: 'AvenirLTProRoman',

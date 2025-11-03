@@ -1,9 +1,10 @@
 import React from 'react';
-import { Box } from '@/components/ui/box';
-import { Input, InputField } from '@/components/ui/input';
-import { Pressable } from '@/components/ui/pressable';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+
+import { Box, Input, InputField, Pressable } from '@/components/ui';
+
 import { documentsStrings } from './strings';
+import { Colors } from '@/src/configs/CustomTheme';
 
 interface SearchFieldProps {
   value: string;
@@ -26,7 +27,7 @@ const SearchField: React.FC<SearchFieldProps> = ({ value, onChangeText }) => {
           <Ionicons
             name="search"
             size={20}
-            color={value.length > 0 ? '#3B82F6' : '#9CA3AF'}
+            color={value.length > 0 ? Colors.blue : Colors.textGray}
           />
         </Box>
         <InputField
@@ -34,7 +35,7 @@ const SearchField: React.FC<SearchFieldProps> = ({ value, onChangeText }) => {
           value={value}
           onChangeText={onChangeText}
           className="text-base font-body pl-10 pr-10"
-          style={{ backgroundColor: 'transparent' }}
+          style={{ backgroundColor: Colors.transparent }}
           returnKeyType="search"
           autoCapitalize="none"
           autoCorrect={false}
@@ -44,7 +45,7 @@ const SearchField: React.FC<SearchFieldProps> = ({ value, onChangeText }) => {
             onPress={handleClear}
             className="absolute right-3 top-3 z-10 p-1"
           >
-            <Ionicons name="close-circle" size={18} color="#9CA3AF" />
+            <Ionicons name="close-circle" size={18} color={Colors.textGray} />
           </Pressable>
         )}
       </Input>

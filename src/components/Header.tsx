@@ -1,10 +1,10 @@
 import React from 'react';
 import { TouchableOpacity, StyleSheet } from 'react-native';
-import { Text as GluestackText } from '@/components/ui/text';
-import { Box } from '@/components/ui/box';
-import { HStack } from '@/components/ui/hstack';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/native';
+
+import { Text as GluestackText, Box, HStack } from '@/components/ui';
+
 import { Colors } from '@/src/configs/CustomTheme';
 
 interface HeaderProps {
@@ -58,7 +58,7 @@ const Header: React.FC<HeaderProps> = ({
 
         {/* Title */}
         <GluestackText
-          className="text-xl font-heading text-gray-800 flex-1"
+          className="text-xl font-heading text-gray-800 font-bold flex-1"
           style={titleStyle}
         >
           {title}
