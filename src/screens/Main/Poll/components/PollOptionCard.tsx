@@ -8,6 +8,7 @@ import { Box, Text, HStack, VStack } from '@/components/ui';
 import { GradientAvatar, GradientText, GradientProgressBar } from '@/src/components';
 import { Colors } from '@/src/configs/CustomTheme';
 import { PollOptionWithVotes } from '@/src/types/poll';
+import { useAppSelector } from '@/src/hooks';
 
 interface PollOptionCardProps {
   options: (string | PollOptionWithVotes)[];
@@ -15,6 +16,7 @@ interface PollOptionCardProps {
   selectedOptions: string[];
   allowMultipleAnswers: boolean;
   onOptionSelect: (optionText: string) => void;
+  isActivePoll: boolean;
 }
 
 const PollOptionCard: React.FC<PollOptionCardProps> = ({
@@ -23,7 +25,12 @@ const PollOptionCard: React.FC<PollOptionCardProps> = ({
   selectedOptions,
   allowMultipleAnswers: _allowMultipleAnswers,
   onOptionSelect,
+  isActivePoll = false,
 }) => {
+
+  const { userId, userRole } = useAppSelector(state => state.auth); 
+  const isOwnerOrHost = userRole === 'owner' || userRole === 'host';
+  
   // Type guard to check if option is PollOptionWithVotes
   const isPollOptionWithVotes = (option: string | PollOptionWithVotes): option is PollOptionWithVotes => {
     return typeof option === 'object' && 'text' in option;
@@ -36,37 +43,38 @@ const PollOptionCard: React.FC<PollOptionCardProps> = ({
         const optionVoters = isPollOptionWithVotes(option) ? (option.voters || []) : [];
         const isSelected = selectedOptions.includes(optionText);
         const percentage = totalVotes > 0 ? (optionVotes / totalVotes) * 100 : 0;
+        const isSelectedByUser = isOwnerOrHost || isActivePoll ? isSelected : isSelected && optionVoters.find(voter => voter._id === userId);
 
         return (
           <TouchableOpacity
             key={optionText} 
-            onPress={() => onOptionSelect(optionText)} 
+            onPress={() => isActivePoll && onOptionSelect(optionText)} 
             activeOpacity={0.7}
           >
             <Box
               className={`rounded-lg p-4 border mb-3 ${
-                isSelected 
+                isSelectedByUser
                   ? `border-primary-300` 
                   : 'border-gray-200'
               }`}
-              style={{ backgroundColor: isSelected ? `#${Colors.primaryLight}` : `#${Colors.white}`, }}
+              style={{ backgroundColor: isSelectedByUser ? `${Colors.primaryLight}` : `${Colors.lightGray}` }}
             >
-              <HStack className="items-center space-x-3 mb-1">
+              <HStack className="items-center space-x-3 mb-1 mt-1">
                 {/* Radio Selection Indicator */}
                 <Box
                   className="w-6 h-6 rounded-full border-2 items-center justify-center mr-2"
                   style={{
-                    backgroundColor: isSelected ? Colors.primary : Colors.white,
-                    borderColor: isSelected ? Colors.primary : Colors.gray
+                    backgroundColor: isSelectedByUser ? Colors.primary : Colors.white,
+                    borderColor: isSelectedByUser ? Colors.primary : Colors.gray
                   }}
                 >
-                  {isSelected && (
-                    <Ionicons name="checkmark" size={13} color={Colors.white} />
+                  {isSelectedByUser && (
+                    <Ionicons name="checkmark" className="checkmarkIcon" size={17} color={Colors.white} />
                   )}
                 </Box>
 
                 {/* Option Text */}         
-                {isSelected ? (
+                {isSelectedByUser ? (
                 <GradientText
                   text={optionText}
                   textStyle={styles.optionGradientText}
@@ -78,13 +86,13 @@ const PollOptionCard: React.FC<PollOptionCardProps> = ({
               </HStack>
 
                 {/* Progress Bar and Vote Count */}
-                {optionVotes > 0 && (<HStack className={`justify-between items-center ${isSelected ? '' : 'mt-3'}`}>
-                  <Box className="flex-1 mr-3">
+                {isOwnerOrHost && optionVotes > 0 && (<HStack className={`justify-between items-center ${isSelectedByUser ? '' : 'mt-3'}`}>
+                  <Box className="flex-1 mr-5">
                       <GradientProgressBar
                         percentage={percentage}
-                        colors={isSelected ? ['#2E6F9E', Colors.primary] : ['#E5E7EB', '#E5E7EB']}
+                        colors={percentage ? [Colors.progressBarColor, Colors.primary] : [Colors.lightProgressBg, Colors.lightProgressBg]}
                         height={4}
-                        backgroundColor="#E5E7EB"
+                        backgroundColor={Colors.lightProgressBg}
                       />
                   </Box>
                   
@@ -93,7 +101,7 @@ const PollOptionCard: React.FC<PollOptionCardProps> = ({
                    
                     {/* Voter Avatars */}
                     {optionVoters.slice(0, 2).map((voter, voterIndex) => (
-                      <Box key={voter._id || voterIndex} className="ml-[-8px] first:ml-0">
+                      <Box key={voter._id || voterIndex} className="first:ml-0 last:ml-[-4px] first:mr-[-4px]">
                         <GradientAvatar 
                           userName={voter.preferredName}
                           size="xs"
@@ -104,7 +112,7 @@ const PollOptionCard: React.FC<PollOptionCardProps> = ({
                     
                     {/* Vote Count */}
                     <Box className="ml-3">
-                    { isSelected ?  (
+                    { isSelectedByUser ?  (
                     <GradientText
                       text={optionVotes > 0 ? optionVotes.toString() : ''}
                       textStyle={styles.optionGradientText}
@@ -136,6 +144,9 @@ const styles = StyleSheet.create({
     fontWeight: '800',
     textAlign: 'center',
     fontFamily: 'AvenirLTPro-Medium',
+  },
+  checkmarkIcon: {
+    fontWeight: 900,
   },
 })
 

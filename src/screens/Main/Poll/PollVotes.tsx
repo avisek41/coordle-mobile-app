@@ -32,7 +32,8 @@ const PollVotes: React.FC = () => {
   const navigation = useNavigation<MainNavigationProps>();
   const route = useRoute();
   const { pollId } = route.params as PollVotesRouteParams;
-  const { userId } = useAppSelector(state => state.auth);
+  const { userId, userRole } = useAppSelector(state => state.auth);  // This should come from auth context
+  const isOwnerOrHost = userRole === 'owner' || userRole === 'host';
   const [refreshing, setRefreshing] = React.useState(false);
   const { showToast, ToastComponent } = useSimpleToast();
 
@@ -106,6 +107,7 @@ const PollVotes: React.FC = () => {
             tintColor={Colors.blue}
           />
         }
+        nestedScrollEnabled={true}
       >
         {/* Cover Image */}
         <Box className="relative">
@@ -118,7 +120,7 @@ const PollVotes: React.FC = () => {
               onBackPress={() => navigation.goBack()}
               showBackButton={true}
               titleStyle={styles.headerTitle}
-              iconColor="#fff"
+              iconColor={Colors.white}
             />
           </Box>
         </Box>
@@ -131,9 +133,11 @@ const PollVotes: React.FC = () => {
               {poll.question}
             </Text>
             
-            <HStack className="justify-between items-center">
-              <GradientText  text={`${totalVoters} ${POLL_VOTES_STRINGS.TRIP_MEMBERS_VOTED} ${tripMembersCount} trip members voted`}
-                textStyle={styles.totalVotersGradientText} />
+            <HStack className="flex-row justify-between items-center">
+              <Box className="mt-3">
+                <GradientText text={`${totalVoters} ${POLL_VOTES_STRINGS.TRIP_MEMBERS_VOTED} ${tripMembersCount} trip members voted`}
+                  textStyle={styles.totalVotersGradientText} />
+              </Box>
               
               {/* Status Badge */}
               {isActive ? (<Box
@@ -143,9 +147,10 @@ const PollVotes: React.FC = () => {
                   textStyle={styles.textButton}
                   onPress={() => {}}
                 /></Box>): (<Box
-                className={`px-3 py-1 rounded-full bg-gray-300 fontWeight-800`}>
+                className={`px-3 py-1 rounded-full`}
+                style={{ backgroundColor: Colors.mediumGray }}>
                 <Text 
-                  className="text-sm text-center font-medium fontFamilyAvenir text-white fontWeight-800"
+                  className="text-sm text-center fontFamilyAvenir text-white fontWeight900"
                 >
                   {POLL_VOTES_STRINGS.CLOSED}
                 </Text>
@@ -163,17 +168,18 @@ const PollVotes: React.FC = () => {
               return (
                 <Box key={optionText} style={styles.optionCard}>
                   {/* Option Title and Vote Count */}
-                  <HStack className={`items-center justify-between mb-3 ${optionVotes > 0 ? 'border-b border-gray-200 pb-2' : ''}`} space="sm">
+                  <HStack className={`items-center justify-between`} space="sm">
                     <Text className="text-base font-bold text-gray-900 fontFamilyAvenir flex-1">
                       {optionText}
                     </Text>
                     {optionVotes > 0 ? (
                       <Box style={styles.oneAndMoreVoteButton}>
-                        <Text className="py-1 px-2 text-white text-sm font-bold fontFamilyAvenir">{optionVotes} {optionVotes === 1 ? POLL_VOTES_STRINGS.VOTE : POLL_VOTES_STRINGS.VOTES}</Text>
+                        <Text className="py-1 px-2 text-white text-sm fontWeight800 fontFamilyAvenir">{optionVotes} {optionVotes === 1 ? POLL_VOTES_STRINGS.VOTE : POLL_VOTES_STRINGS.VOTES}</Text>
                       </Box>
                     ) : (
                       <Box style={styles.zeroVoteButton}>
-                        <Text className="py-1 px-2 text-gray-500 text-sm font-bold fontFamilyAvenir">
+                        <Text className="py-1 px-2 text-sm fontWeight800 fontFamilyAvenir"
+                        style={{ color: Colors.darkGray }}>
                           0 {POLL_VOTES_STRINGS.VOTES}
                         </Text>
                       </Box>
@@ -181,8 +187,8 @@ const PollVotes: React.FC = () => {
                   </HStack>
 
                   {/* Voters List */}
-                  {optionVotes > 0 ? (
-                    <VStack space="md">
+                  {isOwnerOrHost && optionVotes > 0 ? (
+                    <VStack className="border-t border-gray-200 pt-3 mt-3" space="md">
                       {optionVoters.map((voter) => {
                         const isCurrentUser = voter._id === userId;
                         const displayName = isCurrentUser ? 'You' : voter.preferredName;
@@ -190,8 +196,8 @@ const PollVotes: React.FC = () => {
                         return (
                           <HStack key={voter._id} className="items-center" space="sm">
                             <GradientAvatar
-                              userName={voter.preferredName}
-                              userImage={voter.profilePhotoURL || voter.preferredName}
+                              userName={voter.preferredName || 'User'}
+                              userImage={voter.profilePhotoURL}
                               size="small"
                             />
                             <Text className={`text-base font-bold fontFamilyAvenir fontWeight-800 ${displayName === 'You' ? 'text-primary-500' : 'text-gray-900'}`}>
@@ -210,15 +216,16 @@ const PollVotes: React.FC = () => {
       </ScrollView>
 
       {/* Share Button */}
-      <Box className="bg-white border-t border-gray-200 p-4">
+      {isOwnerOrHost && !isActive && (<Box className="bg-white border-t border-gray-200 p-4">
         <GradientButton
           title={POLL_VOTES_STRINGS.SHARE_RESULT}
           onPress={handleShareResult}
           loading={isPublishing}
           disabled={isPublishing}
+          textStyle={styles.shareButtonText}
           size="large"
         />
-      </Box>
+      </Box>)}
       <ToastComponent />
     </SafeAreaView>
   );
@@ -251,7 +258,7 @@ const styles = StyleSheet.create({
   textButton: {
     fontSize: 12,
     fontFamily: 'AvenirLTPro-Medium',
-    fontWeight: 800,
+    fontWeight: 900,
   },
   optionCard: {
     backgroundColor: Colors.lightGray,
@@ -277,11 +284,14 @@ const styles = StyleSheet.create({
     flexGrow: 1,
   },
   headerTitle: {
-    color: '#fff',
+    color: Colors.white,
+    fontSize: 16,
+    fontWeight: '800',
+    fontFamily: 'AvenirLTPro-Medium',
   },
   totalVotersGradientText: {
     fontSize: 13,
-    fontWeight: '800',
+    fontWeight: 700,
     textAlign: 'center',
     fontFamily: 'AvenirLTPro-Medium',
   },
@@ -294,25 +304,39 @@ const styles = StyleSheet.create({
   },
   voteCountText: {
     fontSize: 12,
-    fontWeight: '700',
+    fontWeight: 700,
     fontFamily: 'AvenirLTPro-Medium',
   },
   oneAndMoreVoteButton: {
     backgroundColor: Colors.primary,
-    borderWidth: 1.5,
+    borderWidth: 1,
     borderColor: Colors.primaryLight,
     color: Colors.white,
     borderRadius: 4,
-    fontWeight: 800,
-    fontFamily: 'AvenirLTPro-Bold',
+    fontWeight: 700,
+    fontFamily: 'AvenirLTPro-Medium',
   },
   zeroVoteButton: {
     backgroundColor: Colors.white,
-    borderWidth: 1.5,
+    borderWidth: 1,
     borderColor: Colors.darkGray,
     borderRadius: 4,
     fontWeight: 800,
     fontFamily: 'AvenirLTPro-Bold',
+  },
+  fontWeight900: {
+    fontFamily: 'AvenirLTPro-Medium',
+    fontWeight: 900,
+  },
+  fontWeight800: {
+    fontFamily: 'AvenirLTPro-Medium',
+    fontWeight: 800,
+  },
+  shareButtonText: {
+    color: Colors.white,
+    fontSize: 16,
+    fontWeight: '800',
+    fontFamily: 'AvenirLTPro-Medium',
   },
 });
 

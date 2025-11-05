@@ -8,6 +8,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
+import { Colors } from '../configs/CustomTheme';
 
 interface GradientButtonProps {
   title: string;
@@ -25,7 +26,7 @@ const GradientButton: React.FC<GradientButtonProps> = ({
   title,
   onPress,
   disabled = false,
-  colors = ['#2E6F9E', '#51B1C0'],
+  colors = [Colors.progressBarColor, Colors.primary],
   style,
   gradientStyle,
   textStyle,
@@ -49,7 +50,7 @@ const GradientButton: React.FC<GradientButtonProps> = ({
         end={{ x: 1, y: 0 }}
       >
         {loading ? (
-          <ActivityIndicator color="#ffffff" size="small" />
+          <ActivityIndicator color={Colors.white} size="small" />
         ) : (
           <Text className="font-heading" style={[styles.text, textStyle]}>
             {title}
@@ -73,8 +74,7 @@ const styles = StyleSheet.create({
     height: 50,
   },
   text: {
-    color: '#ffffff',
-
+    color: Colors.white,
     textAlign: 'center',
     fontSize: 16,
   },

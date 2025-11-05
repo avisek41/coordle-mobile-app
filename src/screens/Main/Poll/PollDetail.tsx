@@ -15,7 +15,7 @@ import {Box, Text, VStack, HStack} from '@/components/ui';
 import { MainNavigationProps } from '@/src/types/allRoutes';
 import { useVoteOnPollMutation, useClosePollMutation, useDeletePollMutation, useGetPollVotesQuery } from '@/src/services/pollApi';
 import { GradientButton, GradientAvatar, Loader, CustomActionSheet, CustomAlert, Header, GradientText } from '@/src/components';
-import { POLL_STRINGS, POLL_DETAIL_STRINGS } from './strings';
+import { POLL_STRINGS, POLL_DETAIL_STRINGS, POLL_VOTES_STRINGS } from './strings';
 import { globalStyles } from '@/src/styles';
 import PollOptionCard from './components/PollOptionCard';
 import { PollOptionWithVotes } from '@/src/types/poll';
@@ -56,7 +56,10 @@ const PollDetail: React.FC = () => {
   const [voteOnPoll, { isLoading: isVoting }] = useVoteOnPollMutation();
   const [closePoll, { isLoading: isClosingPoll }] = useClosePollMutation();
   const [deletePoll, { isLoading: isDeletingPoll }] = useDeletePollMutation();
-  const { userId } = useAppSelector(state => state.auth);  // This should come from auth context
+  const { userId, userRole } = useAppSelector(state => state.auth);  // This should come from auth context
+  const isOwnerOrHost = userRole === 'owner' || userRole === 'host';
+
+  let content;
 
   // Initialize selected options based on user's previous votes
   useEffect(() => {
@@ -194,7 +197,6 @@ const PollDetail: React.FC = () => {
       id: 'delete',
       title: isDeletingPoll ? 'Deleting...' : 'Delete',
       onPress: handleDeletePoll,
-      isDestructive: true,
       isDisabled: isClosingPoll || isDeletingPoll,
     },
   ];
@@ -216,6 +218,7 @@ const PollDetail: React.FC = () => {
   }
 
   const poll = pollData.data;
+  const isPollClosed = poll.status === 'Closed' as const;
   const totalVotes = poll?.options?.reduce((sum, option) => {
     // Handle both string array (from base Poll) and PollOptionWithVotes array (from API response)
     if (isPollOptionWithVotes(option)) {
@@ -223,6 +226,60 @@ const PollDetail: React.FC = () => {
     }
     return sum;
   }, 0) || 0;
+
+  if (userRole === 'traveller') {
+    if (poll.status === 'Active') {
+      content = (
+        <Box className="bg-white">
+          <GradientButton
+            title={isVoting ? 'Submitting...' : POLL_DETAIL_STRINGS.SUBMIT}
+            onPress={handleSubmit}
+            loading={isVoting}
+            disabled={selectedOptions.length === 0 || isVoting || isPollClosed}
+            size="large"
+            textStyle={styles.submitButtonText}
+          />
+        </Box>
+      );
+    } else if (poll.published && isPollClosed){
+      content = (
+        <Box className="bg-white">
+          <TouchableOpacity
+            className="p-4 border border-primary-500 rounded-lg bg-white items-center justify-center"
+            onPress={handleViewVotes}>
+            <GradientText
+              text={POLL_DETAIL_STRINGS.VIEW_POLL_RESULTS}
+              textStyle={styles.viewVotesGradientText}
+            />
+          </TouchableOpacity>
+        </Box>
+      );
+    }
+  } else {
+    content = (
+      <HStack className="space-x-3">
+        <Box className="flex-1 justify-end">
+          <TouchableOpacity
+            className="p-4 border border-primary-500 rounded-lg bg-white items-center justify-center"
+            onPress={handleViewVotes}>
+            <GradientText
+              text={POLL_DETAIL_STRINGS.VIEW_VOTES}
+              textStyle={styles.viewVotesGradientText}
+            />
+          </TouchableOpacity>
+        </Box>
+        <Box className="flex-1 ml-3">
+          <GradientButton
+            onPress={handleSubmit}
+            disabled={selectedOptions.length === 0 || isVoting || isPollClosed}
+            title={isVoting ? 'Submitting...' : POLL_DETAIL_STRINGS.SUBMIT}
+            loading={isVoting}
+            textStyle={styles.submitButtonText}
+          />
+        </Box>
+      </HStack>
+    );
+  }
 
   return (
     <SafeAreaView style={globalStyles.container}>
@@ -249,14 +306,15 @@ const PollDetail: React.FC = () => {
               onBackPress={() => navigation.goBack()}
               showBackButton={true}
               titleStyle={styles.headerTitle}
-              iconColor="#fff"
+              iconColor={Colors.white}
               rightComponent={
-                <TouchableOpacity
+                isOwnerOrHost ? (<TouchableOpacity
                   onPress={() => setIsActionSheetOpen(true)}
-                  className="p-2"
+                  className="p-2 border border-gray-200 rounded-lg"
+                  activeOpacity={0.8}
                 >
-                  <Ionicons name="ellipsis-vertical-outline" size={20} color="#fff" />
-                </TouchableOpacity>
+                  <Ionicons name="ellipsis-vertical-outline" size={20} color={Colors.white} />
+                </TouchableOpacity>):(<></>)
               }
             />
           </Box>
@@ -270,7 +328,7 @@ const PollDetail: React.FC = () => {
               {poll.question}
             </Text>
             
-            <HStack className="justify-between items-center mb-4">
+            {poll.status === 'Active' && (<HStack className="justify-between items-center mb-4">
               <Text className="text-red-500 text-sm font-medium fontFamilyAvenir">
                 {getStatusText()}
               </Text>
@@ -284,18 +342,40 @@ const PollDetail: React.FC = () => {
                     {poll.createdBy?.preferredName || 'User'}
                 </Text>
               </HStack>
-            </HStack>
+            </HStack>)}
+            {poll.status !== 'Active' && (<HStack className="justify-between items-center">
+              <HStack className="items-center" space="sm">
+                <GradientAvatar
+                    userName={poll.createdBy?.preferredName || 'User'}
+                    userImage={poll.createdBy?.profilePhotoURL || poll.createdBy?.preferredName}
+                    size="xs"
+                  />
+                <Text className="text-medium font-heading text-gray-900">
+                    {poll.createdBy?.preferredName || 'User'}
+                </Text>
+              </HStack>
+              
+              <Box
+                className={`px-3 py-1 rounded-full`}
+                style={{ backgroundColor: Colors.mediumGray }}>
+                <Text 
+                  className="text-sm text-center fontFamilyAvenir text-white fontWeight900"
+                >
+                  {POLL_VOTES_STRINGS.CLOSED}
+                </Text>
+              </Box>
+            </HStack>)}
           </Box>
           
           {/* Poll Type */}
           <HStack className="items-center mt-2 mb-4 font-semibold">
             {poll.allow_multi_answers ? (
               <Box style={styles.multipleIconContainer}>
-              <Ionicons name="checkmark-outline" size={16} style={styles.allowMultipleIcon1} />
-              <Ionicons name="checkmark-outline" size={16} style={styles.allowMultipleIcon2} />
+              <Ionicons name="checkmark-outline" size={18} style={styles.allowMultipleIcon1} />
+              <Ionicons name="checkmark-outline" size={18} style={styles.allowMultipleIcon2} />
             </Box>            
             ) : (
-              <Ionicons name="checkmark-circle" size={18} color={Colors.primary} />
+              <Ionicons name="checkmark-circle" size={24} color={Colors.primary} />
             )}
             <Text className="text-medium text-gray-900 ml-2 fontFamilyAvenir font-semibold">
               {poll.allow_multi_answers ? POLL_DETAIL_STRINGS.MULTIPLE_SELECT : POLL_DETAIL_STRINGS.SINGLE_SELECT}
@@ -310,43 +390,23 @@ const PollDetail: React.FC = () => {
               selectedOptions={selectedOptions}
               allowMultipleAnswers={poll.allow_multi_answers || false}
               onOptionSelect={handleOptionSelect}
+              isActivePoll={poll.status === 'Active'}
             />
           </VStack>
 
         </VStack>
       </ScrollView>
 
-        {/* Action Buttons */}
-      <Box className="bg-white border-t border-gray-200 p-3 mb-3 px-6">
-        <HStack className="space-x-3">
-          <Box className="flex-1 justify-end">
-            <TouchableOpacity
-              className={`p-4 border border-primary-500 rounded-lg bg-white items-center justify-center`}
-              onPress={handleViewVotes}>
-              <GradientText
-                text={POLL_DETAIL_STRINGS.VIEW_VOTES}
-                textStyle={styles.viewVotesGradientText}
-            />
-            </TouchableOpacity>
-          </Box>
-          <Box className="flex-1 ml-3">
-          <GradientButton
-            onPress={handleSubmit}
-            disabled={selectedOptions.length === 0 || isVoting}
-            title={isVoting ? 'Submitting...' : POLL_DETAIL_STRINGS.SUBMIT}
-            loading={isVoting}
-          />
-          </Box>
-        </HStack>
-      </Box>
+      {/* Action Buttons */}
+      {content && (<Box className="bg-white border-t border-gray-200 p-3 mb-3 px-6">
+       {content}
+      </Box>)}
 
       {/* Action Sheet for Poll Options */}
       <CustomActionSheet
         isOpen={isActionSheetOpen}
         onClose={() => setIsActionSheetOpen(false)}
         actions={actionSheetItems}
-        showCancelButton={true}
-        cancelButtonText="Cancel"
       />
 
       {/* End Poll Confirmation Alert */}
@@ -371,7 +431,6 @@ const PollDetail: React.FC = () => {
         onCancel={() => setShowDeletePollAlert(false)}
         onConfirm={confirmDeletePoll}
         isCreatedAlert={true}
-        isDestructive={true}
       />
       <ToastComponent />
       
@@ -408,7 +467,10 @@ const styles = StyleSheet.create({
     flexGrow: 1,
   },
   headerTitle: {
-    color: '#fff',
+    color: Colors.white,
+    fontSize: 16,
+    fontWeight: '800',
+    fontFamily: 'AvenirLTPro-Medium',
   },
   viewVotesGradientText: {
     fontSize: 16,
@@ -443,7 +505,13 @@ const styles = StyleSheet.create({
     color: Colors.white,
     borderWidth: 1,
     borderColor: Colors.white,
-  },  
+  },
+  submitButtonText: {
+    color: Colors.white,
+    fontSize: 16,
+    fontWeight: '800',
+    fontFamily: 'AvenirLTPro-Medium',
+  },
 });
 
 export default PollDetail;
