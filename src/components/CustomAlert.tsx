@@ -54,14 +54,13 @@ const CustomAlert: React.FC<CustomAlertProps> = ({
         {isCreatedAlert ? (
         <Box className="bg-white rounded-2xl mx-6 p-6 w-full max-w-sm">
           {/* Title and Message */}
-          <VStack className="mb-6">
-            {title && <Text className="text-xl font-heading text-gray-900  mb-2 fontFamilyAvenir font-bold" >
+          <VStack className="gap-5">
+            {Boolean(title) && <Text className="text-xl font-heading text-gray-900 fontFamilyAvenir font-bold" >
               {title}
             </Text>}
-            {message && <Text className={`text-sm font-body text-gray-500 leading-5 ${Colors.darkGray}`}>
-              {message.replace(/\\n/g, '\n')}
+            {Boolean(message) && <Text className={`text-sm font-body text-gray-500 leading-5 ${Colors.darkGray}`}>
+              {message?.replace(/\\n/g, '\n')}
             </Text>}
-          </VStack>
 
           {/* Action Buttons */}
           <HStack className="flex-row gap-3 justify-between">
@@ -87,6 +86,7 @@ const CustomAlert: React.FC<CustomAlertProps> = ({
               textStyle={styles.confirmButtonText}
             />
           </HStack>
+          </VStack>
         </Box>) : (
         <Box className="bg-white px-6 py-8 rounded-2xl mx-6 w-full max-w-sm shadow-lg">
          
@@ -96,33 +96,56 @@ const CustomAlert: React.FC<CustomAlertProps> = ({
            style={styles.closeButton}
            activeOpacity={0.7}
          >
-           <Ionicons name="close" size={20} color="#6B7280" />
+           <Ionicons name="close" size={20} color={Colors.iconGray} />
          </TouchableOpacity>
 
          {/* Content */}
          <VStack className="items-center">
            
-           {/* Icon */}
-           {icon && <Image
-             source={icon as ImageSourcePropType}
-             style={{
-               width: 44,
-               height: 38.13,
-             }}
-             className='fontFamilyAvenir mb-3'
-             resizeMode='contain'
-           />}
+          <HStack className="flex-row justify-between items-center">
+            {/* Icon */}
+            {icon && <Image
+              source={icon as ImageSourcePropType}
+              style={styles.iconStyle}
+              className='fontFamilyAvenir mb-3'
+              resizeMode='contain'
+            />}
 
-           {/* Title */}
-           {title && <Text className="text-xl font-bold text-black leading-5 text-center mb-4 fontFamilyAvenir">
-             {title}
-           </Text>}
+            {/* Title */}
+            {Boolean(title) && <Text className="text-xl font-bold text-black leading-5 text-center mb-4 fontFamilyAvenir">
+              {title}
+            </Text>}
+          </HStack>
 
-           {/* Subtitle */}
-           {message && <Text className="text-sm text-gray-600 text-center leading-5 fontFamilyAvenir">
-             {message}
-           </Text>}
+          {/* Subtitle */}
+          {Boolean(message) && <Text className="text-sm text-gray-500 text-left leading-5 fontFamilyAvenir">
+          {message.replace(/\\n/g, '\n')}
+          </Text>}
          </VStack>
+         {/* Action Buttons */}
+         {isDestructive && (
+          <HStack className="flex-row gap-3 justify-between mt-5">
+          {/* Cancel Button */}
+          <TouchableOpacity
+            className={`border border-primary-500 rounded-md bg-white items-center justify-center font-semibold`}
+            style ={styles.cancelButton}
+            onPress={handleCancel}
+            activeOpacity={0.8}>
+            <GradientText
+              text= {cancelText}
+              textStyle={styles.cancelButtonText}
+          />
+          </TouchableOpacity>
+
+          {/* Confirm Button */}
+          <GradientButton
+            title={confirmText}
+            onPress={handleConfirm}
+            style={styles.confirmButton}
+            gradientStyle={styles.gradientStyle}
+            textStyle={styles.confirmButtonText}
+          />
+          </HStack>)}
        </Box>)}
       </Box>
     </Modal>
@@ -134,6 +157,10 @@ const styles = StyleSheet.create({
     height: 40,
     width: '40%',
     flex: 0.5,
+  },
+  iconStyle: {
+    width: 44,
+    height: 38.13,
   },
   confirmButton: {
     marginTop: 0,

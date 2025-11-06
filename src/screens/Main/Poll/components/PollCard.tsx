@@ -33,12 +33,16 @@ const PollCard: React.FC<PollCardProps> = ({
     }
   };
 
-  const handlePress = () => {
-    if (isActive) {
+  const handleActionPress = () => {
+    if (isActive && userVote === null) {
       onVote(poll._id);
     } else {
       onViewVotes(poll._id);
     }
+  };
+
+  const handlePress = () => {
+    onVote(poll._id);
   };
 
   return (
@@ -97,7 +101,7 @@ const PollCard: React.FC<PollCardProps> = ({
             {isActive && userVote === null && (
            <GradientButton
              title={POLL_STRINGS.VOTE}
-             onPress={handlePress}
+             onPress={handleActionPress}
              style={styles.voteButton}
              gradientStyle={styles.gradientButton}
              textStyle={styles.textButton}
@@ -106,7 +110,7 @@ const PollCard: React.FC<PollCardProps> = ({
            {isActive && userVote !== null && (<TouchableOpacity
               className={`border border-primary-500 bg-white items-center justify-center`}
               style={styles.voteButton}
-              onPress={handlePress}>
+              onPress={handleActionPress}>
               <GradientText
                 text={POLL_STRINGS.VOTE}
                 textStyle={styles.textButton}
@@ -114,7 +118,7 @@ const PollCard: React.FC<PollCardProps> = ({
             </TouchableOpacity>)}
             {!isActive && (
             <TouchableOpacity
-            onPress={handlePress}
+            onPress={handleActionPress}
             style={styles.viewVotesButton}
             activeOpacity={0.8}
           >

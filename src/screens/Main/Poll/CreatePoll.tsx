@@ -27,7 +27,7 @@ import { useSimpleToast } from '@/src/hooks/useSimpleToast';
 import { CREATE_EDIT_POLL_STRINGS, POLL_STRINGS } from './strings';
 import { Colors } from '@/src/configs/CustomTheme';
 import { RootState } from '@/src/redux/Store';
-import { Header, GradientButton, CustomAlert } from '@/src/components';
+import { Header, GradientButton, CustomAlert, GradientText } from '@/src/components';
 import { globalStyles } from '@/src/styles';
 import { dateFormat, dateFormatWithDay, dateTime, timeFormat, dateMonthYearFormat } from '@/src/utils/dateTimeFormat';
 import { formatTimeRemaining } from '@/src/utils';
@@ -429,7 +429,7 @@ const CreatePoll: React.FC = () => {
                   value={allowMultipleAnswers}
                   onValueChange={setAllowMultipleAnswers}
                   trackColor={{ false: Colors.borderGray, true: Colors.primary }}
-                  thumbColor={allowMultipleAnswers ? Colors.white : Colors.white}
+                  thumbColor={Colors.white}
                   ios_backgroundColor={Colors.borderGray}
                 />
               </HStack>
@@ -444,7 +444,7 @@ const CreatePoll: React.FC = () => {
                   value={reminders}
                   onValueChange={setReminders}
                   trackColor={{ false: Colors.borderGray, true: Colors.primary }}
-                  thumbColor={reminders ? Colors.white : Colors.white}
+                  thumbColor={Colors.white}
                   ios_backgroundColor={Colors.borderGray}
                 />
               </HStack>
@@ -483,15 +483,8 @@ const CreatePoll: React.FC = () => {
                                 : Colors.textGray
                             }
                           />
-                          <Text
-                            className={`text-sm font-body ${
-                              selectedReminders?.includes(option.value)
-                                ? 'text-blue-700'
-                                : 'text-gray-600'
-                            }`}
-                          >
-                            {option.label}
-                          </Text>
+                          {selectedReminders?.includes(option.value) ? (<GradientText text={option.label}
+                            textStyle={styles.reminderOptionGradientText} />) : <Text className={`text-sm font-body text-gray-600`}>{option.label}</Text>} 
                         </HStack>
                       </TouchableOpacity>
                     ))}
@@ -522,15 +515,8 @@ const CreatePoll: React.FC = () => {
                                 : Colors.textGray
                             }
                           />
-                          <Text
-                            className={`text-sm font-body ${
-                              selectedReminders?.includes(option.value)
-                                ? 'text-blue-700'
-                                : 'text-gray-600'
-                            }`}
-                          >
-                            {option.label}
-                          </Text>
+                          {selectedReminders?.includes(option.value) ? (<GradientText text={option.label}
+                            textStyle={styles.reminderOptionGradientText} />) : <Text className={`text-sm font-body text-gray-600`}>{option.label}</Text>} 
                         </HStack>
                       </TouchableOpacity>
                     ))}
@@ -657,6 +643,12 @@ const CreatePoll: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
+  reminderOptionGradientText: {
+    fontSize: 13,
+    fontWeight: 700,
+    textAlign: 'center',
+    fontFamily: 'AvenirLTPro-Medium',
+  },
   removeButton: {
     padding: 4,
     justifyContent: 'center',

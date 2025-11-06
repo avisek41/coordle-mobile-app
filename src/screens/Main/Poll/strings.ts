@@ -54,6 +54,7 @@ export const POLL_DETAIL_STRINGS = {
   SINGLE_SELECT: 'Single select',
   MULTIPLE_SELECT: 'Multiple select',
   VIEW_VOTES: 'View Votes',
+  VIEW_POLL_RESULTS: 'View Results',
   SUBMIT: 'Submit',
   ERROR_LOADING: 'Error loading poll details',
   VOTE_SUBMITTED_SUCCESSFULLY: 'Vote submitted successfully',

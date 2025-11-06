@@ -5,6 +5,7 @@ export const Colors = {
   white: '#FFFFFF',
   black: '#000000',
   darkGray: '#909090',
+  mediumGray: '#C2C2C2',
   lightGray: '#F9FAFB',
   dogerBlue: '#4A90E2',
   emeraldGreen: '#50C878',
@@ -17,4 +18,6 @@ export const Colors = {
   transparent: '#00FFFFFF',
   primaryLight: '#F4FEFF',
   blue: '#3B82F6',
+  lightProgressBg: '#E5E7EB',
+  progressBarColor: '#2E6F9E',
 };
