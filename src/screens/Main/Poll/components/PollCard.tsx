@@ -6,9 +6,10 @@ import { Box, HStack, VStack, Text } from '@/components/ui';
 
 import { GradientAvatar, GradientButton, GradientText } from '@/src/components';
 import { Poll } from '@/src/types/poll';
-import { POLL_STRINGS } from '../strings';
+import { POLL_DETAIL_STRINGS, POLL_STRINGS } from '../strings';
 import { Colors } from '@/src/configs/CustomTheme';
 import { formatTimeRemaining } from '@/src/utils';
+import { useAppSelector } from '@/src/hooks';
 
 interface PollCardProps {
   poll: Poll;
@@ -23,7 +24,10 @@ const PollCard: React.FC<PollCardProps> = ({
   onViewVotes,
   userVote
 }) => {
-  const isActive = poll.status === 'Active';
+  const isActive = poll.status === 'Active'
+  const { userRole } = useAppSelector(state => state.auth); 
+  const isOwnerOrHost = userRole === 'owner' || userRole === 'host';
+  const isTraveller = userRole === 'traveller';
 
   const getStatusText = () => {
     if (isActive) {
@@ -98,7 +102,7 @@ const PollCard: React.FC<PollCardProps> = ({
               </VStack>
             )}
           </Box>
-            {isActive && userVote === null && (
+            {isActive && userVote === null && ((isOwnerOrHost) || (isTraveller && poll.published)) && (
            <GradientButton
              title={POLL_STRINGS.VOTE}
              onPress={handleActionPress}
@@ -107,24 +111,22 @@ const PollCard: React.FC<PollCardProps> = ({
              textStyle={styles.textButton}
            />
            )}
-           {isActive && userVote !== null && (<TouchableOpacity
-              className={`border border-primary-500 bg-white items-center justify-center`}
-              style={styles.voteButton}
-              onPress={handleActionPress}>
-              <GradientText
-                text={POLL_STRINGS.VOTE}
-                textStyle={styles.textButton}
-              />
-            </TouchableOpacity>)}
-            {!isActive && (
+           {isActive && userVote !== null && ((isOwnerOrHost) || (isTraveller && poll.published)) && (<TouchableOpacity
+            className="p-1.5 px-3 border border-primary-500 rounded-md bg-white items-center justify-center"
+            onPress={handleActionPress}>
+            <GradientText
+              text={POLL_STRINGS.VOTE}
+              textStyle={styles.viewVotesGradientText}
+            />
+          </TouchableOpacity>)}
+           {!isActive && (isOwnerOrHost || isTraveller && poll.published) && (
             <TouchableOpacity
-            onPress={handleActionPress}
-            style={styles.viewVotesButton}
-            activeOpacity={0.8}
-          >
-            <Text className="text-primary-500 font-heading text-xs">
-              {POLL_STRINGS.VIEW_VOTES}
-            </Text>
+            className="p-1.5 px-3 border border-primary-500 rounded-md bg-white items-center justify-center"
+            onPress={handleActionPress}>
+            <GradientText
+              text={isOwnerOrHost ? POLL_STRINGS.VIEW_VOTES :POLL_DETAIL_STRINGS.VIEW_POLL_RESULTS}
+              textStyle={styles.viewVotesGradientText}
+            />
           </TouchableOpacity>
            )}
         </HStack>
@@ -162,6 +164,12 @@ const styles = StyleSheet.create({
     width: 54,
     marginTop: 0,
     borderRadius: 4
+  },
+  viewVotesGradientText: {
+    fontSize: 11,
+    fontWeight: '600',
+    textAlign: 'center',
+    fontFamily: 'AvenirLTPro-Medium',
   },
   viewVotesButton: {
       borderWidth: 1,

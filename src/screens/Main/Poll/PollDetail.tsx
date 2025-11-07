@@ -308,7 +308,7 @@ const PollDetail: React.FC = () => {
               titleStyle={styles.headerTitle}
               iconColor={Colors.white}
               rightComponent={
-                isOwnerOrHost ? (<TouchableOpacity
+                isOwnerOrHost && poll.status === 'Active' ? (<TouchableOpacity
                   onPress={() => setIsActionSheetOpen(true)}
                   className="p-2 border border-gray-200 rounded-lg"
                   activeOpacity={0.8}
