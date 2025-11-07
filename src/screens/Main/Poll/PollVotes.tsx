@@ -11,7 +11,7 @@ import { useRoute, useNavigation } from '@react-navigation/native';
 import { Box, Text, HStack, VStack } from '@/components/ui';
 import { Header, GradientButton, GradientAvatar, Loader, GradientText } from '@/src/components';
 import { useGetPollVotesQuery, usePublishPollMutation } from '@/src/services/pollApi';
-import { POLL_VOTES_STRINGS } from './strings';
+import { pollStrings } from './strings';
 import { globalStyles } from '@/src/styles';
 import { Colors } from '@/src/configs/CustomTheme';
 import { images } from '@/src/assets';
@@ -62,8 +62,8 @@ const PollVotes: React.FC = () => {
       await publishPoll(pollId).unwrap();
       showToast({
         type: 'success',
-        title: POLL_VOTES_STRINGS.POLL_PUBLISHED_SUCCESSFULLY,
-        message: POLL_VOTES_STRINGS.POLL_PUBLISHED_SUCCESSFULLY,
+        title: pollStrings.pollPublishedTitle,
+        message: pollStrings.pollPublishedSuccessfully,
         duration: 3000,
       });
       navigation.goBack();
@@ -79,10 +79,10 @@ const PollVotes: React.FC = () => {
   if (error || !pollData?.data) {
     return (
       <SafeAreaView style={globalStyles.container}>
-        <Header title={POLL_VOTES_STRINGS.TITLE} />
+        <Header title={pollStrings.viewVotesTitle} />
         <Box className="flex-1 justify-center items-center px-6">
           <Text className="text-lg text-gray-600 text-center">
-            {POLL_VOTES_STRINGS.ERROR_LOADING}
+            {pollStrings.errorLoadingVotes}
           </Text>
         </Box>
       </SafeAreaView>
@@ -116,7 +116,7 @@ const PollVotes: React.FC = () => {
           {/* Header Overlay */}
           <Box className="absolute top-0 left-0 right-0">
             <Header
-              title={POLL_VOTES_STRINGS.TITLE}
+              title={pollStrings.viewVotesTitle}
               onBackPress={() => navigation.goBack()}
               showBackButton={true}
               titleStyle={styles.headerTitle}
@@ -135,14 +135,14 @@ const PollVotes: React.FC = () => {
             
             <HStack className="flex-row justify-between items-center">
               <Box className="mt-3">
-                <GradientText text={`${totalVoters} ${POLL_VOTES_STRINGS.TRIP_MEMBERS_VOTED} ${tripMembersCount} trip members voted`}
+                <GradientText text={`${totalVoters} ${pollStrings.tripMembersVoted} ${tripMembersCount} trip members voted`}
                   textStyle={styles.totalVotersGradientText} />
               </Box>
               
               {/* Status Badge */}
               {isActive ? (<Box
                 className="px-3 py-1 rounded-full"><GradientButton
-                  title={POLL_VOTES_STRINGS.ACTIVE}
+                  title={pollStrings.activeVotes}
                   gradientStyle={styles.gradientButton}
                   textStyle={styles.textButton}
                   onPress={() => {}}
@@ -152,7 +152,7 @@ const PollVotes: React.FC = () => {
                 <Text 
                   className="text-sm text-center fontFamilyAvenir text-white fontWeight900"
                 >
-                  {POLL_VOTES_STRINGS.CLOSED}
+                  {pollStrings.closedVotes}
                 </Text>
               </Box>)}
             </HStack>
@@ -174,13 +174,13 @@ const PollVotes: React.FC = () => {
                     </Text>
                     {optionVotes > 0 ? (
                       <Box style={styles.oneAndMoreVoteButton}>
-                        <Text className="py-1 px-2 text-white text-sm fontWeight800 fontFamilyAvenir">{optionVotes} {optionVotes === 1 ? POLL_VOTES_STRINGS.VOTE : POLL_VOTES_STRINGS.VOTES}</Text>
+                        <Text className="py-1 px-2 text-white text-sm fontWeight800 fontFamilyAvenir">{optionVotes} {optionVotes === 1 ? pollStrings.voteSingular : pollStrings.votes}</Text>
                       </Box>
                     ) : (
                       <Box style={styles.zeroVoteButton}>
                         <Text className="py-1 px-2 text-sm fontWeight800 fontFamilyAvenir"
                         style={{ color: Colors.darkGray }}>
-                          0 {POLL_VOTES_STRINGS.VOTES}
+                          0 {pollStrings.votes}
                         </Text>
                       </Box>
                     )}
@@ -218,7 +218,7 @@ const PollVotes: React.FC = () => {
       {/* Share Button */}
       {isOwnerOrHost && !isActive && (<Box className="bg-white border-t border-gray-200 p-4">
         <GradientButton
-          title={POLL_VOTES_STRINGS.SHARE_RESULT}
+          title={pollStrings.shareResult}
           onPress={handleShareResult}
           loading={isPublishing}
           disabled={isPublishing}

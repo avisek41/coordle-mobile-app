@@ -6,7 +6,7 @@ import { Box, HStack, VStack, Text } from '@/components/ui';
 
 import { GradientAvatar, GradientButton, GradientText } from '@/src/components';
 import { Poll } from '@/src/types/poll';
-import { POLL_DETAIL_STRINGS, POLL_STRINGS } from '../strings';
+import { pollStrings } from '../strings';
 import { Colors } from '@/src/configs/CustomTheme';
 import { formatTimeRemaining } from '@/src/utils';
 import { useAppSelector } from '@/src/hooks';
@@ -31,9 +31,9 @@ const PollCard: React.FC<PollCardProps> = ({
 
   const getStatusText = () => {
     if (isActive) {
-      return `${POLL_STRINGS.POLL_ENDS_ON} ${poll.display_close_poll_date} at ${poll.display_close_poll_time}`;
+      return `${pollStrings.pollEndsOn} ${poll.display_close_poll_date} at ${poll.display_close_poll_time}`;
     } else {
-      return `${POLL_STRINGS.CLOSED_ON} ${poll.display_close_poll_date}`;
+      return `${pollStrings.closedOn} ${poll.display_close_poll_date}`;
     }
   };
 
@@ -92,11 +92,11 @@ const PollCard: React.FC<PollCardProps> = ({
               <VStack space="xs">
                 {userVote ? (
                   <Text className="text-sm text-gray-900">
-                    {POLL_STRINGS.YOUR_VOTE} : <Text style={{ color: Colors.primary }} className="font-medium">{userVote.join(', ')}</Text>
+                    {pollStrings.yourVote} : <Text style={{ color: Colors.primary }} className="font-medium">{userVote.join(', ')}</Text>
                   </Text>
                 ) : (
                   <Text className="text-sm text-red-600">
-                    {POLL_STRINGS.POLL_EXPIRED}
+                    {pollStrings.pollExpired}
                   </Text>
                 )}
               </VStack>
@@ -104,7 +104,7 @@ const PollCard: React.FC<PollCardProps> = ({
           </Box>
             {isActive && userVote === null && ((isOwnerOrHost) || (isTraveller && poll.published)) && (
            <GradientButton
-             title={POLL_STRINGS.VOTE}
+             title={pollStrings.vote}
              onPress={handleActionPress}
              style={styles.voteButton}
              gradientStyle={styles.gradientButton}
@@ -115,7 +115,7 @@ const PollCard: React.FC<PollCardProps> = ({
             className="p-1.5 px-3 border border-primary-500 rounded-md bg-white items-center justify-center"
             onPress={handleActionPress}>
             <GradientText
-              text={POLL_STRINGS.VOTE}
+              text={pollStrings.vote}
               textStyle={styles.viewVotesGradientText}
             />
           </TouchableOpacity>)}
@@ -124,7 +124,7 @@ const PollCard: React.FC<PollCardProps> = ({
             className="p-1.5 px-3 border border-primary-500 rounded-md bg-white items-center justify-center"
             onPress={handleActionPress}>
             <GradientText
-              text={isOwnerOrHost ? POLL_STRINGS.VIEW_VOTES :POLL_DETAIL_STRINGS.VIEW_POLL_RESULTS}
+              text={isOwnerOrHost ? pollStrings.viewVotes : pollStrings.viewPollResults}
               textStyle={styles.viewVotesGradientText}
             />
           </TouchableOpacity>

@@ -9,7 +9,7 @@ import { Box, Text, VStack, HStack } from '@/components/ui';
 
 import { Header, Loader, GradientButton } from '@/src/components';
 import { PollCard } from './components';
-import { POLL_STRINGS } from './strings';
+import { pollStrings } from './strings';
 import { MainNavigationProps, MainRouteProps } from '@/src/types/allRoutes';
 import { images } from '@/src/assets';
 import { useGetPollsByTripQuery } from '@/src/services/pollApi';
@@ -72,7 +72,7 @@ const Poll: React.FC = () => {
   if (isLoading) {
     return (
       <SafeAreaView style={globalStyles.container}>
-        <Header title={POLL_STRINGS.TITLE} />
+        <Header title={pollStrings.title} />
         <Box className="flex-1 justify-center items-center">
           <Loader />
         </Box>
@@ -82,7 +82,7 @@ const Poll: React.FC = () => {
 
   return (
     <SafeAreaView style={globalStyles.container}>
-      <Header title={POLL_STRINGS.TITLE} />
+      <Header title={pollStrings.title} />
       
       {/* Trip Info */}
       <VStack className="px-6 py-2">
@@ -106,7 +106,7 @@ const Poll: React.FC = () => {
             styles.tabText,
             activeTab === 'Active' && styles.activeTabText
           ]}>
-            {POLL_STRINGS.ACTIVE}
+            {pollStrings.active}
           </Text>
           {activeTab === 'Active' && <Box style={styles.tabIndicator} />}
         </TouchableOpacity>
@@ -119,7 +119,7 @@ const Poll: React.FC = () => {
             styles.tabText,
             activeTab === 'Past' && styles.activeTabText
           ]}>
-            {POLL_STRINGS.PAST}
+            {pollStrings.past}
           </Text>
           {activeTab === 'Past' && <Box style={styles.tabIndicator} />}
         </TouchableOpacity>
@@ -172,7 +172,7 @@ const Poll: React.FC = () => {
       {/* Create Poll Button */}
       <Box className="px-6 pb-6">
         <GradientButton
-          title={POLL_STRINGS.CREATE_POLL}
+          title={pollStrings.createPoll}
           onPress={handleCreatePoll}
           size="large"
         />
