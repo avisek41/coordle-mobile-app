@@ -6,9 +6,10 @@ import { Box, HStack, VStack, Text } from '@/components/ui';
 
 import { GradientAvatar, GradientButton, GradientText } from '@/src/components';
 import { Poll } from '@/src/types/poll';
-import { POLL_STRINGS } from '../strings';
+import { pollStrings } from '../strings';
 import { Colors } from '@/src/configs/CustomTheme';
 import { formatTimeRemaining } from '@/src/utils';
+import { useAppSelector } from '@/src/hooks';
 
 interface PollCardProps {
   poll: Poll;
@@ -23,13 +24,16 @@ const PollCard: React.FC<PollCardProps> = ({
   onViewVotes,
   userVote
 }) => {
-  const isActive = poll.status === 'Active';
+  const isActive = poll.status === 'Active'
+  const { userRole } = useAppSelector(state => state.auth); 
+  const isOwnerOrHost = userRole === 'owner' || userRole === 'host';
+  const isTraveller = userRole === 'traveller';
 
   const getStatusText = () => {
     if (isActive) {
-      return `${POLL_STRINGS.POLL_ENDS_ON} ${poll.display_close_poll_date} at ${poll.display_close_poll_time}`;
+      return `${pollStrings.pollEndsOn} ${poll.display_close_poll_date} at ${poll.display_close_poll_time}`;
     } else {
-      return `${POLL_STRINGS.CLOSED_ON} ${poll.display_close_poll_date}`;
+      return `${pollStrings.closedOn} ${poll.display_close_poll_date}`;
     }
   };
 
@@ -88,43 +92,41 @@ const PollCard: React.FC<PollCardProps> = ({
               <VStack space="xs">
                 {userVote ? (
                   <Text className="text-sm text-gray-900">
-                    {POLL_STRINGS.YOUR_VOTE} : <Text style={{ color: Colors.primary }} className="font-medium">{userVote.join(', ')}</Text>
+                    {pollStrings.yourVote} : <Text style={{ color: Colors.primary }} className="font-medium">{userVote.join(', ')}</Text>
                   </Text>
                 ) : (
                   <Text className="text-sm text-red-600">
-                    {POLL_STRINGS.POLL_EXPIRED}
+                    {pollStrings.pollExpired}
                   </Text>
                 )}
               </VStack>
             )}
           </Box>
-            {isActive && userVote === null && (
+            {isActive && userVote === null && ((isOwnerOrHost) || (isTraveller && poll.published)) && (
            <GradientButton
-             title={POLL_STRINGS.VOTE}
+             title={pollStrings.vote}
              onPress={handleActionPress}
              style={styles.voteButton}
              gradientStyle={styles.gradientButton}
              textStyle={styles.textButton}
            />
            )}
-           {isActive && userVote !== null && (<TouchableOpacity
-              className={`border border-primary-500 bg-white items-center justify-center`}
-              style={styles.voteButton}
-              onPress={handleActionPress}>
-              <GradientText
-                text={POLL_STRINGS.VOTE}
-                textStyle={styles.textButton}
-              />
-            </TouchableOpacity>)}
-            {!isActive && (
+           {isActive && userVote !== null && ((isOwnerOrHost) || (isTraveller && poll.published)) && (<TouchableOpacity
+            className="p-1.5 px-3 border border-primary-500 rounded-md bg-white items-center justify-center"
+            onPress={handleActionPress}>
+            <GradientText
+              text={pollStrings.vote}
+              textStyle={styles.viewVotesGradientText}
+            />
+          </TouchableOpacity>)}
+           {!isActive && (isOwnerOrHost || isTraveller && poll.published) && (
             <TouchableOpacity
-            onPress={handleActionPress}
-            style={styles.viewVotesButton}
-            activeOpacity={0.8}
-          >
-            <Text className="text-primary-500 font-heading text-xs">
-              {POLL_STRINGS.VIEW_VOTES}
-            </Text>
+            className="p-1.5 px-3 border border-primary-500 rounded-md bg-white items-center justify-center"
+            onPress={handleActionPress}>
+            <GradientText
+              text={isOwnerOrHost ? pollStrings.viewVotes : pollStrings.viewPollResults}
+              textStyle={styles.viewVotesGradientText}
+            />
           </TouchableOpacity>
            )}
         </HStack>
@@ -162,6 +164,12 @@ const styles = StyleSheet.create({
     width: 54,
     marginTop: 0,
     borderRadius: 4
+  },
+  viewVotesGradientText: {
+    fontSize: 11,
+    fontWeight: '600',
+    textAlign: 'center',
+    fontFamily: 'AvenirLTPro-Medium',
   },
   viewVotesButton: {
       borderWidth: 1,

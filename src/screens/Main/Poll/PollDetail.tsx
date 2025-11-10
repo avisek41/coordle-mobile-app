@@ -15,7 +15,7 @@ import {Box, Text, VStack, HStack} from '@/components/ui';
 import { MainNavigationProps } from '@/src/types/allRoutes';
 import { useVoteOnPollMutation, useClosePollMutation, useDeletePollMutation, useGetPollVotesQuery } from '@/src/services/pollApi';
 import { GradientButton, GradientAvatar, Loader, CustomActionSheet, CustomAlert, Header, GradientText } from '@/src/components';
-import { POLL_STRINGS, POLL_DETAIL_STRINGS, POLL_VOTES_STRINGS } from './strings';
+import { pollStrings } from './strings';
 import { globalStyles } from '@/src/styles';
 import PollOptionCard from './components/PollOptionCard';
 import { PollOptionWithVotes } from '@/src/types/poll';
@@ -114,8 +114,8 @@ const PollDetail: React.FC = () => {
 
       showToast({
         type: 'success',
-        title: POLL_DETAIL_STRINGS.VOTE_SUBMITTED_SUCCESSFULLY,
-        message: POLL_DETAIL_STRINGS.VOTE_SUBMITTED_SUCCESSFULLY,
+        title: pollStrings.voteSubmittedTitle,
+        message: pollStrings.voteSubmittedSuccessfully,
         duration: 3000,
       });
 
@@ -147,7 +147,7 @@ const PollDetail: React.FC = () => {
   };
 
   const getStatusText = () => {
-    return `${POLL_STRINGS.POLL_ENDS_IN} ${formatTimeRemaining(poll.close_poll_date_time)}`;
+    return `${pollStrings.pollEndsIn} ${formatTimeRemaining(poll.close_poll_date_time)}`;
   };
 
   const confirmEndPoll = () => {
@@ -210,7 +210,7 @@ const PollDetail: React.FC = () => {
       <SafeAreaView style={globalStyles.container}>
         <Box className="flex-1 justify-center items-center px-6">
           <Text className="text-lg text-gray-600 text-center">
-            {POLL_DETAIL_STRINGS.ERROR_LOADING}
+            {pollStrings.errorLoadingDetail}
           </Text>
         </Box>
       </SafeAreaView>
@@ -232,7 +232,7 @@ const PollDetail: React.FC = () => {
       content = (
         <Box className="bg-white">
           <GradientButton
-            title={isVoting ? 'Submitting...' : POLL_DETAIL_STRINGS.SUBMIT}
+            title={isVoting ? 'Submitting...' : pollStrings.submit}
             onPress={handleSubmit}
             loading={isVoting}
             disabled={selectedOptions.length === 0 || isVoting || isPollClosed}
@@ -248,7 +248,7 @@ const PollDetail: React.FC = () => {
             className="p-4 border border-primary-500 rounded-lg bg-white items-center justify-center"
             onPress={handleViewVotes}>
             <GradientText
-              text={POLL_DETAIL_STRINGS.VIEW_POLL_RESULTS}
+              text={pollStrings.viewPollResults}
               textStyle={styles.viewVotesGradientText}
             />
           </TouchableOpacity>
@@ -263,7 +263,7 @@ const PollDetail: React.FC = () => {
             className="p-4 border border-primary-500 rounded-lg bg-white items-center justify-center"
             onPress={handleViewVotes}>
             <GradientText
-              text={POLL_DETAIL_STRINGS.VIEW_VOTES}
+              text={pollStrings.viewVotesDetail}
               textStyle={styles.viewVotesGradientText}
             />
           </TouchableOpacity>
@@ -272,7 +272,7 @@ const PollDetail: React.FC = () => {
           <GradientButton
             onPress={handleSubmit}
             disabled={selectedOptions.length === 0 || isVoting || isPollClosed}
-            title={isVoting ? 'Submitting...' : POLL_DETAIL_STRINGS.SUBMIT}
+            title={isVoting ? 'Submitting...' : pollStrings.submit}
             loading={isVoting}
             textStyle={styles.submitButtonText}
           />
@@ -302,13 +302,13 @@ const PollDetail: React.FC = () => {
           {/* Header Overlay */}
           <Box className="absolute top-0 left-0 right-0">
             <Header
-              title={POLL_DETAIL_STRINGS.TITLE}
+              title={pollStrings.pollDetailTitle}
               onBackPress={() => navigation.goBack()}
               showBackButton={true}
               titleStyle={styles.headerTitle}
               iconColor={Colors.white}
               rightComponent={
-                isOwnerOrHost ? (<TouchableOpacity
+                isOwnerOrHost && poll.status === 'Active' ? (<TouchableOpacity
                   onPress={() => setIsActionSheetOpen(true)}
                   className="p-2 border border-gray-200 rounded-lg"
                   activeOpacity={0.8}
@@ -361,7 +361,7 @@ const PollDetail: React.FC = () => {
                 <Text 
                   className="text-sm text-center fontFamilyAvenir text-white fontWeight900"
                 >
-                  {POLL_VOTES_STRINGS.CLOSED}
+                  {pollStrings.closedVotes}
                 </Text>
               </Box>
             </HStack>)}
@@ -378,7 +378,7 @@ const PollDetail: React.FC = () => {
               <Ionicons name="checkmark-circle" size={24} color={Colors.primary} />
             )}
             <Text className="text-medium text-gray-900 ml-2 fontFamilyAvenir font-semibold">
-              {poll.allow_multi_answers ? POLL_DETAIL_STRINGS.MULTIPLE_SELECT : POLL_DETAIL_STRINGS.SINGLE_SELECT}
+              {poll.allow_multi_answers ? pollStrings.multipleSelect : pollStrings.singleSelect}
             </Text>
           </HStack>
 
