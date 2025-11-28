@@ -29,7 +29,7 @@ import { Colors } from '@/src/configs/CustomTheme';
 import { RootState } from '@/src/redux/Store';
 import { Header, GradientButton, CustomAlert, GradientText } from '@/src/components';
 import { globalStyles } from '@/src/styles';
-import { dateFormat, dateFormatWithDay, dateTime, timeFormat, dateMonthYearFormat } from '@/src/utils/dateTimeFormat';
+import { dateFormat, dateFormatWithDay, dateTime, timeFormat } from '@/src/utils/dateTimeFormat';
 import { formatTimeRemaining } from '@/src/utils';
 import { images } from '@/src/assets';
 
@@ -245,8 +245,7 @@ const CreatePoll: React.FC = () => {
       second: 0,
     });
     setClosePollDateTime(combinedDateTime);
-    
-    if (moment(combinedDateTime).format(dateFormat) > moment(tripEndDate, dateMonthYearFormat).format(dateFormat)) {
+    if (moment(combinedDateTime).format(dateTime) > moment(tripEndDate, dateFormat).format(dateTime)) {
       showToast({
         type: 'error',
         title: pollStrings.validationError,

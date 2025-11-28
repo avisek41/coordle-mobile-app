@@ -96,31 +96,31 @@ const CustomAlert: React.FC<CustomAlertProps> = ({
            style={styles.closeButton}
            activeOpacity={0.7}
          >
-           <Ionicons name="close" size={20} color={Colors.iconGray} />
+           <Ionicons name="close" size={20} color={Colors.darkGray} />
          </TouchableOpacity>
 
          {/* Content */}
          <VStack className="items-center">
            
-          <HStack className="flex-row justify-between items-center">
+          <VStack className="mt-3 justify-between items-center">
             {/* Icon */}
-            {icon && <Image
+            {icon && (<Image
               source={icon as ImageSourcePropType}
               style={styles.iconStyle}
               className='fontFamilyAvenir mb-3'
               resizeMode='contain'
-            />}
+            />)}
 
             {/* Title */}
-            {Boolean(title) && <Text className="text-xl font-bold text-black leading-5 text-center mb-4 fontFamilyAvenir">
+            {Boolean(title) && (<Text className="text-xl fontWeightBold text-black text-center mb-4 fontFamilyAvenir">
               {title}
-            </Text>}
-          </HStack>
+            </Text>)}
+          </VStack>
 
           {/* Subtitle */}
-          {Boolean(message) && <Text className="text-sm text-gray-500 text-left leading-5 fontFamilyAvenir">
+          {Boolean(message) && (<Text className="text-sm text-gray-500 text-left leading-5 fontFamilyAvenir">
           {message.replace(/\\n/g, '\n')}
-          </Text>}
+          </Text>)}
          </VStack>
          {/* Action Buttons */}
          {isDestructive && (
@@ -193,6 +193,10 @@ const styles = StyleSheet.create({
   },
   fontFamilyAvenir: {
     fontFamily: 'AvenirLTProRoman',
+  },
+  fontWeightBold: {
+    fontWeight: 'bold',
+    fontFamily: 'AvenirLTPro-Bold',
   },
 });
 

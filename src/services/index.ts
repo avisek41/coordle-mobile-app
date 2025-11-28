@@ -210,3 +210,28 @@ export {
   type UpdateAnnouncementResponse,
   type DeleteAnnouncementResponse,
 } from './announcementsApi';
+
+// Export poll API
+export {
+  pollApi,
+  useGetPollsByTripQuery,
+  useCreatePollMutation,
+  useUpdatePollMutation,
+  useDeletePollMutation,
+  usePublishPollMutation,
+  useClosePollMutation,
+  useVoteOnPollMutation,
+  useGetPollVotesQuery,
+} from './pollApi';
+
+// Export meal API
+export {
+  mealApi,
+  useGetMealsByTripQuery,
+  useCreateMealMutation,
+  useUpdateMealMutation,
+  useDeleteMealMutation,
+  useGetMealByIdQuery,
+  useSubmitMealOrderMutation,
+  useUpdateMealOrderMutation,
+} from './mealApi';

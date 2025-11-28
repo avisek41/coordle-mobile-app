@@ -99,6 +99,26 @@ export type MainStackParams = {
     tripStartDate: string;
     tripEndDate: string;
     tripId: string;
+    tripMembersCounts: number;
+  };
+  AddMeal: {
+    tripId: string;
+    tripStartDate: string;
+    tripEndDate: string;
+    mealId?: string;
+  };
+  MealDetail: {
+    tripId: string;
+    date: string;
+    tripStartDate: string;
+    tripEndDate: string;
+    tripMembersCounts: number;
+  };  MealOrderDetail: {
+    mealId: string;
+  };
+  SubmitMeal: {
+    mealId: string;
+    orderId?: string;
   };
   AddLodging: {
     tripId: string;

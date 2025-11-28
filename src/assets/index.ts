@@ -12,4 +12,5 @@ export const images = {
   docs: require('./Images/docs.png'),
   splash: require('./Images/splash.png'),
   poll: require('./Images/poll.png'),
+  manageFood: require('./Images/manageFood.png'),
 };

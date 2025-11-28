@@ -7,6 +7,7 @@ interface TripMember {
   tripRole: string;
   inviteType: string;
   preferredName: string;
+  profilePhotoURL: string;
 }
 
 interface TripMembersResponse {
