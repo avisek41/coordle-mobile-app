@@ -37,7 +37,7 @@ const MealOrderDetail: React.FC = () => {
   const [refreshing, setRefreshing] = useState(false);
   const [activeTab, setActiveTab] = useState<'Collected' | 'Pending'>('Collected');
   const [showSubmitForm, setShowSubmitForm] = useState(false);
-  const [editingOrder, setEditingOrder] = useState<{ orderId: string; foodOrder: string } | null>(null);
+  const [editingOrder, setEditingOrder] = useState<{ orderId: string; name: string; foodOrder: string } | null>(null);
   const { showToast, ToastComponent } = useSimpleToast();
   const { userId } = useAppSelector(state => state.auth);
 
@@ -104,7 +104,6 @@ const MealOrderDetail: React.FC = () => {
       </SafeAreaView>
     );
   }
-  console.log('mealData', mealData);
 
   if (error || !mealDataValue) {
     return (
@@ -177,6 +176,7 @@ const MealOrderDetail: React.FC = () => {
   const handleEditOrder = (order: IFoodOrder) => {
     setEditingOrder({
       orderId: order._id,
+      name: order.name || '',
       foodOrder: order.meal || '',
     });
     setShowSubmitForm(true);
@@ -206,9 +206,8 @@ const MealOrderDetail: React.FC = () => {
 
     try {
       if (editingOrder) {
-        // Update existing order - need to get restaurant name from the order
-        const orderToUpdate = collectedOrders.find(o => o._id === editingOrder.orderId);
-        const restaurantName = orderToUpdate?.name || meal.restaurants?.[0]?.name || '';
+        // Update existing order - use restaurant from form if provided, otherwise from order, otherwise first restaurant
+        const restaurantName = _restaurant || editingOrder.name || meal.restaurants?.[0]?.name || '';
         await updateMealOrder({
           mealId,
           orderId: editingOrder.orderId,
@@ -533,8 +532,7 @@ const MealOrderDetail: React.FC = () => {
                                     <TouchableOpacity
                                       onPress={() => handleEditOrder(order)}
                                       style={styles.editButton}
-                                      activeOpacity={0.7}
-                                    >
+                                      activeOpacity={0.7}>
                                       <AntDesign name="edit" size={20} color={Colors.textGray} />
                                     </TouchableOpacity>
                                   )}
@@ -713,6 +711,7 @@ const MealOrderDetail: React.FC = () => {
         isLoading={isSubmitting || isUpdating}
         multiline={true}
         restaurants={meal.restaurants}
+        selectedRestaurant={editingOrder?.name}
       />
 
       <ToastComponent />

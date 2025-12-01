@@ -78,9 +78,14 @@ const CustomActionForm: React.FC<CustomActionFormProps> = ({
   React.useEffect(() => {
     if (isOpen) {
       setValue(initialValue);
-      setSelectedRestaurantValue(
-        selectedRestaurant || (restaurants && restaurants.length > 0 ? restaurants[0].name : '')
-      );
+      // If selectedRestaurant is provided (edit mode), use it; otherwise use first restaurant
+      if (selectedRestaurant) {
+        setSelectedRestaurantValue(selectedRestaurant);
+      } else if (restaurants && restaurants.length > 0) {
+        setSelectedRestaurantValue(restaurants[0].name);
+      } else {
+        setSelectedRestaurantValue('');
+      }
     }
   }, [isOpen, initialValue, selectedRestaurant, restaurants]);
 
@@ -97,9 +102,15 @@ const CustomActionForm: React.FC<CustomActionFormProps> = ({
 
   const handleSubmit = () => {
     if (value.trim()) {
+      // If there's a restaurant dropdown, always pass the selected restaurant value
       if (showRestaurantDropdown && selectedRestaurantValue) {
         onSubmit(value.trim(), selectedRestaurantValue);
+      } else if (restaurants && restaurants.length > 0) {
+        // If no dropdown but restaurants exist, use the selectedRestaurantValue or first restaurant
+        const restaurantToUse = selectedRestaurantValue || restaurants[0].name;
+        onSubmit(value.trim(), restaurantToUse);
       } else {
+        // No restaurants, just submit the value
         onSubmit(value.trim());
       }
       setValue(initialValue);
