@@ -25,6 +25,10 @@ import { AppNotifications } from '@/src/screens/Main/AppNotifications';
 import { Poll, PollDetail, PollVotes } from '@/src/screens/Main/Poll';
 import CreatePoll from '@/src/screens/Main/Poll/CreatePoll';
 import ManageFoodOrder from '@/src/screens/Main/ManageFoodOrder';
+import AddMeal from '@/src/screens/Main/ManageFoodOrder/AddMeal';
+import MealDetail from '@/src/screens/Main/ManageFoodOrder/MealDetail';
+import MealOrderDetail from '@/src/screens/Main/ManageFoodOrder/MealOrderDetail';
+import SubmitMeal from '@/src/screens/Main/ManageFoodOrder/SubmitMeal';
 import { AddLodging } from '@/src/screens/Main/AddLodging';
 import { AddActivity } from '@/src/screens/Main/AddActivity';
 import { CreateActivity } from '@/src/screens/Main/CreateActivity';
@@ -146,6 +150,26 @@ const MainStack = () => {
       <Stack.Screen
         name="ManageFoodOrder"
         component={ManageFoodOrder}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="AddMeal"
+        component={AddMeal}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="MealDetail"
+        component={MealDetail}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="MealOrderDetail"
+        component={MealOrderDetail}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="SubmitMeal"
+        component={SubmitMeal}
         options={{ headerShown: false }}
       />
       <Stack.Screen

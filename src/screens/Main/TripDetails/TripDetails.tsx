@@ -13,6 +13,7 @@ import {
   useGetTripByIdQuery,
   useDeleteTripMutation,
   useRemoveParticipantMutation,
+  useGetTripMembersQuery,
 } from '@/src/services';
 import {
   Loader,
@@ -48,6 +49,11 @@ const TripDetails: React.FC = () => {
   const [removeParticipant, { isLoading: isRemoving }] =
     useRemoveParticipantMutation();
   const [showDeleteAlert, setShowDeleteAlert] = useState(false);
+  const {
+    data: tripMembersData,
+    isLoading: isLoadingMembers,
+  } = useGetTripMembersQuery(tripId || '', { skip: !tripId });
+  const userCount = tripMembersData?.data?.totalMembers || 0;
 
   const handleBackPress = () => {
     navigation.goBack();
@@ -102,6 +108,7 @@ const TripDetails: React.FC = () => {
         tripName: trip.name,
         tripStartDate: trip.display_start,
         tripEndDate: trip.display_end,
+        tripMembersCounts: userCount || 0,
       });
     } else if (feature === tripDetailsStrings.map) {
       Linking.openURL(
@@ -237,7 +244,7 @@ const TripDetails: React.FC = () => {
 
   const trip = tripData.data;
   const isOwner = trip.owner_id === userId;
-  const userCount = trip.users?.length || 0;
+
 
   return (
     <SafeAreaView style={globalStyles.container}>

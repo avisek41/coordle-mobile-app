@@ -42,6 +42,7 @@ export const apiSlice = createApi({
     'TripMembers',
     'Announcements',
     'Polls',
+    'Meals',
   ],
   endpoints: () => ({}),
 });

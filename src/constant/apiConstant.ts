@@ -23,6 +23,7 @@ export const API_ENDPOINTS = {
   GET_BANNERS: '/api/banners',
   MAKE_HOST: '/api/trips',
   POLL: '/api/polls',
+  MEAL: '/api/meals',
   CHANGE_USER_ROLE: '/api/trips',
   REMOVE_HOST: '/api/trips',
 } as const;
