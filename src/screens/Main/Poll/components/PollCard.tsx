@@ -1,5 +1,6 @@
 import React from 'react';
 import { TouchableOpacity, StyleSheet } from 'react-native';
+import moment from 'moment';
 
 // imports from gluestack components
 import { Box, HStack, VStack, Text } from '@/components/ui';
@@ -24,7 +25,7 @@ const PollCard: React.FC<PollCardProps> = ({
   onViewVotes,
   userVote
 }) => {
-  const isActive = poll.status === 'Active'
+  const isActive = !(moment(poll.close_poll_date_time).isBefore(moment()));
   const { userRole } = useAppSelector(state => state.auth); 
   const isOwnerOrHost = userRole === 'owner' || userRole === 'host';
   const isTraveller = userRole === 'traveller';

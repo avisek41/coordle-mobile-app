@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Image, SafeAreaView, StyleSheet, ScrollView, TouchableOpacity, RefreshControl } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import moment from 'moment';
@@ -21,7 +21,8 @@ const Poll: React.FC = () => {
   const navigation = useNavigation<MainNavigationProps>();
   const route = useRoute<MainRouteProps<'Poll'>>();
   const { tripId, tripName, tripStartDate, tripEndDate } = route.params;
-  const currentUserId = useAppSelector(state => state.auth.userId);
+  const currentUserId= useAppSelector(state => state.auth.userId);
+  const isOwnerOrHost = useAppSelector(state => state.auth.userRole === 'owner' || state.auth.userRole === 'host');
 
   const [activeTab, setActiveTab] = useState<'Active' | 'Past'>('Active');
   const [refreshing, setRefreshing] = useState(false);
@@ -55,19 +56,27 @@ const Poll: React.FC = () => {
     setRefreshing(false);
   };
 
-  const activePolls = pollsData?.data?.polls?.filter(poll => {
-    const isActive = poll.status === 'Active';
-    const isNotExpired = moment(poll.close_poll_date_time).isAfter(moment());
-    return isActive && isNotExpired;
-  }) || [];
+  const activePolls = useMemo(() => {
+    if (!pollsData?.data?.polls) return [];
+    return pollsData.data.polls.filter(poll => {
+      const isActive = poll.status === 'Active';
+      const isNotExpired = moment(poll.close_poll_date_time).isAfter(moment());
+      return isActive && isNotExpired;
+    });
+  }, [pollsData?.data?.polls]);
   
-  const pastPolls = pollsData?.data?.polls?.filter(poll => {
-    const isClosed = poll.status === 'Closed';
-    const isExpired = moment(poll.close_poll_date_time).isBefore(moment());
-    return isClosed || isExpired;
-  }) || [];
+  const pastPolls = useMemo(() => {
+    if (!pollsData?.data?.polls) return [];
+    return pollsData.data.polls.filter(poll => {
+      const isClosed = poll.status === 'Closed';
+      const isExpired = moment(poll.close_poll_date_time).isBefore(moment());
+      return isClosed || isExpired;
+    });
+  }, [pollsData?.data?.polls]);
   
-  const currentPolls = activeTab === 'Active' ? activePolls : pastPolls;
+  const currentPolls = useMemo(() => {
+    return activeTab === 'Active' ? activePolls : pastPolls;
+  }, [activeTab, activePolls, pastPolls]);
   
   if (isLoading) {
     return (
@@ -170,13 +179,13 @@ const Poll: React.FC = () => {
       </ScrollView>
 
       {/* Create Poll Button */}
-      <Box className="px-6 pb-6">
+      {isOwnerOrHost && <Box className="px-6 pb-6">
         <GradientButton
           title={pollStrings.createPoll}
           onPress={handleCreatePoll}
           size="large"
         />
-      </Box>
+      </Box>}
     </SafeAreaView>
   );
 };
