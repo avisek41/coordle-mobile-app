@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   SafeAreaView,
   TouchableOpacity,
@@ -10,7 +10,6 @@ import { Box } from '@/components/ui/box';
 import { Text } from '@/components/ui/text';
 import { VStack } from '@/components/ui/vstack';
 import { HStack } from '@/components/ui/hstack';
-import { Input, InputField } from '@/components/ui/input';
 import { Pressable } from '@/components/ui/pressable';
 import { INVITE_TRIP_MEMBER_STRINGS } from './strings';
 import { Header, PlanUsers } from '@/src/components';
@@ -52,7 +51,7 @@ const InviteTripMember = () => {
   const navigation = useNavigation<MainNavigationProps>();
   const route = useRoute<MainRouteProps<'InviteTripMember'>>();
   const { tripId, inviteType, ownerId } = route.params || {};
-  const { data, isLoading, error, refetch } = useGetSamePlanUsersQuery(ownerId);
+  const { refetch } = useGetSamePlanUsersQuery(ownerId);
   const { showToast, ToastComponent } = useSimpleToast();
 
   const [inputValue, setInputValue] = useState('');
@@ -414,7 +413,7 @@ const InviteTripMember = () => {
       if (ownerId) {
         refetch();
       }
-    }, [ownerId]),
+    }, [ownerId, refetch]),
   );
 
   return (
@@ -430,7 +429,7 @@ const InviteTripMember = () => {
             {isEmailType && (
               <>
                 <Text className="text-base font-body text-gray-800">
-                  {INVITE_TRIP_MEMBER_STRINGS.EMAIL_INSTRUCTION}
+                  {instruction}
                 </Text>
                 <Text className="text-base mt-2 font-body text-gray-800">
                   {label}
@@ -470,6 +469,11 @@ const InviteTripMember = () => {
                   value={inputValue}
                   onChangeText={handleInputChange}
                   onSubmitEditing={handleInputSubmit}
+                  onKeyPress={({ nativeEvent }) => {
+                    if (nativeEvent.key === 'Enter') {
+                      handleInputSubmit();
+                    }
+                  }}
                   style={styles.textInput}
                   keyboardType="email-address"
                   autoCapitalize="none"
@@ -480,7 +484,7 @@ const InviteTripMember = () => {
             ) : (
               // Phone Input Section
               <VStack space="md">
-                {phoneInputs.map((input, index) => (
+                {phoneInputs.map((input) => (
                   <VStack key={input.id} space="sm">
                     <HStack className="bg-gray-50 border border-gray-200 rounded-lg h-12 items-center px-3">
                       {/* Country Flag and Code Picker */}
@@ -600,7 +604,7 @@ const styles = StyleSheet.create({
     width: '100%',
     paddingVertical: 8,
     paddingHorizontal: 0,
-    height: 100,
+    height: 40,
   },
   phoneInput: {
     fontFamily: 'AvenirLTProRoman',
