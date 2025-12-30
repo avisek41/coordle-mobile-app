@@ -12,7 +12,7 @@ import { Box } from '@/components/ui/box';
 import { Text } from '@/components/ui/text';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
-const GOOGLE_MAPS_API = 'AIzaSyBxfVswQ9hBsjelJqKtoYjR4PefccGxky0';
+const GOOGLE_MAPS_API = 'AIzaSyAgSSFus5DDOHbVUghkl6TSdfsUZYkw8QM';
 
 interface Coordinates {
   latitude: number;
