@@ -4,6 +4,7 @@ import {
   ScrollView,
   StyleSheet,
   TouchableOpacity,
+  Image,
 } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { MainNavigationProps, MainRouteProps } from '@/src/types/allRoutes';
@@ -14,12 +15,10 @@ import { HStack } from '@/components/ui/hstack';
 import { Header } from '@/src/components';
 import { globalStyles } from '@/src/styles';
 import { Colors } from '@/src/configs/CustomTheme';
-import Ionicons from 'react-native-vector-icons/Ionicons';
-
+import { addActivityIcons } from '@/src/assets';
 interface ActivityCategory {
   id: string;
   name: string;
-  icon: string;
   color: string;
 }
 
@@ -27,63 +26,105 @@ const activityCategories: ActivityCategory[] = [
   {
     id: 'restaurant',
     name: 'Restaurant',
-    icon: 'restaurant-outline',
+    color: Colors.primary,
+  },
+  {
+    id: 'tour',
+    name: 'Tour',
     color: Colors.primary,
   },
   {
     id: 'museum',
     name: 'Museum',
-    icon: 'library-outline',
     color: Colors.primary,
   },
-  { id: 'event', name: 'Event', icon: 'ticket-outline', color: Colors.primary },
-  { id: 'relax', name: 'Relax', icon: 'leaf-outline', color: Colors.primary },
-  {
-    id: 'shopping',
-    name: 'Shopping',
-    icon: 'bag-outline',
-    color: Colors.primary,
-  },
-  { id: 'kids', name: 'Kids', icon: 'car-outline', color: Colors.primary },
-  {
-    id: 'meeting',
-    name: 'Meeting',
-    icon: 'calendar-outline',
-    color: Colors.primary,
-  },
-  { id: 'tour', name: 'Tour', icon: 'map-outline', color: Colors.primary },
   {
     id: 'bar',
     name: 'Bar & Party',
-    icon: 'wine-outline',
+    color: Colors.primary,
+  },
+  {
+    id: 'event',
+    name: 'Event',
     color: Colors.primary,
   },
   {
     id: 'training',
     name: 'Training',
-    icon: 'trophy-outline',
+    color: Colors.primary,
+  },
+  {
+    id: 'relax',
+    name: 'Relax',
     color: Colors.primary,
   },
   {
     id: 'fitness',
     name: 'Fitness',
-    icon: 'fitness-outline',
+    color: Colors.primary,
+  },
+  {
+    id: 'shopping',
+    name: 'Shopping',
     color: Colors.primary,
   },
   {
     id: 'concert',
     name: 'Concert',
-    icon: 'musical-notes-outline',
+    color: Colors.primary,
+  },
+  {
+    id: 'kids',
+    name: 'Kids',
     color: Colors.primary,
   },
   {
     id: 'theater',
     name: 'Theater',
-    icon: 'theater-masks-outline',
     color: Colors.primary,
   },
-  { id: 'other', name: 'Other', icon: 'grid-outline', color: Colors.primary },
+  {
+    id: 'meeting',
+    name: 'Meeting',
+    color: Colors.primary,
+  },
+  {
+    id: 'misc',
+    name: 'Misc',
+    color: Colors.primary,
+  },
+  {
+    id: 'other',
+    name: 'Other',
+    color: Colors.primary,
+  },
 ];
+
+/**
+ * Maps category id to the corresponding image key in addActivityIcons
+ */
+const getCategoryImage = (categoryId: string) => {
+  const imageMap: Record<string, keyof typeof addActivityIcons> = {
+    restaurant: 'restaurant',
+    tour: 'tour',
+    museum: 'museum',
+    bar: 'bar_and_party',
+    event: 'event',
+    training: 'training',
+    relax: 'relax',
+    fitness: 'fitness',
+    shopping: 'shopping',
+    concert: 'concert',
+    kids: 'kids',
+    theater: 'theater',
+    meeting: 'meeting',
+    misc: 'misc',
+    other: 'other',
+  };
+
+  const imageKey = imageMap[categoryId];
+  return imageKey ? addActivityIcons[imageKey] : addActivityIcons.other;
+};
 
 const AddActivity: React.FC = () => {
   const navigation = useNavigation<MainNavigationProps>();
@@ -105,25 +146,27 @@ const AddActivity: React.FC = () => {
     });
   };
 
-  const renderActivityCategory = (category: ActivityCategory) => (
-    <TouchableOpacity
-      key={category.id}
-      onPress={() => handleCategorySelect(category.id)}
-      style={styles.categoryButton}
-      activeOpacity={0.7}
-    >
-      <HStack className="items-center" space="sm">
-        <Ionicons
-          name={category.icon as any}
-          size={24}
-          color={category.color}
-        />
-        <Text className="text-base font-body text-gray-700">
-          {category.name}
-        </Text>
-      </HStack>
-    </TouchableOpacity>
-  );
+  const renderActivityCategory = (category: ActivityCategory) => {
+    return (
+      <TouchableOpacity
+        key={category.id}
+        onPress={() => handleCategorySelect(category.id)}
+        style={styles.categoryButton}
+        activeOpacity={0.7}
+      >
+        <HStack className="items-center" space="sm">
+          <Image
+            source={getCategoryImage(category.id)}
+            style={styles.categoryIcon}
+            resizeMode="contain"
+          />
+          <Text className="text-base font-body text-gray-700">
+            {category.name}
+          </Text>
+        </HStack>
+      </TouchableOpacity>
+    );
+  };
 
   return (
     <SafeAreaView style={globalStyles.container}>
@@ -165,6 +208,10 @@ const styles = StyleSheet.create({
     padding: 16,
     minHeight: 60,
     justifyContent: 'center',
+  },
+  categoryIcon: {
+    width: 24,
+    height: 24,
   },
 });
 

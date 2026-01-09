@@ -122,7 +122,6 @@ export type MainStackParams = {
   };
   AddLodging: {
     tripId: string;
-    tripName: string;
   };
   AddActivity: {
     tripId: string;

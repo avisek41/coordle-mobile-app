@@ -24,6 +24,8 @@ export const API_ENDPOINTS = {
   MAKE_HOST: '/api/trips',
   POLL: '/api/polls',
   MEAL: '/api/meals',
+  LODGING: '/api/lodging',
+  ACTIVITIES: '/api/activities',
   CHANGE_USER_ROLE: '/api/trips',
   REMOVE_HOST: '/api/trips',
 } as const;
