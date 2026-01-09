@@ -235,3 +235,21 @@ export {
   useSubmitMealOrderMutation,
   useUpdateMealOrderMutation,
 } from './mealApi';
+
+// Export lodging API
+export {
+  lodgingApi,
+  useCreateLodgingMutation,
+  type CreateLodgingFormData,
+  type CreateLodgingResponse,
+  type LodgingData,
+} from './lodgingApi';
+
+// Export activity API
+export {
+  activityApi,
+  useCreateActivityMutation,
+  type CreateActivityFormData,
+  type CreateActivityResponse,
+  type ActivityData,
+} from './activityApi';

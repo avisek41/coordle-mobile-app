@@ -7,7 +7,7 @@ import { Text } from '@/components/ui/text';
 import { VStack } from '@/components/ui/vstack';
 import { Input, InputField } from '@/components/ui/input';
 import { Pressable } from '@/components/ui/pressable';
-import { GradientButton, Header } from '@/src/components';
+import { GradientButton, Header, Loader } from '@/src/components';
 import { globalStyles } from '@/src/styles';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import DateTimePicker, {
@@ -16,12 +16,16 @@ import DateTimePicker, {
 import moment from 'moment';
 import { useSimpleToast } from '@/src/hooks/useSimpleToast';
 import { dateFormatWithDay } from '@/src/utils/dateTimeFormat';
+import { useCreateLodgingMutation } from '@/src/services/lodgingApi';
+import { ADD_LODGING_STRINGS } from './strings';
+import { HStack } from '@/components/ui/hstack';
 
 const AddLodging: React.FC = () => {
   const navigation = useNavigation<MainNavigationProps>();
   const route = useRoute<MainRouteProps<'AddLodging'>>();
   const { tripId } = route.params;
   const { showToast, ToastComponent } = useSimpleToast();
+  const [createLodging, { isLoading }] = useCreateLodgingMutation();
 
   const [lodgingName, setLodgingName] = useState('');
   const [checkInDate, setCheckInDate] = useState(new Date());
@@ -58,35 +62,86 @@ const AddLodging: React.FC = () => {
     }
   };
 
-  const handleSave = () => {
+  /**
+   * Handles saving the lodging data by calling the API
+   * Validates required fields and date constraints before submission
+   */
+  const handleSave = async () => {
+    // Validate lodging name
     if (!lodgingName.trim()) {
       showToast({
         type: 'error',
         title: 'Error',
-        message: 'Please enter lodging name',
+        message: ADD_LODGING_STRINGS.LODGING_NAME_REQUIRED,
         duration: 2000,
       });
       return;
     }
 
+    // Validate check-out date is after check-in date
     if (checkInDate >= checkOutDate) {
       showToast({
         type: 'error',
         title: 'Error',
-        message: 'Check-out date must be after check-in date',
+        message: ADD_LODGING_STRINGS.CHECKOUT_AFTER_CHECKIN,
         duration: 2000,
       });
       return;
     }
 
-    showToast({
-      type: 'success',
-      title: 'Success',
-      message: 'Lodging added successfully',
-      duration: 2000,
-    });
+    try {
+      // Format dates to ISO 8601 format with time
+      // Set check-in time to 14:00 (2 PM) and check-out time to 11:00 (11 AM)
+      const checkInISO = moment(checkInDate)
+        .set({ hour: 14, minute: 0, second: 0, millisecond: 0 })
+        .toISOString();
+      const checkOutISO = moment(checkOutDate)
+        .set({ hour: 11, minute: 0, second: 0, millisecond: 0 })
+        .toISOString();
 
-    navigation.goBack();
+      // Prepare request payload
+      const lodgingData = {
+        lodging_name: lodgingName.trim(),
+        check_in: checkInISO,
+        check_out: checkOutISO,
+        trip_id: tripId,
+        ...(phoneNumber.trim() && { phone: phoneNumber.trim() }),
+        ...(website.trim() && { website: website.trim() }),
+        ...(reservationCode.trim() && {
+          reservation_code: reservationCode.trim(),
+        }),
+        ...(address.trim() && { address: address.trim() }),
+        ...(notes.trim() && { notes: notes.trim() }),
+      };
+
+      // Call API to create lodging
+      const response = await createLodging(lodgingData).unwrap();
+
+      if (response.success) {
+        showToast({
+          type: 'success',
+          title: 'Success',
+          message: ADD_LODGING_STRINGS.LODGING_CREATED_SUCCESS,
+          duration: 2000,
+        });
+
+        // Navigate back after successful creation
+        navigation.goBack();
+      }
+    } catch (error: any) {
+      // Handle API errors
+      const errorMessage =
+        error?.data?.message ||
+        error?.message ||
+        ADD_LODGING_STRINGS.LODGING_CREATE_FAILED;
+
+      showToast({
+        type: 'error',
+        title: 'Error',
+        message: errorMessage,
+        duration: 2000,
+      });
+    }
   };
 
   const formatDate = (date: Date) => {
@@ -96,8 +151,9 @@ const AddLodging: React.FC = () => {
   return (
     <SafeAreaView style={globalStyles.container}>
       <ToastComponent />
+      {isLoading && <Loader />}
 
-      <Header title="Add Lodging" onBackPress={handleBackPress} />
+      <Header title={ADD_LODGING_STRINGS.TITLE} onBackPress={handleBackPress} />
 
       <ScrollView
         showsVerticalScrollIndicator={false}
@@ -107,11 +163,12 @@ const AddLodging: React.FC = () => {
         <VStack className="px-5 py-2" space="lg">
           <VStack space="sm">
             <Text className="text-sm font-body text-gray-600">
-              Enter Lodging Name<Text className="text-red-500">*</Text>
+              {ADD_LODGING_STRINGS.LODGING_NAME_LABEL}
+              <Text className="text-red-500">*</Text>
             </Text>
             <Input className="bg-white border border-gray-300 rounded-lg h-12">
               <InputField
-                placeholder="Enter Lodging Name"
+                placeholder={ADD_LODGING_STRINGS.LODGING_NAME_PLACEHOLDER}
                 value={lodgingName}
                 onChangeText={setLodgingName}
                 className="text-base font-body px-4"
@@ -121,7 +178,8 @@ const AddLodging: React.FC = () => {
 
           <VStack space="sm">
             <Text className="text-sm font-body text-gray-600">
-              Check-in<Text className="text-red-500">*</Text>
+              {ADD_LODGING_STRINGS.CHECK_IN_LABEL}
+              <Text className="text-red-500">*</Text>
             </Text>
             <Pressable
               onPress={() => setShowCheckInPicker(true)}
@@ -136,7 +194,8 @@ const AddLodging: React.FC = () => {
 
           <VStack space="sm">
             <Text className="text-sm font-body text-gray-600">
-              Check-out<Text className="text-red-500">*</Text>
+              {ADD_LODGING_STRINGS.CHECK_OUT_LABEL}
+              <Text className="text-red-500">*</Text>
             </Text>
             <Pressable
               onPress={() => setShowCheckOutPicker(true)}
@@ -151,11 +210,11 @@ const AddLodging: React.FC = () => {
 
           <VStack space="sm">
             <Text className="text-sm font-body text-gray-600">
-              Enter phone number
+              {ADD_LODGING_STRINGS.PHONE_NUMBER_LABEL}
             </Text>
             <Input className="bg-white border border-gray-300 rounded-lg h-12">
               <InputField
-                placeholder="Phone"
+                placeholder={ADD_LODGING_STRINGS.PHONE_NUMBER_PLACEHOLDER}
                 value={phoneNumber}
                 onChangeText={setPhoneNumber}
                 keyboardType="phone-pad"
@@ -166,11 +225,11 @@ const AddLodging: React.FC = () => {
 
           <VStack space="sm">
             <Text className="text-sm font-body text-gray-600">
-              Enter website
+              {ADD_LODGING_STRINGS.WEBSITE_LABEL}
             </Text>
             <Input className="bg-white border border-gray-300 rounded-lg h-12">
               <InputField
-                placeholder="Website"
+                placeholder={ADD_LODGING_STRINGS.WEBSITE_PLACEHOLDER}
                 value={website}
                 onChangeText={setWebsite}
                 keyboardType="url"
@@ -181,11 +240,11 @@ const AddLodging: React.FC = () => {
 
           <VStack space="sm">
             <Text className="text-sm font-body text-gray-600">
-              Enter reservation code
+              {ADD_LODGING_STRINGS.RESERVATION_CODE_LABEL}
             </Text>
             <Input className="bg-white border border-gray-300 rounded-lg h-12">
               <InputField
-                placeholder="Reservation Code"
+                placeholder={ADD_LODGING_STRINGS.RESERVATION_CODE_PLACEHOLDER}
                 value={reservationCode}
                 onChangeText={setReservationCode}
                 className="text-base font-body px-4"
@@ -194,10 +253,12 @@ const AddLodging: React.FC = () => {
           </VStack>
 
           <VStack space="sm">
-            <Text className="text-sm font-body text-gray-600">Address</Text>
+            <Text className="text-sm font-body text-gray-600">
+              {ADD_LODGING_STRINGS.ADDRESS_LABEL}
+            </Text>
             <Input className="bg-white border border-gray-300 rounded-lg h-12">
               <InputField
-                placeholder="Enter Address"
+                placeholder={ADD_LODGING_STRINGS.ADDRESS_PLACEHOLDER}
                 value={address}
                 onChangeText={setAddress}
                 className="text-base font-body px-4"
@@ -206,46 +267,118 @@ const AddLodging: React.FC = () => {
           </VStack>
 
           <VStack space="sm">
-            <Text className="text-sm font-body text-gray-600">Notes</Text>
+            <Text className="text-sm font-body text-gray-600">
+              {ADD_LODGING_STRINGS.NOTES_LABEL}
+            </Text>
             <Box className="bg-white border border-gray-300 rounded-lg min-h-24 p-4">
               <Input className="bg-transparent border-0 h-auto">
                 <InputField
-                  placeholder="Write a note"
+                  placeholder={ADD_LODGING_STRINGS.NOTES_PLACEHOLDER}
                   value={notes}
                   onChangeText={setNotes}
                   multiline
                   textAlignVertical="top"
                   className="text-base font-body"
-                  style={{ minHeight: 80 }}
+                  style={styles.notesInput}
                 />
               </Input>
             </Box>
           </VStack>
 
           <Box className="mt-4">
-            <GradientButton title="Save Lodging" onPress={handleSave} />
+            <GradientButton
+              title={ADD_LODGING_STRINGS.SAVE_BUTTON}
+              onPress={handleSave}
+              disabled={isLoading}
+            />
           </Box>
         </VStack>
       </ScrollView>
 
       {showCheckInPicker && (
+        <>
         <DateTimePicker
           value={checkInDate}
           mode="date"
           display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-          onChange={handleCheckInDateChange}
+          onChange= {(event: DateTimePickerEvent, selectedDate?: Date) => {
+            if (Platform.OS === 'android') {
+              setShowCheckInPicker(false);
+            }
+            if (event.type === 'set' && selectedDate) {
+              handleCheckInDateChange(event, selectedDate);
+            } else if (event.type === 'dismissed') {
+              setShowCheckInPicker(false);
+            }
+          }}
           minimumDate={new Date()}
         />
+        {Platform.OS === 'ios' && (
+          <Box className="absolute bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4">
+            <HStack className="justify-between items-center">
+              <Pressable
+                onPress={() => setShowCheckInPicker(false)}
+                className="px-4 py-2"
+              >
+                <Text className="text-base font-body text-gray-600">
+                  Cancel
+                </Text>
+              </Pressable>
+              <Pressable
+                onPress={() => setShowCheckInPicker(false)}
+                className="px-4 py-2 bg-blue-500 rounded-lg"
+              >
+                <Text className="text-base font-body text-white">
+                  Confirm
+                </Text>
+              </Pressable>
+            </HStack>
+          </Box>
+        )}
+        </>
       )}
 
       {showCheckOutPicker && (
+        <>
         <DateTimePicker
           value={checkOutDate}
           mode="date"
           display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-          onChange={handleCheckOutDateChange}
+          onChange= {(event: DateTimePickerEvent, selectedDate?: Date) => {
+            if (Platform.OS === 'android') {
+              setShowCheckOutPicker(false);
+            }
+            if (event.type === 'set' && selectedDate) {
+              handleCheckOutDateChange(event, selectedDate);
+            } else if (event.type === 'dismissed') {
+              setShowCheckOutPicker(false);
+            }
+          }}
           minimumDate={checkInDate}
         />
+        {Platform.OS === 'ios' && (
+          <Box className="absolute bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4">
+            <HStack className="justify-between items-center">
+              <Pressable
+                onPress={() => setShowCheckOutPicker(false)}
+                className="px-4 py-2"
+              >
+                <Text className="text-base font-body text-gray-600">
+                  Cancel
+                </Text>
+              </Pressable>
+              <Pressable
+                onPress={() => setShowCheckOutPicker(false)}
+                className="px-4 py-2 bg-blue-500 rounded-lg"
+              >
+                <Text className="text-base font-body text-white">
+                  Confirm
+                </Text>
+              </Pressable>
+            </HStack>
+          </Box>
+        )}
+        </>
       )}
     </SafeAreaView>
   );
@@ -255,6 +388,9 @@ const styles = StyleSheet.create({
   scrollContent: {
     flexGrow: 1,
     paddingBottom: 20,
+  },
+  notesInput: {
+    minHeight: 80,
   },
 });
 
